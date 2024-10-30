@@ -9,6 +9,8 @@ import theme from './styles/theme';
 import SignIn from './pages/SignIn';
 import SignUp from './pages/SignUp';
 import { checkLogin } from './api/users';
+import CourseDetail from './pages/CourseDetail';
+import LevelDetail from './pages/LevelDetail';
 
 const App = () => {
   const { themeMode } = useThemeContext();
@@ -31,7 +33,8 @@ const App = () => {
             <Route path="/" element={isLoggedIn ? <HomePage /> : <SignIn />} />
             <Route path="/signin" element={<SignIn />} />
             <Route path="/signup" element={<SignUp />} />
-            {/* Add more routes as needed */}
+            <Route path="/course/:id" element={<CourseDetail />} />
+            <Route path="/course/:courseId/level/:levelId" element={<LevelDetail/>} />
           </Routes>
         </Router>
       </Box>

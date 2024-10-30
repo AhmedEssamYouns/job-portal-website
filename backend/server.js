@@ -1,8 +1,12 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const dotenv = require('dotenv');
-const authRoutes = require('./routes/authRoutes'); // Adjust the path as necessary
 const cors = require('cors');
+
+const authRoutes = require('./routes/authRoutes'); 
+const progressRoutes = require('./routes/progressRoutes');
+const courseRoutes = require('./routes/courses');
+
 
 dotenv.config();
 
@@ -19,6 +23,9 @@ mongoose.connect(process.env.MONGODB_URI, { useNewUrlParser: true, useUnifiedTop
 
 // Routes
 app.use('/api/auth', authRoutes);
+app.use('/api/progress', progressRoutes);
+app.use('/api/courses', courseRoutes);
+
 
 app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`);
