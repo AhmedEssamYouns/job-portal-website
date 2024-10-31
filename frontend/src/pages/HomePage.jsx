@@ -7,6 +7,7 @@ import {
   Button,
   TextField,
   useTheme,
+  useMediaQuery,
 } from '@mui/material';
 import { keyframes } from '@emotion/react';
 import RobotLoader from '../components/Robot';
@@ -35,16 +36,17 @@ const bounce = keyframes`
 
 const HomePage = () => {
   const theme = useTheme(); // Access theme to detect light or dark mode
+  const isMobile = useMediaQuery('(max-width:970px)');
 
   return (
-    <Container sx={{ marginTop: 8, minHeight: '100vh' }}>
+    <Container sx={{ marginTop: isMobile ? 1 : 7, minHeight: '100vh' }}>
       {/* Hero Section */}
       <Box
         sx={{
           background:
             theme.palette.mode === 'light'
               ? 'linear-gradient(135deg, #1976d2, #42a5f5)'
-              : 'linear-gradient(135deg, #0d47a1, #1565c0)', 
+              : 'linear-gradient(135deg, #0d47a1, #1565c0)',
           padding: 6,
           borderRadius: 4,
           marginBottom: 4,
@@ -70,9 +72,16 @@ const HomePage = () => {
               <Typography
                 variant="h3"
                 gutterBottom
-                sx={{ color: theme.palette.mode === 'light' ? '#fff' : '#bbdefb' }}
+                sx={{
+                  color: theme.palette.mode === 'light' ? '#fff' : '#bbdefb',
+                  animation: `${bounce} 2s infinite`,
+
+                }}
               >
-                Welcome to <span style={{ fontFamily:'tiny5' }}>CodeQuest</span>
+                Welcome to <span style={{
+                  fontFamily: 'tiny5',
+                  animation: `${bounce} 2s infinite`,
+                }} >CodeQuest</span>
               </Typography>
               <Typography
                 variant="subtitle1"
@@ -106,8 +115,6 @@ const HomePage = () => {
       {/* Subscribe Now Section */}
       <Box
         sx={{
-          backgroundColor: theme.palette.mode === 'light' ? '#e3f2fd' : '#1e1e1e',
-          padding: 4,
           borderRadius: 4,
           textAlign: 'center',
           marginBottom: 6,

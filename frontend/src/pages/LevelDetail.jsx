@@ -45,7 +45,7 @@ const LevelDetail = () => {
 
     if (loading) {
         return (
-            <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
+            <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '90vh', }}>
                 <CircularProgress />
             </Box>
         );
@@ -143,7 +143,7 @@ const LevelDetail = () => {
     };
 
     return (
-        <Box sx={{ padding: 5,marginBottom:20, height: '100vh', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+        <Box sx={{ padding: 5,marginBottom:50, height: '100vh', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
             {isMobile && (
                 <>
                     <Typography variant="h4" gutterBottom sx={{ fontWeight: 'bold', color: theme.palette.primary.main }}>

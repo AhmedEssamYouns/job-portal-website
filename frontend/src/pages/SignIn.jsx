@@ -50,14 +50,15 @@ const SignIn = () => {
             )}
 
             {/* Right Side: Sign In Form */}
-            <Grid item xs={12} sm={6} display="flex" flexDirection="column" justifyContent="center" gap={5} alignItems="center">
+            <Grid item xs={12} sm={6} display="flex" flexDirection="column" padding={2} justifyContent="center" gap={5} alignItems="center">
                 <Box textAlign="center">
                     <Typography variant="h6">
-                        Find your dream job with us. Your future starts here!
+                        Discover new skills with our courses. Your learning journey starts here!
                     </Typography>
+
                 </Box>
 
-                <Card sx={{ width: '90%', maxWidth: 400 }}>
+                <Card sx={{ width: '90%', maxWidth: 400, borderRadius: 10, boxShadow: 5 }}>
                     <CardContent>
                         <Typography variant="h4" align="center" gutterBottom>
                             Sign In

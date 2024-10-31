@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import CourseCard from './CourseCard';
-import { Grid, CircularProgress, Typography, Box } from '@mui/material'; // Import Box for centering
-import { fetchCourses } from '../api/courses';
+import { Grid, CircularProgress, Typography, Box } from '@mui/material';
+import { fetchCourses, fetchCoursesWithCompletionStatus, fetchIncompletedCourses } from '../api/courses';
+import { checkLogin } from '../api/users';
 
-const CoursesList = () => {
+const CoursesList = ({ fetchType }) => {
   const [courses, setCourses] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -11,7 +12,22 @@ const CoursesList = () => {
   useEffect(() => {
     const loadCourses = async () => {
       try {
-        const coursesData = await fetchCourses();
+        let coursesData;
+
+        // Fetch courses based on the fetchType prop
+        switch (fetchType) {
+          case 'completed':
+            coursesData = await fetchCoursesWithCompletionStatus();
+            break;
+          case 'incompleted':
+            const user = checkLogin(); 
+            if (!user) throw new Error('User not logged in');
+            coursesData = await fetchIncompletedCourses(user.id);
+            break;
+          default: // 'all'
+            coursesData = await fetchCourses();
+        }
+        
         setCourses(coursesData);
       } catch (err) {
         setError(err.message);
@@ -21,7 +37,7 @@ const CoursesList = () => {
     };
 
     loadCourses();
-  }, []);
+  }, [fetchType]); // Dependency array to refetch if fetchType changes
 
   if (loading) {
     return (
@@ -35,13 +51,13 @@ const CoursesList = () => {
       >
         <CircularProgress />
       </Box>
-    ); // Show a loading spinner centered horizontally
+    ); 
   }
 
   if (error) return <Typography color="error">Error: {error}</Typography>; // Display error message
 
   return (
-    <Grid container spacing={2} sx={{ paddingBottom: '20px' }}> {/* Added paddingBottom here */}
+    <Grid container spacing={2} sx={{ paddingBottom: '20px' }}>
       {courses.map((course) => (
         <Grid item xs={12} sm={6} md={4} key={course._id}>
           <CourseCard course={course} />

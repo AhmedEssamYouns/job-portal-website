@@ -2,6 +2,7 @@ const Course = require('../models/Course');
 const Level = require('../models/Level');
 const Slide = require('../models/Slide');
 const Question = require('../models/Question');
+const User =require('../models/User')
 
 exports.addCourse = async (req, res) => {
   const { title, description, language, levels } = req.body; // Course data from request
@@ -103,4 +104,35 @@ exports.getCourse = async (req, res) => {
   };
 
 
-  // controllers/userController.js
+  exports.fetchIncompletedCourses = async (req, res) => {
+    const userId = req.params.userId;
+
+    try {
+        // Fetch user details
+        const user = await User.findById(userId).populate('completedCourses'); // Populate completedCourses if needed
+
+        if (!user) {
+            return res.status(404).json({ message: 'User not found' });
+        }
+
+        const completedCoursesIds = user.completedCourses.map(course => course._id.toString()); // Convert ObjectId to string
+
+        // Fetch all courses
+        const courses = await Course.find().populate('levels'); // Populate levels to access level details
+
+        // Filter for incompleted courses
+        const incompletedCourses = courses.filter(course => {
+            const isCompleted = completedCoursesIds.includes(course._id.toString()); // Check if course is completed
+            const hasUserCompletedLevel = course.levels.some(level => 
+                level.completedByUsers.some(completedUser => completedUser.userId.toString() === userId)
+            ); // Check if user ID exists in any level's completedByUsers
+
+            return !isCompleted && hasUserCompletedLevel; // Include if not completed and has at least one level completed by user
+        });
+
+        return res.status(200).json(incompletedCourses); // Send back the filtered list of incompleted courses
+    } catch (error) {
+        console.error(`Error fetching incompleted courses: ${error.message}`);
+        return res.status(500).json({ message: error.message });
+    }
+};

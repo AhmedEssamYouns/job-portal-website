@@ -56,7 +56,7 @@ const SignUp = () => {
                     </Typography>
                 </Box>
 
-                <Card sx={{ width: '90%', maxWidth: 400 }}>
+                <Card sx={{ width: '90%', maxWidth: 400,borderRadius: 10, boxShadow: 5 }}>
                     <CardContent>
                         <Typography variant="h4" align="center" gutterBottom>
                             Sign Up

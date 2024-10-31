@@ -1,18 +1,17 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { fetchCourseById } from '../api/courses'; // Ensure this function is implemented in your API file
+import { fetchCourseById } from '../api/courses';
 import { Card, CardContent, Typography, Grid, CircularProgress, Box } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
-import { checkLogin } from '../api/users';
+import { checkLogin, fetchUserById } from '../api/users';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import { green } from '@mui/material/colors';
-
 const CourseDetail = () => {
-  const { id } = useParams(); // Get the course ID from the URL
+  const { id } = useParams();
   const [course, setCourse] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const theme = useTheme(); // Get the current theme
+  const theme = useTheme();
   const CurrentUser = checkLogin();
 
   const isLevelCompletedByUser = (level) => {
@@ -33,7 +32,27 @@ const CourseDetail = () => {
 
     loadCourse();
   }, [id]);
-const currentuser = checkLogin()
+
+  const [user, setUser] = useState(null);
+
+  useEffect(() => {
+    const loadUser = async () => {
+      const currentUser = checkLogin();
+      if (currentUser) {
+        try {
+          const userData = await fetchUserById(currentUser.id);
+          setUser(userData);
+        } catch (err) {
+          console.error(err); 
+        }
+      }
+    };
+
+    loadUser();
+  }, []);
+
+  const isCourseCompleted = user?.completedCourses.includes(course?._id);
+
   if (loading) {
     return (
       <Box
@@ -70,6 +89,16 @@ const currentuser = checkLogin()
         {course.language}
       </Typography>
 
+      {/* Display course completion status */}
+      {isCourseCompleted && (
+        <Box sx={{ display: 'flex', alignItems: 'center', mt: 2 }}>
+          <Typography variant="body1" sx={{ color: green[500], fontWeight: 'bold', mr: 1 }}>
+            Completed
+          </Typography>
+          <CheckCircleIcon sx={{ color: green[500] }} />
+        </Box>
+      )}
+
       <Typography variant="h5" gutterBottom sx={{ marginTop: 4, fontWeight: 'bold' }}>
         Levels
       </Typography>
@@ -81,15 +110,16 @@ const currentuser = checkLogin()
                 sx={{
                   height: '100%',
                   display: 'flex',
-                  flexDirection: 'column', // Arrange content in a column
-                  position: 'relative', // Position relative for absolute positioning
+                  paddingBottom:2,
+                  flexDirection: 'column',
+                  position: 'relative',
                   ':hover': { boxShadow: 6 },
                   border: `1px solid ${theme.palette.divider}`,
                   borderRadius: 2,
                   backgroundColor: theme.palette.background.paper,
                 }}
               >
-                <CardContent sx={{ flex: 1 }}> {/* Allow the CardContent to grow */}
+                <CardContent sx={{ flex: 1 }}>
                   <Typography variant="h6" sx={{ fontWeight: 'bold', color: theme.palette.text.primary }}>
                     {level.title}
                   </Typography>
@@ -98,13 +128,13 @@ const currentuser = checkLogin()
                 {isLevelCompletedByUser(level) && (
                   <Box
                     sx={{
-                      position: 'absolute', // Position it at the bottom left
+                      position: 'absolute',
                       bottom: 8,
                       right: 8,
                       display: 'flex',
                       alignItems: 'center',
-                      backgroundColor: theme.palette.background.paper, // Optional: background for contrast
-                      padding: '2px 4px', // Padding for better appearance
+                      backgroundColor: theme.palette.background.paper,
+                      padding: '2px 4px',
                       borderRadius: 1,
                     }}
                   >
@@ -113,7 +143,7 @@ const currentuser = checkLogin()
                       sx={{
                         color: green[500],
                         fontSize: '0.875rem',
-                        mr: 0.5, // Margin between text and icon
+                        mr: 0.5,
                       }}
                     >
                       Completed

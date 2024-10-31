@@ -15,11 +15,11 @@ import {
 import { Link } from 'react-router-dom';
 import { useThemeContext } from '../context/ThemeContext';
 import MenuIcon from '@mui/icons-material/Menu';
-import HomeIcon from '@mui/icons-material/Home';
 import WorkIcon from '@mui/icons-material/Work';
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import SearchIcon from '@mui/icons-material/Search';
 import CloseIcon from '@mui/icons-material/Close';
+import SchoolIcon from '@mui/icons-material/School';
 import { useTheme } from '@mui/material/styles';
 import { logout, checkLogin } from '../api/users';
 
@@ -82,7 +82,7 @@ const Navbar = () => {
 
                 {/* Responsive Search Bar */}
                 <Box sx={{ flexGrow: 1, display: 'flex', justifyContent: 'flex-end', alignItems: 'center' }}>
-                    {isMobile && !showSearch ? (
+                    {isMobile && !showSearch && user ? (
                         <IconButton color="inherit" onClick={toggleSearch}>
                             <SearchIcon />
                         </IconButton>
@@ -142,7 +142,14 @@ const Navbar = () => {
 
                     }
                     {!user && !showSearch && (
-                        <Box sx={{ display: 'flex', gap: 2 }}>
+                        <Box sx={{ display: 'flex', gap: isMobile ? 0 : 2 }}>
+                            <Button
+                                component={Link}
+                                to="/courses"
+                                color="inherit"
+                            >
+                                <SchoolIcon />
+                            </Button>
                             <Button
                                 component={Link}
                                 to="/signin"
@@ -162,14 +169,14 @@ const Navbar = () => {
                                 >
                                     Sign Up
                                 </Button>
-                                }
+                            }
                         </Box>
                     )}
 
                     {!showSearch && user && (
                         <>
-                            <IconButton color="inherit" component={Link} to="/jobs">
-                                <WorkIcon />
+                            <IconButton color="inherit" component={Link} to="/courses">
+                                <SchoolIcon />
                             </IconButton>
                             <IconButton color="inherit" component={Link} to="/profile">
                                 <AccountCircleIcon />
