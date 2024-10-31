@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { completeCourse, completeLevel, fetchCourseById } from '../api/courses';
 import { Box, Typography, Grid, CircularProgress, IconButton, Card, CardContent } from '@mui/material';
@@ -25,6 +25,7 @@ const LevelDetail = () => {
     const [isCorrect, setIsCorrect] = useState(null);
     const theme = useTheme();
     const isMobile = useMediaQuery('(max-width:970px)');
+    const topSlideRef = useRef(null);
 
 
     const CurrentUser = checkLogin()
@@ -79,10 +80,10 @@ const LevelDetail = () => {
         if (isCorrect) {
             if (currentSlideIndex < slides.length - 1) {
                 // Move to the next slide
-                window.scrollTo({ top: 0, behavior: 'instant' }); // Scroll to top
                 setCurrentSlideIndex(currentSlideIndex + 1);
                 setUserAnswer('');
                 setIsCorrect(null);
+                window.scrollTo({ top: 0, behavior: 'instant' }); // Scroll to top
             } else {
                 // At the last slide of the current level
                 const currentLevelIndex = course.levels.findIndex(level => level._id === levelId);
@@ -110,7 +111,7 @@ const LevelDetail = () => {
                             // Complete the course if all levels are completed
                             await completeCourse(courseId, CurrentUser.id);
                             alert("Course completed!");
-                            window.location.href = `/profile`;
+                            window.location.reload()
                         } else {
                             
                         }
@@ -123,15 +124,15 @@ const LevelDetail = () => {
         }
     };
     
-
     const previousSlide = () => {
         if (currentSlideIndex > 0) {
             setCurrentSlideIndex(currentSlideIndex - 1);
             setUserAnswer('');
             setIsCorrect(null);
-            window.scrollTo({ top: 0, behavior: 'smooth' }); 
+            window.scrollTo({ top: 0, behavior: 'smooth' }); // Scroll to top
         }
     };
+    
 
     const handleAnswerSelect = (answer) => {
         setUserAnswer(answer);
@@ -145,14 +146,17 @@ const LevelDetail = () => {
     };
 
     return (
-        <Box sx={{ padding: 5,marginBottom:50, height: '100vh', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+        <Box sx={{ padding: 5, marginBottom: 5, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
             {isMobile && (
                 <>
                     <Typography variant="h4" gutterBottom sx={{ fontWeight: 'bold', color: theme.palette.primary.main }}>
                         {course.title}
                     </Typography>
-                    <div style={{ display: 'flex', flexDirection: 'row', gap: 10 }}>
+                    <div
+                        ref={topSlideRef}
+                        style={{ display: 'flex', flexDirection: 'row', gap: 10 }}>
                         <IconButton
+
                             onClick={() => setDrawerOpen(true)}
                             sx={{
                                 mb: 1,
@@ -266,7 +270,7 @@ const LevelDetail = () => {
                     </Grid>
                 )}
 
-                <Grid item xs={12} sm={9} sx={{ height: '100%', display: 'flex', flexDirection: 'column', }}>
+                <Grid id='TopSlide' item xs={12} sm={9} sx={{ height: '100%', display: 'flex', flexDirection: 'column', }}>
                     <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 1 }}>
                         <Typography variant="h5" gutterBottom>
                             Slides for {selectedLevel?.title}
