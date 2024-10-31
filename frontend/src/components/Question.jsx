@@ -36,7 +36,6 @@ const Question = ({ question, userAnswer, handleAnswerSelect, isCorrect, languag
                 </SyntaxHighlighter>
             )}
             <div style={{ height: '15px' }}></div>
-
             <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
                 {question.options.map((option, optionIndex) => (
                     <Button
@@ -45,9 +44,10 @@ const Question = ({ question, userAnswer, handleAnswerSelect, isCorrect, languag
                         onClick={() => handleAnswerSelect(option)}
                         sx={{
                             marginBottom: 2,
-                            width: '500px', // Set a smaller width
+                            maxWidth: '500px', // Set a maximum width
+                            width: '100%', // Make the width responsive
                             textTransform: 'none',
-                            textAlign:'left',
+                            textAlign: 'left',
                             justifyContent: 'flex-start', // Center text within the button
                             backgroundColor: userAnswer === option ? colors.selected : colors.background,
                             color: userAnswer === option ? '#fff' : colors.color,

@@ -11,7 +11,7 @@ import {
 } from '@mui/material';
 import { keyframes } from '@emotion/react';
 import RobotLoader from '../components/Robot';
-
+import { Link } from 'react-router-dom';
 // Keyframe animation for the welcome message
 const fadeIn = keyframes`
   0% {
@@ -92,16 +92,18 @@ const HomePage = () => {
               >
                 Discover programming courses, track your progress, and unlock new skills.
               </Typography>
-              <Button
-                variant="contained"
-                color="secondary"
-                sx={{
-                  marginTop: 2,
-                  animation: `${bounce} 2s infinite`,
-                }}
-              >
-                Get Started
-              </Button>
+              <Link to="/courses" style={{ textDecoration: 'none' }}> {/* Replace "/courses" with the actual path */}
+                <Button
+                  variant="contained"
+                  color="secondary"
+                  sx={{
+                    marginTop: 2,
+                    animation: `${bounce} 2s infinite`,
+                  }}
+                >
+                  Get Started
+                </Button>
+              </Link>
             </Box>
           </Grid>
 

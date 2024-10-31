@@ -59,8 +59,9 @@ const Navbar = () => {
     };
 
     return (
+        
         <AppBar
-            position="static"
+            position="sticky"
             style={{
                 background:
                     theme.palette.mode === 'light'

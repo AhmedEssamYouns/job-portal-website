@@ -53,9 +53,9 @@ const UserProfile = () => {
     return (
         <Box
             sx={{
-                padding:{ xs: 2, sm: 4 },
-                paddingRight: { xs: 2, sm: 12 },
-                paddingLeft: { xs: 2, sm: 12 },
+                padding: { xs: 2, sm: 4 },
+                paddingRight:{ xs: 2, sm: 14 },
+                paddingLeft:{ xs: 2, sm: 14 },
                 backgroundColor: (theme) => theme.palette.background.default,
             }}
         >
@@ -97,22 +97,17 @@ const UserProfile = () => {
                     <Typography variant="body1">
                         {user.email}
                     </Typography>
-
-                </Box>
-                <Box sx={{ display: 'flex', alignItems: 'center', marginTop: 1 }}>
-                    <CheckCircleIcon sx={{ marginRight: 1 }} /> {/* Icon for completed courses */}
-                    <Typography variant="body2" >
-                        {user.completedCourses.length} Completed Courses
-                    </Typography>
+                    <Box sx={{ display: 'flex', alignItems: 'center', marginTop: 1 }}>
+                        <CheckCircleIcon sx={{ marginRight: 1 }} /> {/* Icon for completed courses */}
+                        <Typography variant="body2" >
+                            {user.completedCourses.length} Completed Courses
+                        </Typography>
+                    </Box>
                 </Box>
             </Paper>
-            <Typography variant="h5" gutterBottom align="center">
-                Inompleted Courses
-            </Typography>
+
             <CoursesList fetchType="incompleted" />
-            <Typography variant="h5" gutterBottom align="center">
-                Completed Courses
-            </Typography>
+         
             <CoursesList fetchType="completed" />
         </Box>
     );

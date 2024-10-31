@@ -14,10 +14,11 @@ import LevelDetail from './pages/LevelDetail';
 import Footer from './components/Fotter';
 import CoursesPage from './pages/CoursePage';
 import UserProfile from './pages/Profile';
+import ScrollToTop from './components/scrolltotop';
 
 const App = () => {
   const { themeMode } = useThemeContext();
-  const isLoggedIn = checkLogin(); // Check if the user is logged in
+  const isLoggedIn = checkLogin();
 
   return (
     <ThemeProvider theme={theme[themeMode]}>
@@ -25,14 +26,15 @@ const App = () => {
       <Box
         sx={{
           backgroundColor: theme[themeMode].palette.background.default,
-          minHeight: '100vh', // Changed to 100vh to fill the viewport
+          minHeight: '100vh',
           display: 'flex',
           flexDirection: 'column',
         }}
       >
         <Router>
+          <ScrollToTop /> {/* Add ScrollToTop here */}
           <Navbar />
-          <Box sx={{ flex: 1 }}> {/* This Box takes the available space */}
+          <Box sx={{ flex: 1 }}>
             <Routes>
               <Route path="/" element={<HomePage />} />
               <Route path="/signin" element={<SignIn />} />
@@ -44,7 +46,7 @@ const App = () => {
             </Routes>
           </Box>
         </Router>
-        <Footer/>
+        <Footer />
       </Box>
     </ThemeProvider>
   );

@@ -79,6 +79,7 @@ const LevelDetail = () => {
         if (isCorrect) {
             if (currentSlideIndex < slides.length - 1) {
                 // Move to the next slide
+                window.scrollTo({ top: 0, behavior: 'instant' }); // Scroll to top
                 setCurrentSlideIndex(currentSlideIndex + 1);
                 setUserAnswer('');
                 setIsCorrect(null);
@@ -109,7 +110,7 @@ const LevelDetail = () => {
                             // Complete the course if all levels are completed
                             await completeCourse(courseId, CurrentUser.id);
                             alert("Course completed!");
-                            window.location.reload()
+                            window.location.href = `/profile`;
                         } else {
                             
                         }
@@ -128,6 +129,7 @@ const LevelDetail = () => {
             setCurrentSlideIndex(currentSlideIndex - 1);
             setUserAnswer('');
             setIsCorrect(null);
+            window.scrollTo({ top: 0, behavior: 'smooth' }); 
         }
     };
 
