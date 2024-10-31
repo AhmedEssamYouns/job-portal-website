@@ -130,3 +130,25 @@ export const fetchIncompletedCourses = async (userId) => {
         throw new Error(`${error.message}`);
     }
 };
+
+export const addCourse = async (courseData) => {
+    try {
+        const response = await fetch(`${BASE_API_URL}courses/add`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(courseData), // Convert course data to JSON string
+        });
+
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.message || 'Failed to add course');
+        }
+
+        return await response.json(); // Return the newly added course details
+    } catch (error) {
+        console.error('Error adding course:', error);
+        throw new Error(`${error.message}`);
+    }
+};

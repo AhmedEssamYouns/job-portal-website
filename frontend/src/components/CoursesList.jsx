@@ -100,9 +100,9 @@ const CoursesList = ({ fetchType }) => {
           )}
         </Box>
       ) : (
-        <Grid container spacing={2} sx={{ paddingBottom: '20px', marginTop: 2 }}>
+        <Grid container spacing={2} sx={{ paddingBottom: '20px', marginTop: 2, justifyContent: courses.length < 3 ? 'center' : 'flex-start' }}>
           {courses.map((course) => (
-            <Grid item xs={12} sm={6} md={4} key={course._id}>
+            <Grid item xs={12} sm={6} md={4} key={course._id} sx={{ display: 'flex', justifyContent: 'center' }}>
               <CourseCard course={course} />
             </Grid>
           ))}

@@ -25,8 +25,8 @@ const Question = ({ question, userAnswer, handleAnswerSelect, isCorrect, languag
     const colors = buttonStyles[currentMode];
 
     return (
-        <Box mt={2} sx={{ textAlign: 'center' }}>
-            <Typography variant="body1" gutterBottom>
+        <Box mt={2} sx={{ textAlign: 'center' , borderTop:1,paddingTop:2 }}>
+            <Typography variant="h5"  gutterBottom>
                 {question.questionText}
             </Typography>
 
@@ -75,3 +75,4 @@ const Question = ({ question, userAnswer, handleAnswerSelect, isCorrect, languag
 };
 
 export default Question;
+

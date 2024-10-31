@@ -44,6 +44,12 @@ const LevelDetail = () => {
         loadCourse();
     }, [courseId]);
 
+    const allPreviousLevelsCompleted = (levelIndex) => {
+        return course.levels
+            .slice(0, levelIndex) // Get all previous levels
+            .every(level => isLevelCompletedByUser(level)); // Check if each is completed
+    };
+
     if (loading) {
         return (
             <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '90vh', }}>
@@ -77,53 +83,52 @@ const LevelDetail = () => {
     };
 
     const nextSlide = async () => {
-        if (isCorrect) {
-            if (currentSlideIndex < slides.length - 1) {
-                // Move to the next slide
-                setCurrentSlideIndex(currentSlideIndex + 1);
-                setUserAnswer('');
-                setIsCorrect(null);
-                window.scrollTo({ top: 0, behavior: 'instant' }); // Scroll to top
-            } else {
-                // At the last slide of the current level
-                const currentLevelIndex = course.levels.findIndex(level => level._id === levelId);
-                try {
-                    // Complete the current level
-                    await completeLevel(levelId, CurrentUser.id);
-    
-                    // Check if this is the last level
-                    if (currentLevelIndex < course.levels.length - 1) {
-                        // Move to the next level
-                        const nextLevelId = course.levels[currentLevelIndex + 1]._id;
-                        setCurrentSlideIndex(0);
-                        setUserAnswer('');
-                        setIsCorrect(null);
-                        window.location.href = `/course/${courseId}/level/${nextLevelId}`;
-                    } else {
-                        // Check if all levels are completed before completing the course
-                        const allLevelsCompleted = course.levels
+        if (currentSlideIndex < slides.length - 1) {
+            // Move to the next slide
+            setCurrentSlideIndex(currentSlideIndex + 1);
+            setUserAnswer('');
+            setIsCorrect(null);
+            window.scrollTo({ top: 0, behavior: 'instant' }); // Scroll to top
+        } else {
+            // At the last slide of the current level
+            const currentLevelIndex = course.levels.findIndex(level => level._id === levelId);
+            try {
+                // Complete the current level
+                await completeLevel(levelId, CurrentUser.id);
+
+                // Check if this is the last level
+                if (currentLevelIndex < course.levels.length - 1) {
+                    // Move to the next level
+                    const nextLevelId = course.levels[currentLevelIndex + 1]._id;
+                    setCurrentSlideIndex(0);
+                    setUserAnswer('');
+                    setIsCorrect(null);
+                    window.location.href = `/course/${courseId}/level/${nextLevelId}`;
+                } else {
+                    // Check if all levels are completed before completing the course
+                    const allLevelsCompleted = course.levels
                         .filter(level => level._id !== levelId) // Exclude current level
                         .every(level =>
                             level.completedByUsers.some(user => user.userId === CurrentUser.id)
                         );
-    
-                        if (allLevelsCompleted) {
-                            // Complete the course if all levels are completed
-                            await completeCourse(courseId, CurrentUser.id);
-                            alert("Course completed!");
-                            window.location.reload()
-                        } else {
-                            
-                        }
+
+                    if (allLevelsCompleted) {
+                        // Complete the course if all levels are completed
+                        await completeCourse(courseId, CurrentUser.id);
+                        alert("Course completed!");
+                        window.location.href = `/profile`;
+
+                    } else {
+
                     }
-                } catch (error) {
-                    console.error('Error completing level:', error);
-                    alert(`Error: ${error.message}`);
                 }
+            } catch (error) {
+                console.error('Error completing level:', error);
+                alert(`Error: ${error.message}`);
             }
         }
     };
-    
+
     const previousSlide = () => {
         if (currentSlideIndex > 0) {
             setCurrentSlideIndex(currentSlideIndex - 1);
@@ -132,7 +137,7 @@ const LevelDetail = () => {
             window.scrollTo({ top: 0, behavior: 'smooth' }); // Scroll to top
         }
     };
-    
+
 
     const handleAnswerSelect = (answer) => {
         setUserAnswer(answer);
@@ -209,12 +214,17 @@ const LevelDetail = () => {
                         <Typography variant="h6" sx={{ fontWeight: 'bold', marginBottom: 2 }}>
                             Levels
                         </Typography>
-                        {course.levels.map((level) => (
+                        {course.levels.map((level, index) => (
                             <Link
                                 key={level._id}
-                                to={`/course/${courseId}/level/${level._id}`}
-                                style={{ textDecoration: 'none' }}
-                                onClick={() => {
+                                to={allPreviousLevelsCompleted(index) || isLevelCompletedByUser(level) ? `/course/${courseId}/level/${level._id}` : '#'}
+                                style={{ textDecoration: 'none', pointerEvents: allPreviousLevelsCompleted(index) || isLevelCompletedByUser(level) ? 'auto' : 'none', opacity: allPreviousLevelsCompleted(index) || isLevelCompletedByUser(level) ? 1 : 0.5 }}
+                                onClick={(e) => {
+                                    if (!(allPreviousLevelsCompleted(index) || isLevelCompletedByUser(level))) {
+                                        e.preventDefault(); // Prevent navigation if conditions are not met
+                                        alert("You must complete all previous levels first!");
+                                        return;
+                                    }
                                     setCurrentSlideIndex(0);
                                     setUserAnswer('');
                                     setIsCorrect(null);
@@ -224,6 +234,8 @@ const LevelDetail = () => {
                                     sx={{
                                         marginBottom: 1,
                                         backgroundColor: level._id === levelId ? (theme.palette.mode === 'dark' ? '#444' : '#e0e0e0') : 'inherit',
+                                        pointerEvents: allPreviousLevelsCompleted(index) || isLevelCompletedByUser(level) ? 'auto' : 'none',
+                                        opacity: allPreviousLevelsCompleted(index) || isLevelCompletedByUser(level) ? 1 : 0.5,
                                     }}
                                 >
                                     <CardContent sx={{ position: 'relative', minHeight: 80 }}>
@@ -301,8 +313,10 @@ const LevelDetail = () => {
                                     syntaxHighlighterStyle={theme.palette.mode === 'dark' ? gruvboxDark : coldarkCold}
                                 />
                             )}
+
                             <NavigationButtons
                                 onPrevious={previousSlide}
+                                allow={currentQuestions.length > 0 ? false : true}
                                 onNext={nextSlide}
                                 isNextDisabled={isCorrect}
                                 nextButtonText={getNextButtonText()}

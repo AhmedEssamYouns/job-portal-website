@@ -129,7 +129,7 @@ const CourseCard = ({ course }) => {
             />
           )}
           <CardContent sx={{ flexGrow: 1 }}>
-            <Typography variant="h5" component="div" sx={{ fontWeight: 'bold' }}>
+            <Typography variant="h5" component="div" width={'260px'} sx={{ fontWeight: 'bold' }}>
               {course.title}
             </Typography>
             <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>

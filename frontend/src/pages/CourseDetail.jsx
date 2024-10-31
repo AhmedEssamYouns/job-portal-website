@@ -6,6 +6,7 @@ import { useTheme } from '@mui/material/styles';
 import { checkLogin, fetchUserById } from '../api/users';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import { green } from '@mui/material/colors';
+
 const CourseDetail = () => {
   const { id } = useParams();
   const [course, setCourse] = useState(null);
@@ -16,6 +17,10 @@ const CourseDetail = () => {
 
   const isLevelCompletedByUser = (level) => {
     return level.completedByUsers.some(user => user.userId === CurrentUser.id);
+  };
+
+  const allPreviousLevelsCompleted = (index) => {
+    return course.levels.slice(0, index).every(level => isLevelCompletedByUser(level));
   };
 
   useEffect(() => {
@@ -103,14 +108,28 @@ const CourseDetail = () => {
         Levels
       </Typography>
       <Grid container spacing={2}>
-        {course.levels.map((level) => (
+        {course.levels.map((level, index) => (
           <Grid item xs={12} sm={6} md={4} key={level._id}>
-            <Link to={`/course/${id}/level/${level._id}`} style={{ textDecoration: 'none' }}>
+            <Link
+              to={allPreviousLevelsCompleted(index) || isLevelCompletedByUser(level) ? `/course/${id}/level/${level._id}` : '#'}
+              style={{
+                textDecoration: 'none',
+                pointerEvents: allPreviousLevelsCompleted(index) || isLevelCompletedByUser(level) ? 'auto' : 'none',
+                opacity: allPreviousLevelsCompleted(index) || isLevelCompletedByUser(level) ? 1 : 0.5,
+              }}
+              onClick={(e) => {
+                if (!(allPreviousLevelsCompleted(index) || isLevelCompletedByUser(level))) {
+                  e.preventDefault();
+                  alert("You must complete all previous levels first!");
+                  return;
+                }
+              }}
+            >
               <Card
                 sx={{
                   height: '100%',
                   display: 'flex',
-                  paddingBottom:2,
+                  paddingBottom: 2,
                   flexDirection: 'column',
                   position: 'relative',
                   ':hover': { boxShadow: 6 },
