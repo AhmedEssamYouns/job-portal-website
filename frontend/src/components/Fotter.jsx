@@ -32,7 +32,7 @@ const SocialIcons = () => {
         <ul className="example-2" style={{ display: 'flex', justifyContent: 'center', listStyle: 'none', padding: 0 }}>
             <li className="icon-content">
                 <a
-                    href="https://linkedin.com/"
+                    href="https://www.linkedin.com/in/ahmed-essam-195693324/"
                     aria-label="LinkedIn"
                     data-social="linkedin"
                 >
@@ -54,7 +54,7 @@ const SocialIcons = () => {
                 <div className="tooltip">LinkedIn</div>
             </li>
             <li className="icon-content">
-                <a href="https://www.github.com/" aria-label="GitHub" data-social="github">
+                <a href="https://github.com/AhmedEssamYouns" aria-label="GitHub" data-social="github">
                     <div className="filled"></div>
                     <svg
                         xmlns="http://www.w3.org/2000/svg"
@@ -74,7 +74,7 @@ const SocialIcons = () => {
             </li>
             <li className="icon-content">
                 <a
-                    href="https://www.instagram.com/"
+                    href="https://www.instagram.com/ahmmed_esamm/"
                     aria-label="Instagram"
                     data-social="instagram"
                 >

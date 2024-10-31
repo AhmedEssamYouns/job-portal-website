@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react'; // Import useState
 import {
   Container,
   Typography,
@@ -8,6 +8,8 @@ import {
   TextField,
   useTheme,
   useMediaQuery,
+  Snackbar, // Import Snackbar
+  Alert, // Import Alert
 } from '@mui/material';
 import { keyframes } from '@emotion/react';
 import RobotLoader from '../components/Robot';
@@ -37,6 +39,21 @@ const bounce = keyframes`
 const HomePage = () => {
   const theme = useTheme(); // Access theme to detect light or dark mode
   const isMobile = useMediaQuery('(max-width:970px)');
+  const [email, setEmail] = useState(''); // State to store email
+  const [openSnackbar, setOpenSnackbar] = useState(false); // State to control Snackbar visibility
+
+  // Function to handle subscribe button click
+  const handleSubscribe = (e) => {
+    e.preventDefault(); // Prevent default form submission
+    // Show Snackbar when the user subscribes
+    setOpenSnackbar(true);
+    setEmail(''); // Clear the email input after subscription
+  };
+
+  // Function to handle Snackbar close
+  const handleCloseSnackbar = () => {
+    setOpenSnackbar(false);
+  };
 
   return (
     <Container sx={{ marginTop: isMobile ? 1 : 7, minHeight: '100vh' }}>
@@ -75,7 +92,6 @@ const HomePage = () => {
                 sx={{
                   color: theme.palette.mode === 'light' ? '#fff' : '#bbdefb',
                   animation: `${bounce} 2s infinite`,
-
                 }}
               >
                 Welcome to <span style={{
@@ -138,6 +154,7 @@ const HomePage = () => {
         </Typography>
         <Box
           component="form"
+          onSubmit={handleSubscribe} // Handle form submission
           sx={{
             display: 'flex',
             flexDirection: { xs: 'column', sm: 'row' },
@@ -151,17 +168,27 @@ const HomePage = () => {
             label="Enter your email"
             variant="outlined"
             size="small"
+            value={email} // Bind email state to TextField
+            onChange={(e) => setEmail(e.target.value)} // Update email state
             sx={{ width: { xs: '100%', sm: '300px' } }}
           />
           <Button
             variant="contained"
             color="primary"
             sx={{ animation: `${bounce} 2s infinite` }}
+            type="submit" // Ensure button submits the form
           >
             Subscribe
           </Button>
         </Box>
       </Box>
+
+      {/* Snackbar for subscription success */}
+      <Snackbar open={openSnackbar} autoHideDuration={6000} onClose={handleCloseSnackbar}>
+        <Alert onClose={handleCloseSnackbar} severity="success" sx={{ width: '100%' }}>
+          Subscribed successfully!
+        </Alert>
+      </Snackbar>
     </Container>
   );
 };
