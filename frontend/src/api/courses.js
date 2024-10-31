@@ -8,20 +8,17 @@ export const fetchCourses = async () => {
             method: 'GET',
             headers: { 'Content-Type': 'application/json' },
         });
+
         if (!response.ok) {
-            const errorData = await response.json().catch(() => ({}));
-            console.error('Response Details:', {
-                status: response.status,
-                statusText: response.statusText,
-                errorData,
-            });
+            const errorData = await response.json();
+            console.error("Response data:", errorData); // Log the entire error data
             throw new Error(errorData.message || 'Failed to fetch courses');
         }
 
-        return await response.json(); // Return the list of courses
+        return await response.json();
     } catch (error) {
-        console.error(`Fetch courses error: ${error.message}`);
-        throw new Error(`${error.message}`);
+        console.error(`Fetch courses error: ${error}`);
+        throw new Error(`Fetch courses error: ${error}`); // Include more context
     }
 };
 
@@ -131,28 +128,6 @@ export const fetchIncompletedCourses = async (userId) => {
         return await response.json(); // Return the list of incompleted courses
     } catch (error) {
         console.error(`Fetch incompleted courses error: ${error.message}`);
-        throw new Error(`${error.message}`);
-    }
-};
-
-export const addCourse = async (courseData) => {
-    try {
-        const response = await fetch(`${BASE_API_URL}courses/add`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(courseData), // Convert course data to JSON string
-        });
-
-        if (!response.ok) {
-            const errorData = await response.json();
-            throw new Error(errorData.message || 'Failed to add course');
-        }
-
-        return await response.json(); // Return the newly added course details
-    } catch (error) {
-        console.error('Error adding course:', error);
         throw new Error(`${error.message}`);
     }
 };
