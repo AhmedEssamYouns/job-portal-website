@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
     AppBar,
     Toolbar,
@@ -11,17 +11,20 @@ import {
     Slide,
     Typography,
     Button,
+    List,
+    ListItem,
+    ListItemText,
 } from '@mui/material';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useThemeContext } from '../context/ThemeContext';
 import MenuIcon from '@mui/icons-material/Menu';
-import WorkIcon from '@mui/icons-material/Work';
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import SearchIcon from '@mui/icons-material/Search';
 import CloseIcon from '@mui/icons-material/Close';
 import SchoolIcon from '@mui/icons-material/School';
 import { useTheme } from '@mui/material/styles';
 import { logout, checkLogin } from '../api/users';
+import { fetchCourses } from '../api/courses';
 
 const Navbar = () => {
     const { toggleTheme } = useThemeContext();
@@ -30,7 +33,25 @@ const Navbar = () => {
     const [anchorEl, setAnchorEl] = useState(null);
     const [searchQuery, setSearchQuery] = useState('');
     const [showSearch, setShowSearch] = useState(false); // State to handle search bar visibility
-    const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
+    const [courses, setCourses] = useState([]); // State to hold fetched courses
+    const [filteredCourses, setFilteredCourses] = useState([]); // State to hold filtered courses
+    const [showDropdown, setShowDropdown] = useState(false); // State to show/hide dropdown
+    const isMobile = useMediaQuery('(max-width:750px)');
+    const navigate = useNavigate();
+
+    useEffect(() => {
+        const getCourses = async () => {
+            const data = await fetchCourses();
+            setCourses(data); // Assuming fetchCourses returns an array of course objects
+        };
+
+        getCourses();
+    }, []);
+
+    useEffect(() => {
+        // Filter courses based on search query
+        setFilteredCourses(courses.filter(course => course.title.toLowerCase().includes(searchQuery.toLowerCase())));
+    }, [searchQuery, courses]);
 
     const handleMenuClick = (event) => {
         setAnchorEl(event.currentTarget);
@@ -40,15 +61,35 @@ const Navbar = () => {
         setAnchorEl(null);
     };
 
+    const handleSearchSubmit = (event) => {
+        if (event.key === 'Enter') {
+            // Navigate to the search results page with the query as a URL parameter
+            navigate(`/search?q=${searchQuery}`);
+            setShowDropdown(false); // Hide dropdown on submit
+        }
+    };
+
     const handleSearchChange = (event) => {
         setSearchQuery(event.target.value);
+        setShowDropdown(true); // Show dropdown when typing
     };
 
     const toggleSearch = () => {
         setShowSearch((prev) => !prev); // Toggle the search bar
         if (showSearch) {
             setSearchQuery(''); // Clear the search query when closing
+            setShowDropdown(false); // Hide dropdown when closing
         }
+    };
+
+    const handleDropdownItemClick = (title) => {
+        setSearchQuery(title); // Set the clicked course title as the search query
+        setShowDropdown(false); // Hide dropdown after selecting
+        navigate(`/search?q=${title}`); // Navigate to the search results
+    };
+
+    const handleBlur = () => {
+        setShowDropdown(false); // Hide dropdown on blur
     };
 
     const open = Boolean(anchorEl);
@@ -59,7 +100,6 @@ const Navbar = () => {
     };
 
     return (
-        
         <AppBar
             position="sticky"
             style={{
@@ -83,65 +123,136 @@ const Navbar = () => {
 
                 {/* Responsive Search Bar */}
                 <Box sx={{ flexGrow: 1, display: 'flex', justifyContent: 'flex-end', alignItems: 'center' }}>
-                    {isMobile && !showSearch && user ? (
-                        <IconButton color="inherit" onClick={toggleSearch}>
-                            <SearchIcon />
-                        </IconButton>
-                    ) : (
-                        <Slide direction="right" in={showSearch} mountOnEnter>
-                            <TextField
-                                variant="outlined"
-                                size="small"
-                                placeholder="Search jobs..."
-                                value={searchQuery}
-                                onChange={handleSearchChange}
+                    <Box sx={{ flexGrow: 1, display: 'flex', justifyContent: 'flex-end', alignItems: 'center' }}>
+                        {isMobile && !showSearch && user ? (
+                            <IconButton color="inherit" onClick={toggleSearch}>
+                                <SearchIcon />
+                            </IconButton>
+                        ) : (
+                            <Slide direction="right" in={showSearch} mountOnEnter>
+                                <TextField
+                                    variant="outlined"
+                                    size="small"
+                                    placeholder="Search jobs..."
+                                    value={searchQuery}
+                                    onKeyDown={handleSearchSubmit}
+                                    onChange={handleSearchChange}
+                                    onFocus={() => setShowDropdown(true)} // Show dropdown on focus
+                                    onBlur={handleBlur} // Hide dropdown on blur
+                                    sx={{
+                                        marginLeft: 2,
+                                        marginRight: 2,
+                                        borderRadius: 1,
+                                        backgroundColor: theme.palette.background.paper,
+                                        width: '100%', // Set a fixed width for the TextField
+                                    }}
+                                />
+                            </Slide>
+                        )}
+
+                        {showDropdown && isMobile && filteredCourses.length > 0 && (
+                            <Box
                                 sx={{
-                                    marginLeft: 2,
-                                    marginRight: 2,
-                                    borderRadius: 1,
+                                    position: 'absolute',
                                     backgroundColor: theme.palette.background.paper,
-                                    width: '90%', // Fixed width for desktop
+                                    border: `1px solid ${theme.palette.divider}`,
+                                    borderRadius: 1,
+                                    top: 46, // Positioning the dropdown below the TextField
+                                    left: '45%', // Centering the dropdown
+                                    transform: 'translateX(-50%)', // Centering it perfectly based on its width
+                                    maxHeight: 120,
+                                    overflowY: 'auto',
+                                    zIndex: 1000,
+                                    width: '70%', // Match the width of the TextField
                                 }}
-                            />
-                        </Slide>
-                    )}
+                            >
+                                <List>
+                                    {filteredCourses.map((course) => (
+                                        <ListItem button key={course.id} onClick={() => handleDropdownItemClick(course.title)}>
+                                            <ListItemText
+                                                primary={course.title}
+                                                sx={{ color: theme.palette.mode === 'light' ? 'black' : 'white' }} // Use sx for custom styling
+                                            />
+                                        </ListItem>
+                                    ))}
+                                </List>
+                            </Box>
+                        )}
+                    </Box>
+
 
                     {showSearch && (
                         <IconButton color="inherit" onClick={toggleSearch}>
                             <CloseIcon />
                         </IconButton>
                     )}
-                    {!isMobile &&
-                        <TextField
-                            variant="outlined"
-                            size="small"
-                            placeholder="Search jobs..."
-                            value={searchQuery}
-                            onChange={handleSearchChange}
-                            sx={{
-                                marginLeft: 2,
-                                marginRight: 2,
-                                backgroundColor: theme.palette.background.paper,
-                                borderRadius: 10,
-                                width: '300px',
-                            }}
-                            InputProps={{
-                                sx: {
+                    <Box sx={{ position: 'relative', display: 'flex', alignItems: 'center' }}>
+                        {!isMobile && (
+                            <TextField
+                                variant="outlined"
+                                size="small"
+                                placeholder="Search jobs..."
+                                value={searchQuery}
+                                onKeyDown={handleSearchSubmit}
+                                onChange={handleSearchChange}
+                                onFocus={() => setShowDropdown(true)} // Show dropdown on focus
+                                onBlur={handleBlur} // Hide dropdown on blur
+                                sx={{
+                                    marginLeft: 2,
+                                    marginRight: 2,
+                                    backgroundColor: theme.palette.background.paper,
                                     borderRadius: 10,
-                                    '& .MuiOutlinedInput-notchedOutline': {
-                                        border: 'none', // Remove the default border
+                                    width: '300px', // Fixed width for desktop
+                                }}
+                                InputProps={{
+                                    sx: {
+                                        borderRadius: 10,
+                                        '& .MuiOutlinedInput-notchedOutline': {
+                                            border: 'none', // Remove the default border
+                                        },
+                                        '&:hover .MuiOutlinedInput-notchedOutline': {
+                                            border: 'none', // Remove the border on hover
+                                        },
+                                        '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                                            border: 'none', // Remove the border when focused
+                                        },
                                     },
-                                    '&:hover .MuiOutlinedInput-notchedOutline': {
-                                        border: 'none', // Remove the border on hover
-                                    },
-                                    '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
-                                        border: 'none', // Remove the border when focused
-                                    },
-                                },
-                            }}
-                        />
+                                }}
+                            />
+                        )}
 
-                    }
+                        {showDropdown && !isMobile && filteredCourses.length > 0 && (
+                            <Box
+                                sx={{
+                                    position: 'absolute',
+                                    backgroundColor: theme.palette.background.paper,
+                                    border: `1px solid ${theme.palette.divider}`,
+                                    borderRadius: 1,
+                                    marginLeft: 2,
+                                    top: 35,
+                                    maxHeight: 200,
+                                    overflowY: 'auto',
+                                    zIndex: 1000,
+                                    marginTop: 1, // Ensure there's a little space between the TextField and dropdown
+                                    width: '300px', // Match the width of the TextField
+                                }}
+                            >
+                                <List>
+                                    {filteredCourses.map((course) => (
+                                        <ListItem button key={course.id} onClick={() => handleDropdownItemClick(course.title)}>
+                                            <ListItemText
+                                                primary={course.title}
+                                                sx={{ color: theme.palette.mode === 'light' ? 'black' : 'white' }} // Use sx for custom styling
+                                            />
+
+                                        </ListItem>
+                                    ))}
+                                </List>
+                            </Box>
+                        )}
+                    </Box>
+
+
                     {!user && !showSearch && (
                         <Box sx={{ display: 'flex', gap: isMobile ? 0 : 2 }}>
                             <Button
@@ -160,7 +271,7 @@ const Navbar = () => {
                             >
                                 Sign In
                             </Button>
-                            {!isMobile &&
+                            {!isMobile && (
                                 <Button
                                     component={Link}
                                     to="/signup"
@@ -170,9 +281,11 @@ const Navbar = () => {
                                 >
                                     Sign Up
                                 </Button>
-                            }
+                            )}
+
                         </Box>
                     )}
+
 
                     {!showSearch && user && (
                         <>
@@ -189,6 +302,8 @@ const Navbar = () => {
                     )}
                 </Box>
             </Toolbar>
+
+
 
             <Popover
                 id={id}

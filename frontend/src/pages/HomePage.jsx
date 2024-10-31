@@ -12,7 +12,7 @@ import {
 import { keyframes } from '@emotion/react';
 import RobotLoader from '../components/Robot';
 import { Link } from 'react-router-dom';
-// Keyframe animation for the welcome message
+
 const fadeIn = keyframes`
   0% {
     opacity: 0;

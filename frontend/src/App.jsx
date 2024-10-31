@@ -15,6 +15,8 @@ import Footer from './components/Fotter';
 import CoursesPage from './pages/CoursePage';
 import UserProfile from './pages/Profile';
 import ScrollToTop from './components/scrolltotop';
+import SearchResultsPage from './pages/SearchResultsPage';
+
 
 const App = () => {
   const { themeMode } = useThemeContext();
@@ -38,6 +40,7 @@ const App = () => {
             <Routes>
               <Route path="/" element={<HomePage />} />
               <Route path="/signin" element={<SignIn />} />
+              <Route path="/search" element={<SearchResultsPage />} />
               <Route path="/signup" element={<SignUp />} />
               <Route path="/courses" element={<CoursesPage />} />
               <Route path="/profile" element={isLoggedIn ? <UserProfile /> : <SignIn />} />

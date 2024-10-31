@@ -136,3 +136,32 @@ exports.getCourse = async (req, res) => {
         return res.status(500).json({ message: error.message });
     }
 };
+
+exports.searchCourses = async (req, res) => {
+  const { title, language } = req.query;
+  
+  try {
+     
+    const searchCriteria = {};
+    if (title) {
+      searchCriteria.title = { $regex: title, $options: 'i' }; 
+    }
+    if (language) {
+      searchCriteria.language = { $regex: language, $options: 'i' }; 
+    }
+
+    // Find courses based on the search criteria
+    const courses = await Course.find(searchCriteria)
+      .populate({
+        path: 'levels',
+        select: 'title' // Only fetch the title of the levels
+      })
+      .select('title description language levels'); // Select only required fields
+
+    // Return the filtered list of courses
+    res.status(200).json(courses);
+  } catch (error) {
+    console.error(`Error searching courses: ${error.message}`);
+    res.status(500).json({ message: 'Failed to search courses', error });
+  }
+};
