@@ -101,3 +101,6 @@ exports.getCourse = async (req, res) => {
       res.status(500).json({ message: 'Failed to fetch courses', error });
     }
   };
+
+
+  // controllers/userController.js

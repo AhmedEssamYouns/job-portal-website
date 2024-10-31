@@ -39,33 +39,42 @@ exports.submitAnswer = async (req, res) => {
   }
 };
 
-
 exports.completeLevel = async (req, res) => {
-    const { levelId } = req.params;
-    const userId = req.user._id;
-  
-    try {
+  const { levelId } = req.params;
+  const userId = req.body.userId; // Accept userId from the request body
+
+  if (!userId) {
+      return res.status(400).json({ message: 'User ID is required' });
+  }
+
+  try {
       const level = await Level.findById(levelId);
       if (!level) return res.status(404).json({ message: 'Level not found' });
-  
+
+      // Check if the user has already completed this level
+      const alreadyCompleted = level.completedByUsers.some(user => user.userId.toString() === userId);
+      if (alreadyCompleted) {
+          return res.status(400).json({ message: 'Level already completed by this user' });
+      }
+
       level.completedByUsers.push({ userId, completed: true });
       await level.save();
-  
+
       // Check if the entire course is completed
       const course = await Course.findOne({ levels: levelId }).populate('levels');
       const allLevelsCompleted = course.levels.every(lvl =>
-        lvl.completedByUsers.some(user => user.userId.toString() === userId.toString())
+          lvl.completedByUsers.some(user => user.userId.toString() === userId.toString())
       );
-  
+
       if (allLevelsCompleted) {
-        const user = await User.findById(userId);
-        user.completedCourses.push(course._id);
-        await user.save();
+          const user = await User.findById(userId);
+          user.completedCourses.push(course._id);
+          await user.save();
       }
-  
+
       res.status(200).json({ message: 'Level completed successfully!' });
-    } catch (error) {
+  } catch (error) {
       res.status(500).json({ message: 'Server error', error });
-    }
-  };
-  
+  }
+};
+

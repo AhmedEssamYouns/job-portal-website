@@ -54,9 +54,33 @@ export const checkLogin = () => {
     if (!token) return false;
 
     try {
-        const userData = JSON.parse(atob(token.split('.')[1])); // Decode JWT payload
-        return userData;
+        // Decode JWT and parse it to an object
+        const payload = JSON.parse(atob(token.split('.')[1]));
+        return payload;  // Return user data as an object
     } catch (error) {
-        return false;
+        console.error('Invalid token:', error);
+        return false;  // Handle invalid token case
+    }
+};
+
+export const fetchUserById = async (userId) => {
+    try {
+        const response = await fetch(`${BASE_API_URL}auth/${userId}`, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${localStorage.getItem('token')}`, 
+            },
+        });
+
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.message || 'Failed to fetch user data');
+        }
+
+        return await response.json(); // Return the user data
+    } catch (error) {
+        console.error(`Fetch user by ID error: ${error.message}`);
+        throw new Error(`${error.message}`);
     }
 };

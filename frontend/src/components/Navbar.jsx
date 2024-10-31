@@ -10,6 +10,7 @@ import SearchIcon from '@mui/icons-material/Search';
 import CloseIcon from '@mui/icons-material/Close';
 import { useTheme } from '@mui/material/styles';
 import { logout, checkLogin } from '../api/users';
+import ToggleButton from './ToggleButton';
 const Navbar = () => {
     const { toggleTheme } = useThemeContext();
     const user = checkLogin()
@@ -40,15 +41,20 @@ const Navbar = () => {
     const open = Boolean(anchorEl);
     const id = open ? 'simple-popover' : undefined;
     const handleLogout = () => {
-        logout(); 
+        logout();
     };
     return (
-        <AppBar position="static">
+        <AppBar position="static" style={{
+            background:
+                theme.palette.mode === 'light'
+                    ? 'linear-gradient(135deg, #1976d2, #42a5f5)'
+                    : 'linear-gradient(95deg, #0d47a1, #1565c0)'
+        }}>
             <Toolbar>
                 {!showSearch &&
                     <Box component={Link} to="/" sx={{ display: 'flex', alignItems: 'center', marginRight: 2 }}>
-                        <Typography variant="h6" sx={{ color: theme.palette.common.white }}>
-                            Job Portal
+                        <Typography variant="h4" sx={{ color: theme.palette.common.white, fontFamily: "Tiny5", }}>
+                            CodeQuest
                         </Typography>
                     </Box>
                 }
@@ -94,14 +100,27 @@ const Navbar = () => {
                                 marginLeft: 2,
                                 marginRight: 2,
                                 backgroundColor: theme.palette.background.paper,
-                                borderRadius: 1,
+                                borderRadius: 10,
                                 width: '300px',
                             }}
-                        />}
+                            InputProps={{
+                                sx: {
+                                    borderRadius: 10,
+                                    '& .MuiOutlinedInput-notchedOutline': {
+                                        border: 'none', // Remove the default border
+                                    },
+                                    '&:hover .MuiOutlinedInput-notchedOutline': {
+                                        border: 'none', // Remove the border on hover
+                                    },
+                                    '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                                        border: 'none', // Remove the border when focused
+                                    },
+                                },
+                            }}
+                        />
+
+                    }
                     {!showSearch && <>
-                        <IconButton color="inherit" component={Link} to="/">
-                            <HomeIcon />
-                        </IconButton>
                         <IconButton color="inherit" component={Link} to="/jobs">
                             <WorkIcon />
                         </IconButton>
@@ -114,6 +133,7 @@ const Navbar = () => {
                     </>
                     }
                 </Box>
+
             </Toolbar>
             <Popover
                 id={id}

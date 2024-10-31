@@ -11,7 +11,7 @@ import SignUp from './pages/SignUp';
 import { checkLogin } from './api/users';
 import CourseDetail from './pages/CourseDetail';
 import LevelDetail from './pages/LevelDetail';
-
+import Fotter from './components/Fotter'
 const App = () => {
   const { themeMode } = useThemeContext();
   const isLoggedIn = checkLogin(); // Check if the user is logged in
@@ -37,6 +37,7 @@ const App = () => {
             <Route path="/course/:courseId/level/:levelId" element={<LevelDetail/>} />
           </Routes>
         </Router>
+        <Fotter />
       </Box>
     </ThemeProvider>
   );

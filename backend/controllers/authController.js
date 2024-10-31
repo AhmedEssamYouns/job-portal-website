@@ -64,4 +64,46 @@ const signIn = async (req, res) => {
     }
 };
 
-module.exports = { signUp, signIn };
+
+// Function to add a completed course to a user
+const addCompletedCourse = async (req, res) => {
+    const { userId, courseId } = req.body; // Expecting userId and courseId in the request body
+
+    try {
+        // Find the user by ID and update their completedCourses array
+        const user = await User.findByIdAndUpdate(
+            userId,
+            { $addToSet: { completedCourses: courseId } }, // Use $addToSet to avoid duplicates
+            { new: true } // Return the updated user document
+        );
+
+        if (!user) {
+            return res.status(404).json({ message: 'User not found' });
+        }
+
+        res.status(200).json({ message: 'Course added to completed courses', user });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'Server error', error });
+    }
+};
+
+
+// Fetch User Data by ID
+const getUserById = async (req, res) => {
+    const { id } = req.params; // Extract user ID from request parameters
+
+    try {
+        const user = await User.findById(id).select('-password'); // Exclude the password field from the response
+        if (!user) {
+            return res.status(404).json({ message: 'User not found' });
+        }
+        res.status(200).json(user);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'Server error' });
+    }
+};
+
+module.exports = { signUp, signIn, addCompletedCourse, getUserById };
+

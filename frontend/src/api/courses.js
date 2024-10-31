@@ -38,4 +38,47 @@ export const fetchCourseById = async (courseId) => {
     }
 };
 
-// Add any additional course-related API functions here (e.g., createCourse, updateCourse, deleteCourse, etc.)
+export const completeLevel = async (levelId, userId) => {
+    try {
+        const response = await fetch(`${BASE_API_URL}progress/complete-level/${levelId}`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ userId }),
+        });
+
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.message || 'Failed to complete level');
+        }
+
+        const data = await response.json();
+        return data;
+    } catch (error) {
+        console.error('Error completing level:', error);
+    }
+};
+
+export const completeCourse = async (courseId, userId) => {
+    try {
+        const response = await fetch(`${BASE_API_URL}progress/completed-course`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ userId, courseId }),
+        });
+
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.message || 'Failed to complete course');
+        }
+
+        const data = await response.json();
+        return data; // Return the result of the course completion
+    } catch (error) {
+        console.error('Error completing course:', error);
+        throw new Error(`${error.message}`);
+    }
+};
