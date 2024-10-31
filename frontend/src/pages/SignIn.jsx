@@ -9,7 +9,6 @@ const SignIn = () => {
     const [error, setError] = useState(''); // Store error messages
     const [isLoading, setIsLoading] = useState(false); // Track loading state
 
-    const navigate = useNavigate();
     const theme = useTheme();
     const isMobile = useMediaQuery(theme.breakpoints.down('sm')); // Check if screen is mobile
 
@@ -26,7 +25,7 @@ const SignIn = () => {
             const data = await login(formData); // Call login API
             alert('Sign in successful! Welcome back!');
             console.log(data); // Log response (optional)
-            navigate('/dashboard'); // Redirect to dashboard
+            window.location.href = '/'
         } catch (error) {
             setError(error.message); // Display error message
         } finally {

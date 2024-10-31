@@ -12,7 +12,7 @@ const theme = {
         main: '#dc004e', // Example secondary color
       },
       background: {
-        default: '#ffffff', // Light mode background
+        default: '#f2f2f2',
         paper: '#f5f5f5',   // Light mode paper background
       },
       text: {
