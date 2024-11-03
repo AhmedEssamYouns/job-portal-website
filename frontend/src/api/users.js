@@ -1,4 +1,5 @@
-const BASE_API_URL = 'http://job-portal-website-production.up.railway.app/api/';
+const BASE_API_URL = 'https://job-portal-website-production.up.railway.app/api/';
+
 
 export const signup = async (userData) => {
     try {
@@ -44,9 +45,8 @@ export const login = async (userData) => {
 };
 
 export const logout = () => {
+    window.location.href = '/signin';
     localStorage.removeItem('token');
-    window.location.href = '/signin'; // Redirect to sign-in
-    window.location.reload(); // Ensure the page is refreshed after logout
 };
 
 export const checkLogin = () => {

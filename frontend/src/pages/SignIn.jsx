@@ -1,14 +1,15 @@
 import React, { useState } from 'react';
-import { TextField, Button, Typography, Box, Card, CardContent, Grid, useMediaQuery, Link, Alert } from '@mui/material';
+import { TextField, Button, Typography, Box, Card, CardContent, Grid, useMediaQuery, Alert, Snackbar } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import { login } from '../api/users';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate,Link } from 'react-router-dom';
 
 const SignIn = () => {
     const [formData, setFormData] = useState({ email: '', password: '' });
     const [error, setError] = useState(''); // Store error messages
     const [isLoading, setIsLoading] = useState(false); // Track loading state
-
+    const [openSnackbar, setOpenSnackbar] = useState(false); // Snackbar open state
+    const [snackbarMessage, setSnackbarMessage] = useState(''); // Snackbar message
     const theme = useTheme();
     const isMobile = useMediaQuery(theme.breakpoints.down('sm')); // Check if screen is mobile
 
@@ -23,39 +24,84 @@ const SignIn = () => {
 
         try {
             const data = await login(formData); // Call login API
-            alert('Sign in successful! Welcome back!');
+            setSnackbarMessage('Sign in successful! Welcome back!'); // Set success message
+            setOpenSnackbar(true); // Show success Snackbar
             console.log(data); // Log response (optional)
-            window.location.href = '/'
+            window.location.href = '/';
         } catch (error) {
             setError(error.message); // Display error message
+            setSnackbarMessage(error.message); // Set error message for Snackbar
+            setOpenSnackbar(true); // Show error Snackbar
         } finally {
             setIsLoading(false); // Stop loading
         }
     };
 
+    const handleCloseSnackbar = () => {
+        setOpenSnackbar(false); // Close Snackbar
+    };
+
     return (
-        <Grid container sx={{ height: '90vh' }}>
+        <Grid container sx={{ height: isMobile ? 'auto' : '80vh' }}>
             {/* Left Side: Only for larger screens */}
             {!isMobile && (
-                <Grid item xs={12} sm={6} sx={{
-                    backgroundImage: 'url(https://i.pinimg.com/originals/6b/1b/22/6b1b22573f9f3d4bba11a9fa5cb45652.png)',
-                    backgroundSize: 'contain',
-                    backgroundPosition: 'center',
-                    backgroundRepeat: 'no-repeat',
-                    display: 'flex',
-                    justifyContent: 'center',
-                    alignItems: 'center',
-                    padding: 2
-                }} />
+                <Grid
+                    item
+                    xs={12}
+                    sm={6}
+                    sx={{
+                        display: 'flex',
+                        justifyContent: 'center',
+                        alignItems: 'center',
+                    }}
+                >
+                    <Box
+                        component="img"
+                        src="https://cdni.iconscout.com/illustration/premium/thumb/sign-up-8694031-6983270.png"
+                        alt="Illustrative image"
+                        sx={{
+                            width: '70%',
+                            height: 'auto',
+                            maxWidth: '80%', // Adjusts size for responsiveness
+                            objectFit: 'contain',
+                        }}
+                    />
+                </Grid>
             )}
 
             {/* Right Side: Sign In Form */}
-            <Grid item xs={12} sm={6} display="flex" flexDirection="column" padding={2} justifyContent="center" gap={5} alignItems="center">
+            <Grid
+                item
+                xs={12}
+                sm={6}
+                display="flex"
+                flexDirection="column"
+                sx={{
+                    background: 'linear-gradient(135deg, rgba(25, 118, 210, 0.5), rgba(66, 165, 245, 0.5))',
+                    borderBottomLeftRadius: '100px',
+                    justifyContent: 'center',
+                    height: 'auto',
+                    borderRadius: '0px',
+                    margin: '0px',
+                    [theme.breakpoints.down('sm')]: {
+                        borderBottomRightRadius: '100px',
+                        borderTopLeftRadius: '100px',
+                        borderTopRightRadius: '100px',
+                        borderBottomLeftRadius: '100px',
+                        marginTop: '20px',
+                        marginRight: '10px',
+                        marginLeft: '10px',
+                        height: '75vh',
+                    },
+                }}
+                padding={2}
+                gap={5}
+                alignItems="center"
+            >
                 <Box textAlign="center">
                     <Typography variant="h6">
                         Discover new skills with our courses. Your learning journey starts here!
                     </Typography>
-
                 </Box>
 
                 <Card sx={{ width: '90%', maxWidth: 400, borderRadius: 10, boxShadow: 5 }}>
@@ -104,14 +150,26 @@ const SignIn = () => {
                         <Box textAlign="center" sx={{ marginTop: 2 }}>
                             <Typography variant="body2">
                                 Don’t have an account?
-                                <Link href="/signup" sx={{ marginLeft: 1 }}>
+                                <Typography component={Link} to={'/signup'} sx={{ marginLeft: 1 ,color:theme.palette.primary.main }}>
                                     Sign Up
-                                </Link>
+                                </Typography>
                             </Typography>
                         </Box>
                     </CardContent>
                 </Card>
             </Grid>
+
+            {/* Snackbar for success/error messages */}
+            <Snackbar
+                open={openSnackbar}
+                autoHideDuration={6000}
+                onClose={handleCloseSnackbar}
+                anchorOrigin={{ vertical: 'top', horizontal: 'center' }} // Position Snackbar
+            >
+                <Alert onClose={handleCloseSnackbar} severity={error ? 'error' : 'success'} sx={{ width: '100%' }}>
+                    {snackbarMessage}
+                </Alert>
+            </Snackbar>
         </Grid>
     );
 };

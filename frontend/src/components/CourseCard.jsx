@@ -1,11 +1,50 @@
 import React, { useEffect, useState } from 'react';
-import { Card, CardContent, Typography, CardActions, Box, LinearProgress, Snackbar, useTheme } from '@mui/material';
+import {
+  Card,
+  CardContent,
+  Typography,
+  CardActions,
+  Box,
+  LinearProgress,
+  Snackbar,
+  useTheme,
+} from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import { checkLogin, fetchUserById } from '../api/users';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
-import MilitaryTechIcon from '@mui/icons-material/MilitaryTech'; // Import the icon
+import MilitaryTechIcon from '@mui/icons-material/MilitaryTech';
 import { fetchCourseById } from '../api/courses';
+import { 
+  SiHtml5, 
+  SiCss3, 
+  SiJavascript, 
+  SiPython, 
+  SiCplusplus, 
+  SiRuby, 
+  SiPhp, 
+  SiCsharp, 
+  SiSwift, 
+  SiTypescript ,
+  SiKotlin
+} from 'react-icons/si';
 import './SocialIcons.css';
+
+const languageIcons = {
+  javascript: { icon: <SiJavascript />, color: '#F7DF1E' }, // JavaScript color
+  python: { icon: <SiPython />, color: '#306998' },         // Python color
+  cpp: { icon: <SiCplusplus />, color: '#00599C' },        // C++ color
+  ruby: { icon: <SiRuby />, color: '#CC342D' },            // Ruby color
+  html: { icon: <SiHtml5 />, color: '#E44D26' },           // HTML color
+  css: { icon: <SiCss3 />, color: '#1572B6' },             // CSS color
+  php: { icon: <SiPhp />, color: '#8993BE' },              // PHP color
+  csharp: { icon: <SiCsharp />, color: '#239120' },        // C# color
+  swift: { icon: <SiSwift />, color: '#F05138' },          // Swift color
+  typescript: { icon: <SiTypescript />, color: '#007ACC' }, // TypeScript color
+  kotlin: { icon: <SiKotlin />, color: '#F18E33' }, 
+
+};
+
+const placeholderIconUrl = 'https://cdn2.iconfinder.com/data/icons/seo-web/512/website-code-1024.png';
 
 const CourseCard = ({ course }) => {
   const [user, setUser] = useState(null);
@@ -14,6 +53,7 @@ const CourseCard = ({ course }) => {
   const [openSnackbar, setOpenSnackbar] = useState(false);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
+  const theme = useTheme();
 
   useEffect(() => {
     const loadUser = async () => {
@@ -54,7 +94,6 @@ const CourseCard = ({ course }) => {
   }, [user, course._id]);
 
   const isCourseCompleted = user?.completedCourses.includes(course._id);
-  const theme = useTheme();
 
   const handleCardClick = () => {
     if (loading) return;
@@ -95,7 +134,7 @@ const CourseCard = ({ course }) => {
   );
 
   return (
-    <>
+    <div style={{ marginBottom: 15 }}>
       {loading ? (
         <PlaceholderCard />
       ) : (
@@ -103,35 +142,60 @@ const CourseCard = ({ course }) => {
           sx={{
             height: '100%',
             display: 'flex',
+            marginTop: '10px',
             flexDirection: 'column',
             position: 'relative',
             boxShadow: 3,
             borderRadius: 2,
             cursor: loading ? 'not-allowed' : 'pointer',
             transition: 'transform 0.2s, box-shadow 0.2s',
-            '&:hover': {
-              transform: loading ? 'none' : 'scale(1.05)',
-              boxShadow: loading ? 3 : 6,
-            },
+            overflow: 'visible',
           }}
           onClick={handleCardClick}
         >
-          {isCourseCompleted && ( // Award Emblem at the top left
+          {isCourseCompleted && (
             <MilitaryTechIcon
               style={{
                 position: 'absolute',
                 top: '-7px',
                 right: '0px',
-                color: theme.palette.mode == 'light' ? 'black' : 'whitesmoke', // Adjust color as needed
-                width: '60px', // Adjust size as needed
+                color: theme.palette.mode === 'light' ? 'black' : 'whitesmoke',
+                width: '60px',
                 height: 'auto',
               }}
             />
           )}
-          <CardContent sx={{ flexGrow: 1 }}>
-            <Typography variant="h5" component="div" width={'260px'} sx={{ fontWeight: 'bold' }}>
-              {course.title}
-            </Typography>
+          {/* Language Icon and Title Row inside CardContent */}
+          <CardContent sx={{ flexGrow: 1, paddingTop: '5px' }}>
+            <Box
+              sx={{
+                display: 'flex',
+                alignItems: 'center',
+                mb: '10px',
+              }}
+            >
+              {languageIcons[course.language.toLowerCase()] ? (
+                <Box
+                  sx={{
+                    color: languageIcons[course.language.toLowerCase()].color,
+                    fontSize: '2.5rem', // Adjust icon size here
+                    marginRight: '10px', // Space between icon and title
+                    marginTop: '10px',
+                  }}
+                >
+                  {languageIcons[course.language.toLowerCase()].icon}
+                </Box>
+              ) : (
+                <img
+                  src={placeholderIconUrl}
+                  alt="Programming Icon"
+                  style={{ width: '2.5rem', height: '2.5rem', marginRight: '10px' }}
+                />
+              )}
+              <Typography variant="h6" component="div" width={'200px'} sx={{ fontWeight: 'bold' }}>
+                {course.title}
+              </Typography>
+            </Box>
             <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
               {course.description}
             </Typography>
@@ -157,15 +221,15 @@ const CourseCard = ({ course }) => {
               <Box
                 sx={{
                   display: 'flex',
-                  alignSelf:'flex-end',
+                  alignSelf: 'flex-end',
                   alignItems: 'center',
-                  padding: '2px 4px', // Reduced padding for a smaller size
+                  padding: '2px 4px',
                   background: theme.palette.mode === 'light'
                     ? 'linear-gradient(135deg, #1976d2, #42a5f5)'
                     : 'linear-gradient(135deg, #0d47a1, #1565c0)',
                   borderRadius: 1,
-                  marginTop: { xs: 1, md: 0 }, // Adjust margin based on screen size
-                  width: 'auto', // Auto width for responsiveness
+                  marginTop: { xs: 1, md: 0 },
+                  width: 'auto',
                 }}
               >
                 <Typography variant="body2" color="white" sx={{ fontSize: { xs: '0.75rem', md: '0.875rem' } }}>
@@ -175,8 +239,6 @@ const CourseCard = ({ course }) => {
               </Box>
             )}
           </CardActions>
-
-
         </Card>
       )}
 
@@ -196,7 +258,7 @@ const CourseCard = ({ course }) => {
           },
         }}
       />
-    </>
+    </div>
   );
 };
 

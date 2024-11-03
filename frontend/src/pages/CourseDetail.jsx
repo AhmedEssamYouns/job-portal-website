@@ -6,6 +6,7 @@ import { useTheme } from '@mui/material/styles';
 import { checkLogin, fetchUserById } from '../api/users';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import { green } from '@mui/material/colors';
+import HourglassLoader from '../components/loader';
 
 const CourseDetail = () => {
   const { id } = useParams();
@@ -69,7 +70,7 @@ const CourseDetail = () => {
           backgroundColor: theme.palette.background.default,
         }}
       >
-        <CircularProgress />
+        <HourglassLoader />
       </Box>
     );
   }

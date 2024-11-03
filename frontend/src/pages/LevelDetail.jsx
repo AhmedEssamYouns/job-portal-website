@@ -13,6 +13,7 @@ import { useMediaQuery } from '@mui/material';
 import { checkLogin } from '../api/users';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import { green } from '@mui/material/colors';
+import HourglassLoader from '../components/loader';
 
 const LevelDetail = () => {
     const { courseId, levelId } = useParams();
@@ -53,7 +54,7 @@ const LevelDetail = () => {
     if (loading) {
         return (
             <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '90vh', }}>
-                <CircularProgress />
+                <HourglassLoader />
             </Box>
         );
     }
@@ -88,7 +89,8 @@ const LevelDetail = () => {
             setCurrentSlideIndex(currentSlideIndex + 1);
             setUserAnswer('');
             setIsCorrect(null);
-            window.scrollTo({ top: 0, behavior: 'instant' }); // Scroll to top
+            isMobile ? topSlideRef.current.scrollIntoView({ behavior: 'instant' }) : window.scrollTo({ top: 0, behavior: 'instant' });
+
         } else {
             // At the last slide of the current level
             const currentLevelIndex = course.levels.findIndex(level => level._id === levelId);
@@ -134,7 +136,8 @@ const LevelDetail = () => {
             setCurrentSlideIndex(currentSlideIndex - 1);
             setUserAnswer('');
             setIsCorrect(null);
-            window.scrollTo({ top: 0, behavior: 'smooth' }); // Scroll to top
+            isMobile ? topSlideRef.current.scrollIntoView({ behavior: 'smooth' }) : window.scrollTo({ top: 0, behavior: 'smooth' });
+
         }
     };
 
@@ -157,39 +160,7 @@ const LevelDetail = () => {
                     <Typography variant="h4" gutterBottom sx={{ fontWeight: 'bold', color: theme.palette.primary.main }}>
                         {course.title}
                     </Typography>
-                    <div
-                        ref={topSlideRef}
-                        style={{ display: 'flex', flexDirection: 'row', gap: 10 }}>
-                        <IconButton
 
-                            onClick={() => setDrawerOpen(true)}
-                            sx={{
-                                mb: 1,
-                                bgcolor: theme.palette.background.paper,
-                                borderRadius: 1,
-                                '&:hover': { bgcolor: theme.palette.action.hover },
-                                display: 'flex',
-                                alignItems: 'center',
-                                justifyContent: 'flex-start',
-                                padding: '8px',
-                                width: '150px'
-                            }}
-                        >
-                            <MenuIcon sx={{ mr: 1 }} />
-                            <Typography variant="body1">Show Levels</Typography>
-                        </IconButton>
-                        <Typography variant="subtitle1" gutterBottom sx={{
-                            color: theme.palette.text.secondary,
-                            bgcolor: theme.palette.background.paper,
-                            width: '150px',
-                            padding: '8px',
-                            borderRadius: 1,
-                            mb: 1,
-                            alignItems: 'center',
-                        }}>
-                            Slide {currentSlideIndex + 1} of {slides.length}
-                        </Typography>
-                    </div>
                 </>
             )}
 
@@ -206,7 +177,9 @@ const LevelDetail = () => {
 
             <Grid container spacing={2} sx={{ flexGrow: 1, height: '100%', }}>
                 {!isMobile && (
-                    <Grid item xs={12} sm={3} sx={{ bgcolor: theme.palette.background.paper, padding: 2, borderRadius: 2, }}>
+                    <Grid
+                        ref={topSlideRef}
+                        item xs={12} sm={3} sx={{ bgcolor: theme.palette.background.paper, padding: 2, borderRadius: 2, }}>
                         <Typography variant="h4" marginBottom="25px" gutterBottom sx={{ fontWeight: 'bold', color: theme.palette.primary.main }}>
                             {course.title}
                         </Typography>
@@ -283,12 +256,15 @@ const LevelDetail = () => {
                 )}
 
                 <Grid id='TopSlide' item xs={12} sm={9} sx={{ height: '100%', display: 'flex', flexDirection: 'column', }}>
-                    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 1 }}>
+                    <Box ref={isMobile ? topSlideRef : null}
+                        sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 1 }}>
                         <Typography variant="h5" gutterBottom>
                             Slides for {selectedLevel?.title}
                         </Typography>
+
+
                         {!isMobile &&
-                            <Typography variant="subtitle1" sx={{
+                            <Typography  variant="subtitle1" sx={{
                                 color: theme.palette.text.secondary,
                                 bgcolor: theme.palette.background.paper,
                                 width: '150px',
@@ -300,6 +276,40 @@ const LevelDetail = () => {
                             </Typography>
                         }
                     </Box>
+                    {isMobile &&
+                        <div
+                            style={{ display: 'flex', flexDirection: 'row', gap: 10 }}>
+                            <IconButton
+
+                                onClick={() => setDrawerOpen(true)}
+                                sx={{
+                                    mb: 1,
+                                    bgcolor: theme.palette.background.paper,
+                                    borderRadius: 1,
+                                    '&:hover': { bgcolor: theme.palette.action.hover },
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'flex-start',
+                                    padding: '8px',
+                                    width: '150px'
+                                }}
+                            >
+                                <MenuIcon sx={{ mr: 1 }} />
+                                <Typography variant="body1">Show Levels</Typography>
+                            </IconButton>
+                            <Typography variant="subtitle1" gutterBottom sx={{
+                                color: theme.palette.text.secondary,
+                                bgcolor: theme.palette.background.paper,
+                                width: '150px',
+                                padding: '8px',
+                                borderRadius: 1,
+                                mb: 1,
+                                alignItems: 'center',
+                            }}>
+                                Slide {currentSlideIndex + 1} of {slides.length}
+                            </Typography>
+                        </div>
+                    }
                     {slides.length > 0 ? (
                         <Box sx={{ flexGrow: 1 }}>
                             <SlideContent slide={currentSlide} language={course.language} theme={theme} />

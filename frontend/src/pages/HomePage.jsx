@@ -45,11 +45,14 @@ const HomePage = () => {
   // Function to handle subscribe button click
   const handleSubscribe = (e) => {
     e.preventDefault(); // Prevent default form submission
+  
+    if (!email) return; // Exit function if email is null or empty
+  
     // Show Snackbar when the user subscribes
     setOpenSnackbar(true);
     setEmail(''); // Clear the email input after subscription
   };
-
+  
   // Function to handle Snackbar close
   const handleCloseSnackbar = () => {
     setOpenSnackbar(false);

@@ -4,6 +4,7 @@ import { Grid, CircularProgress, Typography, Box, Button } from '@mui/material';
 import { fetchCourses, fetchCoursesWithCompletionStatus, fetchIncompletedCourses } from '../api/courses';
 import { checkLogin } from '../api/users';
 import { useNavigate } from 'react-router-dom';
+import HourglassLoader from './loader';
 
 const CoursesList = ({ fetchType }) => {
   const [courses, setCourses] = useState([]);
@@ -43,15 +44,16 @@ const CoursesList = ({ fetchType }) => {
   if (loading) {
     return (
       <Box
-        sx={{
+      sx={{
           display: 'flex',
           justifyContent: 'center',
-          height: '100vh',
-          marginTop: '20px',
-        }}
-      >
-        <CircularProgress />
-      </Box>
+          alignItems: 'center', 
+          paddingTop:'100px'
+      }}
+  >
+      <HourglassLoader />
+  </Box>
+  
     );
   }
 

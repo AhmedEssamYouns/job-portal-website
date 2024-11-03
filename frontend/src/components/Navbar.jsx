@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
     AppBar,
     Toolbar,
@@ -16,6 +16,8 @@ import {
     ListItemText,
 } from '@mui/material';
 import { Link, useNavigate } from 'react-router-dom';
+import WbSunnyIcon from '@mui/icons-material/WbSunny';
+import NightsStayIcon from '@mui/icons-material/NightsStay';
 import { useThemeContext } from '../context/ThemeContext';
 import MenuIcon from '@mui/icons-material/Menu';
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
@@ -36,7 +38,9 @@ const Navbar = () => {
     const [courses, setCourses] = useState([]); // State to hold fetched courses
     const [filteredCourses, setFilteredCourses] = useState([]); // State to hold filtered courses
     const [showDropdown, setShowDropdown] = useState(false); // State to show/hide dropdown
-    const isMobile = useMediaQuery('(max-width:750px)');
+    const isMobile = useMediaQuery('(max-width:830px)');
+    const dropdownRef = useRef(null); // Ref for dropdown
+    const inputRef = useRef(null); // Ref for input
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -69,6 +73,24 @@ const Navbar = () => {
         }
     };
 
+
+    useEffect(() => {
+        const handleClickOutside = (event) => {
+            if (
+                dropdownRef.current && !dropdownRef.current.contains(event.target) &&
+                inputRef.current && !inputRef.current.contains(event.target)
+            ) {
+                setShowDropdown(false); // Hide dropdown if clicked outside
+            }
+        };
+
+        document.addEventListener('mousedown', handleClickOutside);
+        return () => {
+            document.removeEventListener('mousedown', handleClickOutside);
+        };
+    }, []);
+
+
     const handleSearchChange = (event) => {
         setSearchQuery(event.target.value);
         setShowDropdown(true); // Show dropdown when typing
@@ -82,16 +104,13 @@ const Navbar = () => {
         }
     };
 
-    const handleDropdownItemClick = (title) => {
-        setSearchQuery(title); // Set the clicked course title as the search query
-        setShowDropdown(false); // Hide dropdown after selecting
-        navigate(`/search?q=${title}`); // Navigate to the search results
+    const handleDropdownItemClick = (course) => {
+        setSearchQuery(course.title); 
+        setShowDropdown(false); 
+        navigate(`/course/${course._id}`);
     };
 
-    const handleBlur = () => {
-        setShowDropdown(false); // Hide dropdown on blur
-    };
-
+  
     const open = Boolean(anchorEl);
     const id = open ? 'simple-popover' : undefined;
 
@@ -109,15 +128,19 @@ const Navbar = () => {
                         : 'linear-gradient(95deg, #0d47a1, #1565c0)',
             }}
         >
-            <Toolbar>
+            <Toolbar >
                 {!showSearch && (
                     <Box component={Link} to="/" sx={{ display: 'flex', alignItems: 'center', marginRight: 2 }}>
                         <Typography
-                            variant="h4"
-                            sx={{ color: theme.palette.common.white, fontFamily: 'Tiny5' }}
+                            sx={{
+                                color: theme.palette.common.white,
+                                fontFamily: 'Tiny5',
+                                fontSize: isMobile ? '1.605rem' : '2.625rem' // Set a custom size between h4 and h3
+                            }}
                         >
                             CodeQuest
                         </Typography>
+
                     </Box>
                 )}
 
@@ -131,6 +154,7 @@ const Navbar = () => {
                         ) : (
                             <Slide direction="right" in={showSearch} mountOnEnter>
                                 <TextField
+                                    ref={inputRef}
                                     variant="outlined"
                                     size="small"
                                     placeholder="Search jobs..."
@@ -138,7 +162,6 @@ const Navbar = () => {
                                     onKeyDown={handleSearchSubmit}
                                     onChange={handleSearchChange}
                                     onFocus={() => setShowDropdown(true)} // Show dropdown on focus
-                                    onBlur={handleBlur} // Hide dropdown on blur
                                     sx={{
                                         marginLeft: 2,
                                         marginRight: 2,
@@ -152,6 +175,7 @@ const Navbar = () => {
 
                         {showDropdown && isMobile && filteredCourses.length > 0 && (
                             <Box
+                                ref={dropdownRef}
                                 sx={{
                                     position: 'absolute',
                                     backgroundColor: theme.palette.background.paper,
@@ -168,7 +192,7 @@ const Navbar = () => {
                             >
                                 <List>
                                     {filteredCourses.map((course) => (
-                                        <ListItem button key={course.id} onClick={() => handleDropdownItemClick(course.title)}>
+                                        <ListItem button key={course.id} onClick={() => handleDropdownItemClick(course)}>
                                             <ListItemText
                                                 primary={course.title}
                                                 sx={{ color: theme.palette.mode === 'light' ? 'black' : 'white' }} // Use sx for custom styling
@@ -187,8 +211,9 @@ const Navbar = () => {
                         </IconButton>
                     )}
                     <Box sx={{ position: 'relative', display: 'flex', alignItems: 'center' }}>
-                        {!isMobile && (
+                        {!isMobile && !showSearch && (
                             <TextField
+                                ref={inputRef}
                                 variant="outlined"
                                 size="small"
                                 placeholder="Search jobs..."
@@ -196,7 +221,6 @@ const Navbar = () => {
                                 onKeyDown={handleSearchSubmit}
                                 onChange={handleSearchChange}
                                 onFocus={() => setShowDropdown(true)} // Show dropdown on focus
-                                onBlur={handleBlur} // Hide dropdown on blur
                                 sx={{
                                     marginLeft: 2,
                                     marginRight: 2,
@@ -223,6 +247,7 @@ const Navbar = () => {
 
                         {showDropdown && !isMobile && filteredCourses.length > 0 && (
                             <Box
+                                ref={dropdownRef}
                                 sx={{
                                     position: 'absolute',
                                     backgroundColor: theme.palette.background.paper,
@@ -239,7 +264,7 @@ const Navbar = () => {
                             >
                                 <List>
                                     {filteredCourses.map((course) => (
-                                        <ListItem button key={course.id} onClick={() => handleDropdownItemClick(course.title)}>
+                                        <ListItem button key={course.id} onClick={() => handleDropdownItemClick(course)}>
                                             <ListItemText
                                                 primary={course.title}
                                                 sx={{ color: theme.palette.mode === 'light' ? 'black' : 'white' }} // Use sx for custom styling
@@ -254,23 +279,37 @@ const Navbar = () => {
 
 
                     {!user && !showSearch && (
-                        <Box sx={{ display: 'flex', gap: isMobile ? 0 : 2 }}>
-                            <Button
-                                component={Link}
-                                to="/courses"
-                                color="inherit"
-                            >
-                                <SchoolIcon />
-                            </Button>
+                        <Box sx={{ display: 'flex', gap: isMobile ? 2 : 2, justifyContent: 'center' }}>
+                            <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: isMobile ? 2 : 2 }}>
+                                <div
+                                    onClick={() => navigate('/courses')} // Use navigate to change the route
+                                    style={{ cursor: 'pointer', display: 'flex', alignItems: 'center', color: 'inherit' }}
+                                >
+                                    <SchoolIcon />
+                                </div>
+                                {isMobile && (
+                                    <div
+                                        onClick={toggleTheme}
+                                        style={{ cursor: 'pointer', display: 'flex', alignItems: 'center', color: 'inherit' }}
+                                    >
+                                        {theme.palette.mode === 'light' ? <NightsStayIcon /> : <WbSunnyIcon />}
+                                    </div>
+                                )}
+                            </Box>
                             <Button
                                 component={Link}
                                 to="/signin"
                                 variant="outlined"
                                 color="inherit"
-                                sx={{ borderRadius: 10 }}
+                                sx={{
+                                    borderRadius: 10,
+                                    padding: { xs: '4px 8px', sm: '6px 12px' }, // Smaller padding for mobile
+                                    fontSize: { xs: '0.75rem', sm: '0.8rem' }, // Smaller font size for mobile
+                                }}
                             >
                                 Sign In
                             </Button>
+
                             {!isMobile && (
                                 <Button
                                     component={Link}
@@ -301,6 +340,7 @@ const Navbar = () => {
                         </>
                     )}
                 </Box>
+
             </Toolbar>
 
 

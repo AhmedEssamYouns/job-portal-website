@@ -4,12 +4,13 @@ import CourseCard from '../components/CourseCard';
 import { Grid, CircularProgress, Typography, Box } from '@mui/material';
 import { fetchCourses } from '../api/courses';
 import { useLocation } from 'react-router-dom';
+import HourglassLoader from '../components/loader';
 
 const SearchResultsPage = () => {
   const [courses, setCourses] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const query = new URLSearchParams(useLocation().search).get('q'); // Get search query from URL
+  const query = new URLSearchParams(useLocation().search).get('q'); 
 
   useEffect(() => {
     const loadCourses = async () => {
@@ -36,20 +37,19 @@ const SearchResultsPage = () => {
           marginTop: '20px',
         }}
       >
-        <CircularProgress />
+        <HourglassLoader />
       </Box>
     );
   }
 
   if (error) return <Typography color="error">Error: {error}</Typography>;
 
-  // Filter courses based on the search query
   const filteredCourses = courses.filter(course =>
     course.title.toLowerCase().includes(query.toLowerCase())
   );
 
   return (
-    <Box sx={{ padding: 10 }}>
+    <Box sx={{ padding: { xs: 5, sm: 10 } }}>
       <Typography variant="h5" gutterBottom>
         Search Results for: "{query}"
       </Typography>

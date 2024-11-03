@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from 'react';
-import { Box, Typography, Avatar, CircularProgress, Paper, useTheme } from '@mui/material';
-import { fetchUserById } from '../api/users';
-import { checkLogin } from '../api/users';
+import { Box, Typography, Avatar, CircularProgress, Paper, useTheme, Button, Grid } from '@mui/material';
+import { fetchUserById, checkLogin } from '../api/users';
 import CoursesList from '../components/CoursesList';
-import CheckCircleIcon from '@mui/icons-material/CheckCircle'; // Importing an icon
+import CheckCircleIcon from '@mui/icons-material/CheckCircle';
+import HourglassLoader from '../components/loader';
+import SignIn from './SignIn';
 
 const UserProfile = () => {
     const [user, setUser] = useState(null);
@@ -18,6 +19,14 @@ const UserProfile = () => {
                 if (CurrentUser) {
                     const userData = await fetchUserById(CurrentUser.id);
                     setUser(userData);
+
+                    // Check if there's a stored avatar and name that matches the current user
+                    const storedAvatar = localStorage.getItem('userAvatar');
+                    const storedUserName = localStorage.getItem('userName');
+
+                    if (storedUserName === userData.username) {
+                        setUser(prevUser => ({ ...prevUser, avatar: storedAvatar }));
+                    }
                 } else {
                     setError('User not logged in.');
                 }
@@ -31,6 +40,19 @@ const UserProfile = () => {
         loadUser();
     }, [CurrentUser]);
 
+    const handleImageUpload = (event) => {
+        const file = event.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onloadend = () => {
+                localStorage.setItem('userAvatar', reader.result);
+                localStorage.setItem('userName', user.username); // Save the user's name
+                setUser(prevUser => ({ ...prevUser, avatar: reader.result }));
+            };
+            reader.readAsDataURL(file);
+        }
+    };
+
     if (loading) {
         return (
             <Box
@@ -41,82 +63,115 @@ const UserProfile = () => {
                     height: '100vh',
                 }}
             >
-                <CircularProgress />
+                <HourglassLoader />
             </Box>
         );
     }
 
     if (error) {
-        return <Typography color="error">Error: {error}</Typography>;
+        return <SignIn/>;
     }
 
     return (
         <Box
             sx={{
-                padding: { xs: 2, sm: 4 },
-                paddingRight: { xs: 2, sm: 14 },
-                paddingLeft: { xs: 2, sm: 14 },
+                display: 'flex',
+                flexDirection: { xs: 'column', sm: 'row' },
+                gap:4,
+                padding: { xs: 2, sm: 10 },
+                paddingRight: { xs: 2, sm: 20 },
+                paddingLeft: { xs: 2, sm: 20 },
                 backgroundColor: (theme) => theme.palette.background.default,
             }}
         >
-            <Typography variant="h4" gutterBottom align="center">
-                User Profile
-            </Typography>
-
-            {/* Profile Card */}
             <Paper
-                elevation={3}
+                elevation={6}
                 sx={{
                     padding: 3,
-                    marginBottom: 4,
                     borderRadius: 2,
                     display: 'flex',
-                    flexDirection: { xs: 'column', sm: 'row' },
-                    alignItems: { xs: 'center', sm: 'flex-start' },
+                    flexDirection: 'column',
+                    alignItems: 'center',
+                    flex: 1,
                     background: theme.palette.mode === 'light'
                         ? 'linear-gradient(135deg, #1976d2, #42a5f5)'
-                        : 'linear-gradient(135deg, #0d47a1, #1565c0)', // Gradient background
+                        : 'linear-gradient(135deg, #0d47a1, #1565c0)',
                     color: theme.palette.common.white,
+                    textAlign: 'center',
+                    maxWidth: '400px',
+                    maxHeight: '350px'
                 }}
             >
                 <Avatar
-                    src={user.avatar} // Assume user has an avatar URL
+                    src={user.avatar || 'https://th.bing.com/th/id/OIP.XmhhHP-RnTJSSDJsNshpUQHaHa?w=186&h=186&c=7&r=0&o=5&dpr=1.3&pid=1.7'}
                     alt={user.name}
                     sx={{
-                        width: { xs: 80, sm: 100 },
-                        height: { xs: 80, sm: 100 },
-                        marginBottom: { xs: 2, sm: 0 },
-                        marginRight: { sm: 2 },
-                        border: '2px solid #ffffff', // Change border color to white for contrast
+                        width: 120,
+                        height: 120,
+                        marginBottom: 2,
+                        border: '2px solid #ffffff',
                     }}
                 />
-                <Box textAlign={{ xs: 'center', sm: 'left' }} sx={{ flex: 1 }}>
-                    <Typography variant="h6" fontWeight="bold">
-                        {user.name}
-                    </Typography>
-                    <Typography variant="body1">
-                        {user.email}
-                    </Typography>
-                    <Box sx={{ display: 'flex', alignItems: 'center', marginTop: 1 }}>
-                        {user.completedCourses.length > 0 &&
-                            <>
-                                <Typography variant="body2" >
-                                    {user.completedCourses.length} Completed Courses
-                                </Typography>
-                                <CheckCircleIcon sx={{ marginRight: 1 }} />
-                            </>
-                        }
-
-                    </Box>
+                <Typography variant="h5" fontWeight="bold" gutterBottom>
+                    {user.name}
+                </Typography>
+                <Typography variant="body1" sx={{ mb: 1 }}>
+                    {user.email}
+                </Typography>
+                <Typography variant="body2" sx={{ mb: 1 }}>
+                    @{user.username} {/* Displaying the username */}
+                </Typography>
+                <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', marginTop: 1 }}>
+                    {user.completedCourses.length > 0 && (
+                        <>
+                            <Typography variant="body2" sx={{ marginRight: 1 }}>
+                                {user.completedCourses.length} Completed Courses
+                            </Typography>
+                            <CheckCircleIcon sx={{ color: 'limegreen' }} />
+                        </>
+                    )}
                 </Box>
+
+                <input
+                    accept="image/*"
+                    style={{ display: 'none' }}
+                    id="icon-button-file"
+                    type="file"
+                    onChange={handleImageUpload}
+                />
+                <label htmlFor="icon-button-file">
+                    <Button variant="contained" component="span" sx={{ mt: 2 }}>
+                        Upload Photo
+                    </Button>
+                </label>
             </Paper>
 
-            <CoursesList fetchType="incompleted" />
+            <Box
+                sx={{
+                    flex: 1,
+                    padding: { xs: 2, sm: 2 },
+                    marginLeft: { sm: 2 },
+                    backgroundColor: theme.palette.mode === 'light' ? '#f0f0f0' : '#0a0a0a',
+                    borderRadius: 2,
+                    boxShadow: 3,
+                    minHeight: '350px'
+                }}
+            >
+                <Typography variant="h4" gutterBottom align="center">
+                    Your Courses
+                </Typography>
 
-            <CoursesList fetchType="completed" />
+                <Grid container spacing={4}>
+                    <Grid item xs={12}>
+                        <CoursesList fetchType="incompleted" />
+                    </Grid>
+                    <Grid item xs={12}>
+                        <CoursesList fetchType="completed" />
+                    </Grid>
+                </Grid>
+            </Box>
         </Box>
     );
 };
 
 export default UserProfile;
-

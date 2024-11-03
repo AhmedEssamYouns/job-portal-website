@@ -13,11 +13,17 @@ const theme = {
       },
       background: {
         default: '#f2f2f2',
-        paper: '#f5f5f5',   // Light mode paper background
+        paper: '#f5f5f5', // Light mode paper background
       },
       text: {
         primary: '#000000', // Text color for light mode
         secondary: '#555555', // Secondary text color
+      },
+    },
+    typography: {
+      fontFamily: 'Itim, cursive', // Set Itim font as default
+      allVariants: {
+        fontFamily: 'Itim, cursive', // Apply Itim font to all text variants
       },
     },
   }),
@@ -32,11 +38,17 @@ const theme = {
       },
       background: {
         default: '#121212', // Dark mode background
-        paper: '#1e1e1e',   // Dark mode paper background
+        paper: '#1e1e1e', // Dark mode paper background
       },
       text: {
         primary: '#ffffff', // Text color for dark mode
         secondary: '#e0e0e0', // Secondary text color
+      },
+    },
+    typography: {
+      fontFamily: 'Itim, cursive', // Set Itim font as default
+      allVariants: {
+        fontFamily: 'Itim, cursive', // Apply Itim font to all text variants
       },
     },
   }),

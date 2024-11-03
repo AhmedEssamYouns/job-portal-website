@@ -1,6 +1,6 @@
 import { checkLogin, fetchUserById } from "./users";
 
-const BASE_API_URL = 'http://job-portal-website-production.up.railway.app/api/';
+const BASE_API_URL = 'https://job-portal-website-production.up.railway.app/api/';
 
 export const fetchCourses = async () => {
     try {
@@ -11,14 +11,13 @@ export const fetchCourses = async () => {
 
         if (!response.ok) {
             const errorData = await response.json();
-            console.error("Response data:", errorData); // Log the entire error data
             throw new Error(errorData.message || 'Failed to fetch courses');
         }
 
-        return await response.json();
+        return await response.json(); // Return the list of courses
     } catch (error) {
-        console.error(`Fetch courses error: ${error}`);
-        throw new Error(`Fetch courses error: ${error}`); // Include more context
+        console.error(`Fetch courses error: ${error.message}`);
+        throw new Error(`${error.message}`);
     }
 };
 
