@@ -24,45 +24,61 @@ const Question = ({ question, userAnswer, handleAnswerSelect, isCorrect, languag
     const currentMode = theme.palette.mode === 'dark' ? 'dark' : 'light';
     const colors = buttonStyles[currentMode];
 
+    // Helper function to determine if the answer is selected
+    const isSelected = (option) => userAnswer === option;
+
+    // Render MCQ options with correct styling
+    const renderOptions = () => {
+        return question.options.map((option, optionIndex) => {
+            const isOptionSelected = isSelected(option);
+
+            return (
+                <Button
+                    key={optionIndex}
+                    variant={isOptionSelected ? "contained" : "outlined"}
+                    onClick={() => handleAnswerSelect(option)}
+                    sx={{
+                        marginBottom: 2,
+                        maxWidth: '500px', // Set a maximum width
+                        width: '100%', // Make the width responsive
+                        textTransform: 'none',
+                        textAlign: 'left',
+                        justifyContent: 'flex-start', // Center text within the button
+                        backgroundColor: isOptionSelected ? colors.selected : colors.background,
+                        color: isOptionSelected ? '#fff' : colors.color,
+                        '&:hover': {
+                            backgroundColor: isOptionSelected ? colors.selected : colors.hover,
+                        },
+                        '&:focus': {
+                            outline: 'none', // Remove default focus outline
+                            boxShadow: (theme) => `0 0 0 2px ${theme.palette.primary.main}`, // Add custom focus outline
+                        },
+                    }}
+                >
+                    {String.fromCharCode(65 + optionIndex) + ". " + option} {/* A, B, C, ... */}
+                </Button>
+            );
+        });
+    };
+
     return (
-        <Box mt={2} sx={{ textAlign: 'center' , borderTop:1,paddingTop:2 }}>
-            <Typography variant="h5"  gutterBottom>
-                {question.questionText}
+        <Box mt={2} sx={{ textAlign: 'center', borderTop: 1, paddingTop: 2 }}>
+            {/* Ensure you're rendering the questionText properly */}
+            <Typography variant="h5" gutterBottom>
+                {question.questionText} {/* Rendering the actual question text */}
             </Typography>
 
+            {/* Render code if provided */}
             {question.code && (
                 <SyntaxHighlighter language={language} style={syntaxHighlighterStyle}>
-                    {question.code}
+                    {question.code} {/* Rendering the code block */}
                 </SyntaxHighlighter>
             )}
+
             <div style={{ height: '15px' }}></div>
+            
             <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-                {question.options.map((option, optionIndex) => (
-                    <Button
-                        key={optionIndex}
-                        variant={userAnswer === option ? "contained" : "outlined"}
-                        onClick={() => handleAnswerSelect(option)}
-                        sx={{
-                            marginBottom: 2,
-                            maxWidth: '500px', // Set a maximum width
-                            width: '100%', // Make the width responsive
-                            textTransform: 'none',
-                            textAlign: 'left',
-                            justifyContent: 'flex-start', // Center text within the button
-                            backgroundColor: userAnswer === option ? colors.selected : colors.background,
-                            color: userAnswer === option ? '#fff' : colors.color,
-                            '&:hover': {
-                                backgroundColor: userAnswer === option ? colors.selected : colors.hover,
-                            },
-                            '&:focus': {
-                                outline: 'none', // Remove default focus outline
-                                boxShadow: (theme) => `0 0 0 2px ${theme.palette.primary.main}`, // Add custom focus outline
-                            },
-                        }}
-                    >
-                        {String.fromCharCode(65 + optionIndex) + ". " + option} {/* A, B, C, ... */}
-                    </Button>
-                ))}
+                {renderOptions()}
             </Box>
 
             {isCorrect !== null && (
@@ -75,4 +91,3 @@ const Question = ({ question, userAnswer, handleAnswerSelect, isCorrect, languag
 };
 
 export default Question;
-

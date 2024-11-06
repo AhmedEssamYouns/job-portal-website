@@ -14,17 +14,17 @@ import { checkLogin, fetchUserById } from '../api/users';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import MilitaryTechIcon from '@mui/icons-material/MilitaryTech';
 import { fetchCourseById } from '../api/courses';
-import { 
-  SiHtml5, 
-  SiCss3, 
-  SiJavascript, 
-  SiPython, 
-  SiCplusplus, 
-  SiRuby, 
-  SiPhp, 
-  SiCsharp, 
-  SiSwift, 
-  SiTypescript ,
+import {
+  SiHtml5,
+  SiCss3,
+  SiJavascript,
+  SiPython,
+  SiCplusplus,
+  SiRuby,
+  SiPhp,
+  SiCsharp,
+  SiSwift,
+  SiTypescript,
   SiKotlin
 } from 'react-icons/si';
 import './SocialIcons.css';
@@ -40,11 +40,11 @@ const languageIcons = {
   csharp: { icon: <SiCsharp />, color: '#239120' },        // C# color
   swift: { icon: <SiSwift />, color: '#F05138' },          // Swift color
   typescript: { icon: <SiTypescript />, color: '#007ACC' }, // TypeScript color
-  kotlin: { icon: <SiKotlin />, color: '#F18E33' }, 
+  kotlin: { icon: <SiKotlin />, color: '#F18E33' },
 
 };
 
-const placeholderIconUrl = 'https://cdn2.iconfinder.com/data/icons/seo-web/512/website-code-1024.png';
+const placeholderIconUrl = 'https://assets.xcelpros.com/wp-content/uploads/2023/04/28141538/icm-icon-code.png';
 
 const CourseCard = ({ course }) => {
   const [user, setUser] = useState(null);
@@ -112,7 +112,7 @@ const CourseCard = ({ course }) => {
   const PlaceholderCard = () => (
     <Card
       sx={{
-        height: '100%',
+        height: '250px',
         display: 'flex',
         flexDirection: 'column',
         position: 'relative',
@@ -140,7 +140,8 @@ const CourseCard = ({ course }) => {
       ) : (
         <Card
           sx={{
-            height: '100%',
+            width: '100%', 
+            maxWidth: '400px',
             display: 'flex',
             marginTop: '10px',
             flexDirection: 'column',
@@ -196,7 +197,9 @@ const CourseCard = ({ course }) => {
                 {course.title}
               </Typography>
             </Box>
-            <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
+            <Typography  variant="body2"  color="text.secondary" sx={{ mb: 1 , WebkitLineClamp: 3,
+              textOverflow: 'ellipsis',
+             }}>
               {course.description}
             </Typography>
             <Typography variant="body2" color="text.secondary">

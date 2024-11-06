@@ -1,5 +1,5 @@
 const express = require('express');
-const { addCourse, fetchIncompletedCourses, searchCourses } = require('../controllers/courseController');
+const { addCourse, fetchIncompletedCourses, searchCourses, deleteCourse } = require('../controllers/courseController');
 const { getCourse } = require('../controllers/courseController');
 const { getAllCourses } = require('../controllers/courseController');
 
@@ -12,6 +12,6 @@ router.get('/incompleted-courses/:userId', fetchIncompletedCourses);
 router.get('/courses/search', searchCourses);
 router.get('/:id', getCourse);
 router.get('/', getAllCourses);
-
+router.delete('/course/:id', deleteCourse);
 
 module.exports = router;

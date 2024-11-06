@@ -44,16 +44,16 @@ const CoursesList = ({ fetchType }) => {
   if (loading) {
     return (
       <Box
-      sx={{
+        sx={{
           display: 'flex',
           justifyContent: 'center',
-          alignItems: 'center', 
-          paddingTop:'100px'
-      }}
-  >
-      <HourglassLoader />
-  </Box>
-  
+          alignItems: 'center',
+          paddingTop: '100px'
+        }}
+      >
+        <HourglassLoader />
+      </Box>
+
     );
   }
 
@@ -102,9 +102,9 @@ const CoursesList = ({ fetchType }) => {
           )}
         </Box>
       ) : (
-        <Grid container spacing={2} sx={{ paddingBottom: '20px', marginTop: 2, justifyContent: courses.length < 3 ? 'center' : 'flex-start' }}>
+        <Grid container spacing={2} sx={{ paddingBottom: '20px', marginTop: 2, justifyContent: 'center', }}>
           {courses.map((course) => (
-            <Grid item xs={12} sm={6} md={4} key={course._id} sx={{ display: 'flex', justifyContent: 'center' }}>
+            <Grid item xs={12} sm={6} md={4} key={course._id}>
               <CourseCard course={course} />
             </Grid>
           ))}

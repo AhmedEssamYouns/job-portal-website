@@ -64,8 +64,11 @@ const LevelDetail = () => {
     const selectedLevel = course.levels.find(level => level._id === levelId);
     const slides = selectedLevel ? selectedLevel.slides : [];
     const currentSlide = slides[currentSlideIndex];
-    const currentQuestions = currentSlide?.questions || [];
-
+    const currentQuestions = currentSlide?.sections?.reduce((acc, section) => {
+        // Combine all questions from each section
+        return acc.concat(section.questions || []);
+    }, []) || []; // Default to an empty array if no questions are found
+    
     const getNextButtonText = () => {
         if (currentSlideIndex < slides.length - 1) {
             return "Next Slide";
@@ -312,14 +315,14 @@ const LevelDetail = () => {
                     }
                     {slides.length > 0 ? (
                         <Box sx={{ flexGrow: 1 }}>
-                            <SlideContent slide={currentSlide} language={course.language} theme={theme} />
+                           <SlideContent slide={currentSlide} language={course.language.toLowerCase()} theme={theme} />
                             {currentQuestions.length > 0 && (
                                 <Question
                                     question={currentQuestions[0]}
                                     userAnswer={userAnswer}
                                     handleAnswerSelect={handleAnswerSelect}
                                     isCorrect={isCorrect}
-                                    language={course.language}
+                                    language={course.language.toLowerCase()}
                                     syntaxHighlighterStyle={theme.palette.mode === 'dark' ? gruvboxDark : coldarkCold}
                                 />
                             )}

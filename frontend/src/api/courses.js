@@ -1,6 +1,31 @@
 import { checkLogin, fetchUserById } from "./users";
 
-const BASE_API_URL = 'https://job-portal-website-production.up.railway.app/api/';
+const BASE_API_URL = 'http://localhost:5000/api/';
+
+
+
+export const addCourse = async (courseData) => {
+    try {
+        const response = await fetch(`${BASE_API_URL}courses/add`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(courseData), // Convert course data to JSON format
+        });
+
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.message || 'Failed to add course');
+        }
+
+        const data = await response.json(); // Response with the created course data
+        return data;
+    } catch (error) {
+        console.error('Error adding course:', error.message);
+        throw new Error(`${error.message}`);
+    }
+};
 
 export const fetchCourses = async () => {
     try {
@@ -127,6 +152,30 @@ export const fetchIncompletedCourses = async (userId) => {
         return await response.json(); // Return the list of incompleted courses
     } catch (error) {
         console.error(`Fetch incompleted courses error: ${error.message}`);
+        throw new Error(`${error.message}`);
+    }
+};
+
+export const deleteCourse = async (courseId) => {
+
+
+    try {
+        const response = await fetch(`${BASE_API_URL}courses/course/${courseId}`, {
+            method: 'DELETE',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+        });
+
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.message || 'Failed to delete course');
+        }
+
+        const data = await response.json(); // Response confirming the deletion
+        return data;
+    } catch (error) {
+        console.error('Error deleting course:', error.message);
         throw new Error(`${error.message}`);
     }
 };

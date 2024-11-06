@@ -16,6 +16,8 @@ import CoursesPage from './pages/CoursePage';
 import UserProfile from './pages/Profile';
 import ScrollToTop from './components/scrolltotop';
 import SearchResultsPage from './pages/SearchResultsPage';
+import AdminPanal from './pages/admin';
+import AddCoursePage from './pages/addCourse';
 
 
 const App = () => {
@@ -39,6 +41,8 @@ const App = () => {
           <Box sx={{ flex: 1 }}>
             <Routes>
               <Route path="/" element={<HomePage />} />
+              <Route path="/admin" element={<AdminPanal />} />
+              <Route path="/admin/addCourse" element={<AddCoursePage />} />
               <Route path="/signin" element={<SignIn />} />
               <Route path="/search" element={<SearchResultsPage />} />
               <Route path="/signup" element={<SignUp />} />
