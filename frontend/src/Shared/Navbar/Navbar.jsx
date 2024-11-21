@@ -18,15 +18,15 @@ import {
 import { Link, useNavigate } from 'react-router-dom';
 import WbSunnyIcon from '@mui/icons-material/WbSunny';
 import NightsStayIcon from '@mui/icons-material/NightsStay';
-import { useThemeContext } from '../context/ThemeContext';
+import { useThemeContext } from '../../context/ThemeContext';
 import MenuIcon from '@mui/icons-material/Menu';
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import SearchIcon from '@mui/icons-material/Search';
 import CloseIcon from '@mui/icons-material/Close';
 import SchoolIcon from '@mui/icons-material/School';
 import { useTheme } from '@mui/material/styles';
-import { logout, checkLogin } from '../api/users';
-import { fetchCourses } from '../api/courses';
+import { logout, checkLogin } from '../../api/users';
+import { fetchCourses } from '../../api/courses';
 
 const Navbar = () => {
     const { toggleTheme } = useThemeContext();

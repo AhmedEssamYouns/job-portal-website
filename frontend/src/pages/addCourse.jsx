@@ -23,6 +23,7 @@ const AddCoursePage = () => {
     const [loading, setLoading] = useState(false);
     const [alert, setAlert] = useState({ open: false, message: '', severity: 'success' });
     const [showAddQuestion, setShowAddQuestion] = useState(false);
+    const [showAddQuestionIndex, setShowAddQuestionIndex] = useState(null);
 
     const handleAddLevel = () => {
         setCourseData(prevData => ({
@@ -52,21 +53,34 @@ const AddCoursePage = () => {
             setSlideInputs(prev => ({ ...prev, [`${levelIndex}-${slideIndex}`]: { content: '', code: '' } }));
         }
     };
-
-    const handleAddQuestion = (levelIndex, slideIndex, sectionIndex) => {
+    const handleAddQuestion = (levelIndex, slideIndex) => {
         setCourseData(prevData => {
             const updatedLevels = [...prevData.levels];
-            const newQuestionEntry = {
-                questionText: newQuestion.questionText,
-                type: 'mcq',
-                options: newQuestion.options,
-                correctAnswers: newQuestion.correctAnswers,
-                code: newQuestion.code
+
+            // Prepare new section data
+            const newSection = {
+                content: slideInputs[`${levelIndex}-${slideIndex}`]?.content || '',
+                code: slideInputs[`${levelIndex}-${slideIndex}`]?.code || '',
+                questions: [{
+                    questionText: newQuestion.questionText,
+                    type: 'mcq',
+                    options: newQuestion.options,
+                    correctAnswers: newQuestion.correctAnswers,
+                    code: newQuestion.code
+                }]
             };
-            updatedLevels[levelIndex].slides[slideIndex].sections[sectionIndex].questions.push(newQuestionEntry);
+
+            // Add the new section to the target slide
+            updatedLevels[levelIndex].slides[slideIndex].sections.push(newSection);
+
             return { ...prevData, levels: updatedLevels };
         });
+
+        // Reset input fields and state
         setNewQuestion({ questionText: '', options: ['', ''], correctAnswers: [], code: '' });
+        setSlideInputs(prev => ({ ...prev, [`${levelIndex}-${slideIndex}`]: { content: '', code: '' } }));
+        setShowAddQuestion(false);
+        setShowAddQuestionIndex(null);
     };
 
     const handleAddOption = () => {
@@ -261,109 +275,146 @@ const AddCoursePage = () => {
                                                             <Typography variant="body1">
                                                                 {q.questionText}
                                                             </Typography>
+
+                                                            {/* Display code if it exists */}
+                                                            {q.code && (
+                                                                <Box mt={1} p={1} bgcolor="#f0f0f0" borderRadius="4px">
+                                                                    <Typography variant="body2" color="textSecondary" style={{ fontFamily: 'monospace' }}>
+                                                                        {q.code}
+                                                                    </Typography>
+                                                                </Box>
+                                                            )}
+
+                                                            {/* Map through options and color correct answers green */}
                                                             {q.options.map((option, oIndex) => (
-                                                                <Typography key={oIndex} variant="body2">
+                                                                <Typography
+                                                                    key={oIndex}
+                                                                    variant="body2"
+                                                                    style={{
+                                                                        color: q.correctAnswers.includes(option) ? 'green' : 'inherit',
+                                                                        fontWeight: q.correctAnswers.includes(option) ? 'bold' : 'normal'
+                                                                    }}
+                                                                >
                                                                     {option}
                                                                 </Typography>
                                                             ))}
                                                         </Box>
                                                     ))}
-                                                    <Button
-                                                        onClick={() => setShowAddQuestion(!showAddQuestion)}
-                                                        color="secondary"
-                                                        variant="outlined"
-                                                        sx={{ mt: 2 }}
-                                                    >
-                                                        {showAddQuestion ? 'close' : 'open'} Question form
-                                                    </Button>
-                                                    {showAddQuestion &&
-                                                        <>
-                                                            <Box display="flex" flexDirection="column" mt={2}>
-                                                                <TextField
-                                                                    fullWidth
-                                                                    label="New Question"
-                                                                    value={newQuestion.questionText}
-                                                                    onChange={(e) =>
-                                                                        setNewQuestion(prev => ({ ...prev, questionText: e.target.value }))
-                                                                    }
-                                                                    margin="dense"
-                                                                    multiline
-                                                                />
-                                                                {newQuestion.options.map((option, oIndex) => (
-                                                                    <TextField
-                                                                        key={oIndex}
-                                                                        fullWidth
-                                                                        label={`Option ${oIndex + 1}`}
-                                                                        value={option}
-                                                                        onChange={(e) => handleOptionChange(oIndex, e.target.value)}
-                                                                        margin="dense"
-                                                                        sx={{ mt: 1 }}
-                                                                    />
-                                                                ))}
-                                                                <Button
-                                                                    onClick={handleAddOption}
-                                                                    startIcon={<AddIcon />}
-                                                                    color="secondary"
-                                                                    variant="text"
-                                                                    sx={{ mt: 1 }}
-                                                                >
-                                                                    Add Option
-                                                                </Button>
-                                                                <Box mt={1}>
-                                                                    {newQuestion.options.map((option, oIndex) => (
-                                                                        <Button
-                                                                            key={oIndex}
-                                                                            onClick={() => handleCorrectAnswerToggle(option)}
-                                                                            color={
-                                                                                newQuestion.correctAnswers.includes(option)
-                                                                                    ? 'primary'
-                                                                                    : 'inherit'
-                                                                            }
-                                                                            variant={
-                                                                                newQuestion.correctAnswers.includes(option)
-                                                                                    ? 'contained'
-                                                                                    : 'outlined'
-                                                                            }
-                                                                            sx={{ mr: 1 }}
-                                                                        >
-                                                                            {option}
-                                                                        </Button>
-                                                                    ))}
-                                                                </Box>
-                                                            </Box>
-                                                            <Button
-                                                                onClick={() => handleAddQuestion(levelIndex, slideIndex, sectionIndex)}
-                                                                color="secondary"
-                                                                variant="outlined"
-                                                                sx={{ mt: 2 }}
-                                                                disabled={!newQuestion.options.length || !newQuestion.correctAnswers.length}
-                                                            >
-                                                                Save Question
-                                                            </Button>
-                                                        </>}
+
 
 
 
                                                 </Box>
                                             ))}
-                                            <Box display="flex" mt={2}>
-                                                <TextField
-                                                    fullWidth
-                                                    label="Section Content"
-                                                    value={slideInputs[`${levelIndex}-${slideIndex}`]?.content || ''}
-                                                    onChange={(e) => handleSectionInputChange(levelIndex, slideIndex, 'content', e.target.value)}
-                                                    margin="normal"
-                                                    multiline
-                                                />
-                                                <TextField
-                                                    fullWidth
-                                                    label="Code Example"
-                                                    value={slideInputs[`${levelIndex}-${slideIndex}`]?.code || ''}
-                                                    onChange={(e) => handleSectionInputChange(levelIndex, slideIndex, 'code', e.target.value)}
-                                                    margin="normal"
-                                                    sx={{ ml: 1 }}
-                                                    multiline
-                                                />
+                                            <Box display="flex" flexDirection="column" mt={2}>
+                                                <Box display="flex">
+                                                    <TextField
+                                                        fullWidth
+                                                        label="Section Content"
+                                                        value={slideInputs[`${levelIndex}-${slideIndex}`]?.content || ''}
+                                                        onChange={(e) => handleSectionInputChange(levelIndex, slideIndex, 'content', e.target.value)}
+                                                        margin="normal"
+                                                        multiline
+                                                    />
+                                                    <TextField
+                                                        fullWidth
+                                                        label="Code Example"
+                                                        value={slideInputs[`${levelIndex}-${slideIndex}`]?.code || ''}
+                                                        onChange={(e) => handleSectionInputChange(levelIndex, slideIndex, 'code', e.target.value)}
+                                                        margin="normal"
+                                                        sx={{ ml: 1 }}
+                                                        multiline
+                                                    />
+                                                </Box>
+                                                <Button
+                                                    onClick={() => {
+                                                        setShowAddQuestion(prev => !prev);  // Toggle showAddQuestion state
+                                                    }}
+                                                    color="secondary"
+                                                    variant="outlined"
+                                                    sx={{ mt: 2 }}
+                                                >
+                                                    {showAddQuestion ? 'Close' : 'Open'} Question Form
+                                                </Button>
+
+                                                {showAddQuestion && (
+                                                    <>
+                                                        <Box display="flex" flexDirection="column" mt={2}>
+                                                            <TextField
+                                                                fullWidth
+                                                                label="New Question"
+                                                                value={newQuestion.questionText}
+                                                                onChange={(e) =>
+                                                                    setNewQuestion(prev => ({ ...prev, questionText: e.target.value }))
+                                                                }
+                                                                margin="dense"
+                                                                multiline
+                                                            />
+                                                            <TextField
+                                                                fullWidth
+                                                                label="Code (optional)"
+                                                                value={newQuestion.code}
+                                                                onChange={(e) =>
+                                                                    setNewQuestion(prev => ({ ...prev, code: e.target.value }))
+                                                                }
+                                                                margin="dense"
+                                                                multiline
+                                                                sx={{ mt: 1 }}
+                                                            />
+                                                            {newQuestion.options.map((option, oIndex) => (
+                                                                <TextField
+                                                                    key={oIndex}
+                                                                    fullWidth
+                                                                    label={`Option ${oIndex + 1}`}
+                                                                    value={option}
+                                                                    onChange={(e) => handleOptionChange(oIndex, e.target.value)}
+                                                                    margin="dense"
+                                                                    sx={{ mt: 1 }}
+                                                                />
+                                                            ))}
+                                                            <Button
+                                                                onClick={handleAddOption}
+                                                                startIcon={<AddIcon />}
+                                                                color="secondary"
+                                                                variant="text"
+                                                                sx={{ mt: 1 }}
+                                                            >
+                                                                Add Option
+                                                            </Button>
+                                                            <Box mt={1}>
+                                                                {newQuestion.options.map((option, oIndex) => (
+                                                                    <Button
+                                                                        key={oIndex}
+                                                                        onClick={() => handleCorrectAnswerToggle(option)}
+                                                                        color={
+                                                                            newQuestion.correctAnswers.includes(option)
+                                                                                ? 'primary'
+                                                                                : 'inherit'
+                                                                        }
+                                                                        variant={
+                                                                            newQuestion.correctAnswers.includes(option)
+                                                                                ? 'contained'
+                                                                                : 'outlined'
+                                                                        }
+                                                                        sx={{ mr: 1 }}
+                                                                    >
+                                                                        {option}
+                                                                    </Button>
+                                                                ))}
+                                                            </Box>
+                                                        </Box>
+                                                        <Button
+                                                            onClick={() => handleAddQuestion(levelIndex, slideIndex)}
+                                                            color="secondary"
+                                                            variant="outlined"
+                                                            sx={{ mt: 2 }}
+                                                            disabled={!newQuestion.options.length || !newQuestion.correctAnswers.length}
+                                                        >
+                                                            Save Question and Add New Section
+                                                        </Button>
+                                                    </>
+                                                )}
+
 
                                             </Box>
                                             <Button
@@ -403,6 +454,7 @@ const AddCoursePage = () => {
                             onClick={handleAddLevel}
                             startIcon={<AddIcon />}
                             color="primary"
+                            disabled={newLevelTitle == '' ? true : false}
                             variant="contained"
                             sx={{ ml: 2, height: '56px' }}
                         >

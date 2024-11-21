@@ -29,38 +29,40 @@ const Question = ({ question, userAnswer, handleAnswerSelect, isCorrect, languag
 
     // Render MCQ options with correct styling
     const renderOptions = () => {
-        return question.options.map((option, optionIndex) => {
-            const isOptionSelected = isSelected(option);
-
-            return (
-                <Button
-                    key={optionIndex}
-                    variant={isOptionSelected ? "contained" : "outlined"}
-                    onClick={() => handleAnswerSelect(option)}
-                    sx={{
-                        marginBottom: 2,
-                        maxWidth: '500px', // Set a maximum width
-                        width: '100%', // Make the width responsive
-                        textTransform: 'none',
-                        textAlign: 'left',
-                        justifyContent: 'flex-start', // Center text within the button
-                        backgroundColor: isOptionSelected ? colors.selected : colors.background,
-                        color: isOptionSelected ? '#fff' : colors.color,
-                        '&:hover': {
-                            backgroundColor: isOptionSelected ? colors.selected : colors.hover,
-                        },
-                        '&:focus': {
-                            outline: 'none', // Remove default focus outline
-                            boxShadow: (theme) => `0 0 0 2px ${theme.palette.primary.main}`, // Add custom focus outline
-                        },
-                    }}
-                >
-                    {String.fromCharCode(65 + optionIndex) + ". " + option} {/* A, B, C, ... */}
-                </Button>
-            );
-        });
+        return question.options
+            .filter(option => option.trim() !== '') // Filter out empty options
+            .map((option, optionIndex) => {
+                const isOptionSelected = isSelected(option);
+    
+                return (
+                    <Button
+                        key={optionIndex}
+                        variant={isOptionSelected ? "contained" : "outlined"}
+                        onClick={() => handleAnswerSelect(option)}
+                        sx={{
+                            marginBottom: 2,
+                            maxWidth: '500px', // Set a maximum width
+                            width: '100%', // Make the width responsive
+                            textTransform: 'none',
+                            textAlign: 'left',
+                            justifyContent: 'flex-start', // Center text within the button
+                            backgroundColor: isOptionSelected ? colors.selected : colors.background,
+                            color: isOptionSelected ? '#fff' : colors.color,
+                            '&:hover': {
+                                backgroundColor: isOptionSelected ? colors.selected : colors.hover,
+                            },
+                            '&:focus': {
+                                outline: 'none', // Remove default focus outline
+                                boxShadow: (theme) => `0 0 0 2px ${theme.palette.primary.main}`, // Add custom focus outline
+                            },
+                        }}
+                    >
+                        {String.fromCharCode(65 + optionIndex) + ". " + option} {/* A, B, C, ... */}
+                    </Button>
+                );
+            });
     };
-
+    
     return (
         <Box mt={2} sx={{ textAlign: 'center', borderTop: 1, paddingTop: 2 }}>
             {/* Ensure you're rendering the questionText properly */}

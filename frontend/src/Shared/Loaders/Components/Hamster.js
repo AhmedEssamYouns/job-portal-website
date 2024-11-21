@@ -1,5 +1,5 @@
 import React from 'react';
-import './HourglassLoader.css'; // Import the CSS file
+import '../style/HamsterLoader.css'
 
 const HourglassLoader = () => {
     return (

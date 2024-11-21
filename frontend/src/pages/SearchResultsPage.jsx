@@ -1,10 +1,10 @@
 // SearchResultsPage.js
 import React, { useEffect, useState } from 'react';
-import CourseCard from '../components/CourseCard';
+import CourseCard from '../Shared/Course/client/CourseCard';
 import { Grid, CircularProgress, Typography, Box } from '@mui/material';
 import { fetchCourses } from '../api/courses';
 import { useLocation } from 'react-router-dom';
-import HourglassLoader from '../components/loader';
+import HourglassLoader from '../Shared/Loaders/Components/Hamster';
 
 const SearchResultsPage = () => {
   const [courses, setCourses] = useState([]);

@@ -12,7 +12,7 @@ import {
   Alert, // Import Alert
 } from '@mui/material';
 import { keyframes } from '@emotion/react';
-import RobotLoader from '../components/Robot';
+import RobotLoader from '../Shared/Loaders/Components/Robot';
 import { Link } from 'react-router-dom';
 
 const fadeIn = keyframes`

@@ -1,5 +1,5 @@
 import React from 'react';
-import './RobotLoader.css'; // Import the CSS file
+import '../style/RobotLoader.css'; 
 import { useTheme } from '@mui/material';
 
 

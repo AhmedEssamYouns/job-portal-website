@@ -3,17 +3,17 @@ import { Link, useParams } from 'react-router-dom';
 import { completeCourse, completeLevel, fetchCourseById } from '../api/courses';
 import { Box, Typography, Grid, CircularProgress, IconButton, Card, CardContent } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
-import LevelDrawer from '../components/LevelDrawer';
-import SlideContent from '../components/SlideContent';
-import Question from '../components/Question';
-import NavigationButtons from '../components/NavigationButtons';
+import LevelDrawer from '../Shared/Course/client/LevelDrawer';
+import SlideContent from '../Shared/Course/client/SlideContent'
+import Question from '../Shared/Course/client/Question';
+import NavigationButtons from '../Shared/Course/client/NavigationButtons';
 import { gruvboxDark, coldarkCold } from 'react-syntax-highlighter/dist/esm/styles/prism';
 import MenuIcon from '@mui/icons-material/Menu';
 import { useMediaQuery } from '@mui/material';
 import { checkLogin } from '../api/users';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import { green } from '@mui/material/colors';
-import HourglassLoader from '../components/loader';
+import HourglassLoader from '../Shared/Loaders/Components/Hamster';
 
 const LevelDetail = () => {
     const { courseId, levelId } = useParams();

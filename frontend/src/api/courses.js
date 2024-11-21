@@ -1,6 +1,6 @@
 import { checkLogin, fetchUserById } from "./users";
 
-const BASE_API_URL = 'http://localhost:5000/api/';
+const BASE_API_URL = 'https://job-portal-website-production.up.railway.app/api/';
 
 
 

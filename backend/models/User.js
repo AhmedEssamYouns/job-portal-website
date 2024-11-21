@@ -5,6 +5,8 @@ const userSchema = new mongoose.Schema({
   email: { type: String, required: true, unique: true },
   password: { type: String, required: true },
   completedCourses: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Course' }],
+  resetPasswordToken: String,
+  resetPasswordExpiry: Date,
 });
 
 module.exports = mongoose.model('User', userSchema);

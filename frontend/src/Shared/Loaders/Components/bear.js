@@ -1,5 +1,5 @@
 import React from 'react';
-import './BearLoader.css'; // Import the CSS file
+import '../style/BearLoader.css'; 
 
 const BearLoader = () => {
     return (

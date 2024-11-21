@@ -10,10 +10,10 @@ import {
   useTheme,
 } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
-import { checkLogin, fetchUserById } from '../api/users';
+import { checkLogin, fetchUserById } from '../../../api/users'
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import MilitaryTechIcon from '@mui/icons-material/MilitaryTech';
-import { fetchCourseById } from '../api/courses';
+import { fetchCourseById } from '../../../api/courses';
 import {
   SiHtml5,
   SiCss3,
@@ -27,7 +27,7 @@ import {
   SiTypescript,
   SiKotlin
 } from 'react-icons/si';
-import './SocialIcons.css';
+
 
 const languageIcons = {
   javascript: { icon: <SiJavascript />, color: '#F7DF1E' }, // JavaScript color
@@ -112,7 +112,7 @@ const CourseCard = ({ course }) => {
   const PlaceholderCard = () => (
     <Card
       sx={{
-        height: '250px',
+        height: '220px',
         display: 'flex',
         flexDirection: 'column',
         position: 'relative',
@@ -140,8 +140,9 @@ const CourseCard = ({ course }) => {
       ) : (
         <Card
           sx={{
-            width: '100%', 
+            width: '100%',
             maxWidth: '400px',
+            height: '220px',
             display: 'flex',
             marginTop: '10px',
             flexDirection: 'column',
@@ -167,12 +168,12 @@ const CourseCard = ({ course }) => {
             />
           )}
           {/* Language Icon and Title Row inside CardContent */}
-          <CardContent sx={{ flexGrow: 1, paddingTop: '5px' }}>
+          <CardContent sx={{ flexGrow: 1, paddingTop: '2px' }}>
             <Box
               sx={{
                 display: 'flex',
                 alignItems: 'center',
-                mb: '10px',
+                mb: '5px',
               }}
             >
               {languageIcons[course.language.toLowerCase()] ? (
@@ -181,7 +182,7 @@ const CourseCard = ({ course }) => {
                     color: languageIcons[course.language.toLowerCase()].color,
                     fontSize: '2.5rem', // Adjust icon size here
                     marginRight: '10px', // Space between icon and title
-                    marginTop: '10px',
+                    marginTop: '5px',
                   }}
                 >
                   {languageIcons[course.language.toLowerCase()].icon}
@@ -193,22 +194,32 @@ const CourseCard = ({ course }) => {
                   style={{ width: '2.5rem', height: '2.5rem', marginRight: '10px' }}
                 />
               )}
-              <Typography variant="h6" component="div" width={'200px'} sx={{ fontWeight: 'bold' }}>
+              <Typography variant="h7" component="div" width={'200px'} sx={{ fontWeight: 'bold' }}>
                 {course.title}
               </Typography>
             </Box>
-            <Typography  variant="body2"  color="text.secondary" sx={{ mb: 1 , WebkitLineClamp: 3,
-              textOverflow: 'ellipsis',
-             }}>
+            <Typography
+              variant="body2"
+              color="text.secondary"
+              sx={{
+                mb: 0,
+                display: '-webkit-box',
+                overflow: 'hidden',
+                WebkitBoxOrient: 'vertical',
+                WebkitLineClamp: 2, // Limit to 3 lines
+                textOverflow: 'ellipsis',
+              }}
+            >
               {course.description}
             </Typography>
+
             <Typography variant="body2" color="text.secondary">
               <strong>Language:</strong> {course.language}
             </Typography>
           </CardContent>
-          <CardActions sx={{ justifyContent: 'space-between', mt: 'auto', flexDirection: { xs: 'column', md: 'row' } }}>
+          <CardActions sx={{ justifyContent: 'space-between', mt: '2px', flexDirection: { xs: 'column', md: 'row' } }}>
             {levelsCompleted > 0 && (
-              <Box sx={{ mt: 2, width: '100%' }}>
+              <Box sx={{ mt: 1, width: '100%' }}>
                 <Typography variant="body2" color="text.secondary" textAlign={{ xs: 'center', md: 'left' }}>
                   Progress: {levelsCompleted} of {totalLevels} levels completed
                 </Typography>
@@ -226,7 +237,7 @@ const CourseCard = ({ course }) => {
                   display: 'flex',
                   alignSelf: 'flex-end',
                   alignItems: 'center',
-                  padding: '2px 4px',
+                  padding: '1px 3px',
                   background: theme.palette.mode === 'light'
                     ? 'linear-gradient(135deg, #1976d2, #42a5f5)'
                     : 'linear-gradient(135deg, #0d47a1, #1565c0)',
@@ -255,7 +266,7 @@ const CourseCard = ({ course }) => {
           sx: {
             backgroundColor: '#f44336',
             color: '#fff',
-            padding: '16px',
+            padding: '10px',
             borderRadius: '8px',
             boxShadow: '0 2px 10px rgba(0, 0, 0, 0.2)',
           },

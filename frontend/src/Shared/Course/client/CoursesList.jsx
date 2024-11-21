@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import CourseCard from './CourseCard';
 import { Grid, CircularProgress, Typography, Box, Button } from '@mui/material';
-import { fetchCourses, fetchCoursesWithCompletionStatus, fetchIncompletedCourses } from '../api/courses';
-import { checkLogin } from '../api/users';
+import { fetchCourses, fetchCoursesWithCompletionStatus, fetchIncompletedCourses } from '../../../api/courses';
+import { checkLogin } from '../../../api/users';
 import { useNavigate } from 'react-router-dom';
-import HourglassLoader from './loader';
+import HourglassLoader from '../../Loaders/Components/Hamster';
 
 const CoursesList = ({ fetchType }) => {
   const [courses, setCourses] = useState([]);
