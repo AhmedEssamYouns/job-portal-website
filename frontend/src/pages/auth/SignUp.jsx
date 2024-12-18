@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { TextField, Button, Typography, Box, Card, CardContent, Grid, useMediaQuery, Alert, IconButton, Snackbar, SnackbarContent } from '@mui/material';
 import { Visibility, VisibilityOff } from '@mui/icons-material';
 import { useTheme } from '@mui/material/styles';
-import { signup } from '../../api/users';
+import { signup } from '../../services/users';
 import { useNavigate } from 'react-router-dom';
 import { Link } from 'react-router-dom';
 

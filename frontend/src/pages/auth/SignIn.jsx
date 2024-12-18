@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { TextField, Button, Typography, Box, Card, CardContent, Grid, useMediaQuery, Alert, Snackbar } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
-import { login } from '../../api/users';
+import { login } from '../../services/users';
 import { useNavigate,Link } from 'react-router-dom';
 
 const SignIn = () => {

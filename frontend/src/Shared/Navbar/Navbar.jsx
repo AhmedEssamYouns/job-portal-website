@@ -25,8 +25,8 @@ import SearchIcon from '@mui/icons-material/Search';
 import CloseIcon from '@mui/icons-material/Close';
 import SchoolIcon from '@mui/icons-material/School';
 import { useTheme } from '@mui/material/styles';
-import { logout, checkLogin } from '../../api/users';
-import { fetchCourses } from '../../api/courses';
+import { logout, checkLogin } from '../../services/users';
+import { fetchCourses } from '../../services/courses';
 
 const Navbar = () => {
     const { toggleTheme } = useThemeContext();

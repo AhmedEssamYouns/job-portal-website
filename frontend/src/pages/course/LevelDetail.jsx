@@ -1,19 +1,19 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
-import { completeCourse, completeLevel, fetchCourseById } from '../../api/courses';
+import { completeCourse, completeLevel, fetchCourseById } from '../../services/courses';
 import { Box, Typography, Grid, CircularProgress, IconButton, Card, CardContent } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
-import LevelDrawer from '../../Shared/Course/client/LevelDrawer';
-import SlideContent from '../../Shared/Course/client/SlideContent'
-import Question from '../../Shared/Course/client/Question';
-import NavigationButtons from '../../Shared/Course/client/NavigationButtons';
+import LevelDrawer from '../../shared/Course/client/LevelDrawer';
+import SlideContent from '../../shared/Course/client/SlideContent'
+import Question from '../../shared/Course/client/Question';
+import NavigationButtons from '../../shared/Course/client/NavigationButtons';
 import { gruvboxDark, coldarkCold } from 'react-syntax-highlighter/dist/esm/styles/prism';
 import MenuIcon from '@mui/icons-material/Menu';
 import { useMediaQuery } from '@mui/material';
-import { checkLogin } from '../../api/users';
+import { checkLogin } from '../../services/users';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import { green } from '@mui/material/colors';
-import HourglassLoader from '../../Shared/Loaders/Components/Hamster';
+import HourglassLoader from '../../shared/Loaders/Components/Hamster';
 
 const LevelDetail = () => {
     const { courseId, levelId } = useParams();

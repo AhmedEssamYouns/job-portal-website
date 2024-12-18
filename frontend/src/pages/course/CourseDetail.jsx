@@ -1,12 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { fetchCourseById } from '../../api/courses';
+import { fetchCourseById } from '../../services/courses';
 import { Card, CardContent, Typography, Grid, Box } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
-import { checkLogin, fetchUserById } from '../../api/users';
+import { checkLogin, fetchUserById } from '../../services/users';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import { green } from '@mui/material/colors';
-import HourglassLoader from '../../Shared/Loaders/Components/Hamster';
+import HourglassLoader from '../../shared/Loaders/Components/Hamster';
 
 const CourseDetail = () => {
   const { id } = useParams();

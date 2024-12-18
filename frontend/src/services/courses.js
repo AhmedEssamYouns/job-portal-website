@@ -11,7 +11,7 @@ export const addCourse = async (courseData) => {
             headers: {
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify(courseData), // Convert course data to JSON format
+            body: JSON.stringify(courseData), 
         });
 
         if (!response.ok) {
@@ -19,7 +19,7 @@ export const addCourse = async (courseData) => {
             throw new Error(errorData.message || 'Failed to add course');
         }
 
-        const data = await response.json(); // Response with the created course data
+        const data = await response.json(); 
         return data;
     } catch (error) {
         console.error('Error adding course:', error.message);

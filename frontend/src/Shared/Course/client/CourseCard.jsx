@@ -10,10 +10,10 @@ import {
   useTheme,
 } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
-import { checkLogin, fetchUserById } from '../../../api/users'
+import { checkLogin, fetchUserById } from '../../../services/users'
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import MilitaryTechIcon from '@mui/icons-material/MilitaryTech';
-import { fetchCourseById } from '../../../api/courses';
+import { fetchCourseById } from '../../../services/courses';
 import {
   SiHtml5,
   SiCss3,

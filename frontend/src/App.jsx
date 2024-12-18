@@ -2,17 +2,17 @@ import React from 'react';
 import { ThemeProvider } from '@mui/material/styles';
 import { CssBaseline, Box } from '@mui/material';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query'; // إضافة react-query
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query' 
 import { useThemeContext } from './context/ThemeContext';
-import Navbar from './Shared/Navbar/Navbar';
+import Navbar from './shared/Navbar/Navbar'
 import HomePage from './pages/home/HomePage';
 import theme from './styles/theme';
 import SignIn from './pages/auth/SignIn';
 import SignUp from './pages/auth/SignUp';
-import { checkLogin } from './api/users';
+import { checkLogin } from './services/users';
 import CourseDetail from './pages/course/CourseDetail';
 import LevelDetail from './pages/course/LevelDetail';
-import Footer from './Shared/Fotter/Fotter';
+import Footer from './shared/Fotter/Fotter';
 import CoursesPage from './pages/course/CoursePage';
 import UserProfile from './pages/profile/Profile';
 import ScrollToTop from './utils/scrolltotop';
@@ -40,7 +40,7 @@ const App = () => {
         >
           <Router>
             <ScrollToTop />
-            <Navbar />
+            <Navbar/>
             <Box sx={{ flex: 1 }}>
               <Routes>
                 <Route path="/" element={<HomePage />} />
