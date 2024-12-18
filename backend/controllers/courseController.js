@@ -3,6 +3,152 @@ const Level = require('../models/Level');
 const Slide = require('../models/Slide');
 const Question = require('../models/Question');
 const User =require('../models/User')
+const Comment = require('../models/comment');
+const mongoose = require('mongoose');
+
+
+exports.addCommentToCourse = async (req, res) => {
+  const { courseId } = req.params;
+  const { userId, name, comment, rating } = req.body;
+
+  try {
+    // Validate input data
+    if (!userId || !name || !comment || !rating) {
+      return res.status(400).json({ message: 'All fields are required.' });
+    }
+
+    // Ensure rating is between 1 and 5
+    const validRating = Math.min(Math.max(rating, 1), 5);
+
+    // Find the course by ID
+    const course = await Course.findById(courseId);
+    if (!course) {
+      return res.status(404).json({ message: 'Course not found' });
+    }
+
+    // Create the Comment document
+    const newComment = new Comment({
+      userId,  // Directly store the userId as a string
+      name,
+      comment,
+      rating: validRating,
+      createdAt: Date.now(),
+      edited: false
+    });
+
+    // Save the new comment to the database
+    await newComment.save();
+
+    // Add the new comment's ObjectId to the course's comments array
+    course.comments.push(newComment._id);
+
+    // Update the totalRating and commentCount of the course
+    course.totalRating += validRating; // Add the new comment's rating
+    course.commentCount += 1; // Increment the comment count
+
+    // Recalculate the course's rating, capped at 5
+    course.rating = Math.min(course.totalRating / course.commentCount, 5);
+
+    // Save the updated course
+    await course.save();
+
+    res.status(201).json({ message: 'Comment added successfully', comment: newComment });
+  } catch (error) {
+    console.error('Error adding comment:', error);
+    res.status(500).json({ message: 'Failed to add comment', error: error.message });
+  }
+};
+
+
+
+
+// Edit a comment on a course
+
+exports.editComment = async (req, res) => {
+  const { courseId, commentId } = req.params;
+  const { comment, rating } = req.body;
+
+  try {
+    // Ensure rating is between 1 and 5
+    const validRating = Math.min(Math.max(rating, 1), 5);
+
+    // Find the course and the comment
+    const course = await Course.findById(courseId);
+    if (!course) {
+      return res.status(404).json({ message: 'Course not found' });
+    }
+
+    const commentToEdit = await Comment.findById(commentId);
+    if (!commentToEdit) {
+      return res.status(404).json({ message: 'Comment not found' });
+    }
+
+    // Update the totalRating by removing the old rating and adding the new one
+    course.totalRating -= commentToEdit.rating;  // Subtract old rating
+    course.totalRating += validRating;  // Add new rating
+
+    // Update the course's rating based on the updated totalRating, capped at 5
+    course.rating = Math.min(course.totalRating / course.commentCount, 5);
+
+    // Update the comment itself
+    commentToEdit.comment = comment;
+    commentToEdit.rating = validRating;
+    commentToEdit.edited = true;
+    await commentToEdit.save();
+
+    // Save the updated course
+    await course.save();
+
+    res.status(200).json({ message: 'Comment edited successfully', comment: commentToEdit });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Failed to edit comment', error });
+  }
+};
+
+// Delete a comment from a course
+exports.deleteComment = async (req, res) => {
+  const { courseId, commentId } = req.params;
+
+  try {
+    const mongoose = require('mongoose');
+    if (!mongoose.Types.ObjectId.isValid(courseId) || !mongoose.Types.ObjectId.isValid(commentId)) {
+      return res.status(400).json({ message: 'Invalid courseId or commentId' });
+    }
+
+    const course = await Course.findById(courseId);
+    if (!course) {
+      return res.status(404).json({ message: 'Course not found' });
+    }
+
+    const commentToDelete = await Comment.findById(commentId);
+    if (!commentToDelete) {
+      return res.status(404).json({ message: 'Comment not found' });
+    }
+
+    if (!course.comments.includes(commentId)) {
+      return res.status(400).json({ message: 'Comment does not belong to the specified course' });
+    }
+
+    // Update the totalRating and commentCount
+    course.totalRating -= commentToDelete.rating; // Subtract the rating of the deleted comment
+    course.commentCount -= 1; // Decrease the comment count
+    course.rating = course.commentCount === 0 ? 0 : Math.min(course.totalRating / course.commentCount, 5);
+
+    // Remove the comment from the course's comments array
+    course.comments.pull(commentId);
+    await course.save();
+
+    // Delete the comment itself using the new method
+    await Comment.deleteOne({ _id: commentId });
+
+    res.status(200).json({ message: 'Comment deleted successfully' });
+  } catch (error) {
+    console.error('Error in deleteComment:', error.message);
+    res.status(500).json({ message: 'Failed to delete comment', error: error.message });
+  }
+};
+
 
 exports.addCourse = async (req, res) => {
   const { title, description, language, levels } = req.body;
@@ -73,12 +219,11 @@ exports.addCourse = async (req, res) => {
 
 
 
-
 exports.getCourse = async (req, res) => {
   const courseId = req.params.id; // Get the course ID from the URL parameters
 
   try {
-    // Populate levels, slides, sections, and questions within sections
+    // Populate levels, slides, sections, questions, and comments (with full content)
     const course = await Course.findById(courseId)
       .populate({
         path: 'levels',
@@ -88,6 +233,10 @@ exports.getCourse = async (req, res) => {
             path: 'sections.questions', // Populate questions within each section of slides
           },
         },
+      })
+      .populate({
+        path: 'comments',  // Populate comments field
+        select: 'userId name comment rating createdAt edited',  // Fetch these fields from the Comment model
       });
 
     if (!course) {
@@ -100,7 +249,6 @@ exports.getCourse = async (req, res) => {
     res.status(500).json({ message: 'Failed to retrieve course', error });
   }
 };
-
 
   
 exports.getAllCourses = async (req, res) => {
