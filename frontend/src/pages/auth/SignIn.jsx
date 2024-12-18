@@ -1,17 +1,33 @@
 import React, { useState } from 'react';
 import { TextField, Button, Typography, Box, Card, CardContent, Grid, useMediaQuery, Alert, Snackbar } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
-import { login } from '../../services/users';
-import { useNavigate,Link } from 'react-router-dom';
+import { useLogin } from '../../hooks/useAuth'; 
+import { useNavigate, Link } from 'react-router-dom';
 
 const SignIn = () => {
     const [formData, setFormData] = useState({ email: '', password: '' });
-    const [error, setError] = useState(''); 
-    const [isLoading, setIsLoading] = useState(false); 
-    const [openSnackbar, setOpenSnackbar] = useState(false); 
-    const [snackbarMessage, setSnackbarMessage] = useState(''); 
+    const [error, setError] = useState('');
+    const [openSnackbar, setOpenSnackbar] = useState(false);
+    const [snackbarMessage, setSnackbarMessage] = useState('');
     const theme = useTheme();
-    const isMobile = useMediaQuery(theme.breakpoints.down('sm')); 
+    const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
+    const navigate = useNavigate();
+
+ 
+    const { mutate: login, isLoading } = useLogin(
+        (data) => {
+            // Success callback
+            setSnackbarMessage('Sign in successful! Welcome back!');
+            setOpenSnackbar(true);
+            navigate('/'); 
+        },
+        (error) => {
+            // Error callback
+            setError(error.message);
+            setSnackbarMessage(error.message);
+            setOpenSnackbar(true);
+        }
+    );
 
     const handleChange = (e) => {
         setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -19,26 +35,19 @@ const SignIn = () => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        setIsLoading(true); 
-        setError(''); 
-
+        setError('');
+        setSnackbarMessage('');
+        
         try {
-            const data = await login(formData); 
-            setSnackbarMessage('Sign in successful! Welcome back!'); 
-            setOpenSnackbar(true); 
-            console.log(data); 
-            window.location.href = '/';
+            await login(formData); // Triggers login mutation
         } catch (error) {
-            setError(error.message); 
+            // This block can be optional as we're handling error in the mutation directly
             setSnackbarMessage(error.message);
             setOpenSnackbar(true);
-        } finally {
-            setIsLoading(false); 
         }
     };
-
     const handleCloseSnackbar = () => {
-        setOpenSnackbar(false); // Close Snackbar
+        setOpenSnackbar(false); 
     };
 
     return (
@@ -62,7 +71,7 @@ const SignIn = () => {
                         sx={{
                             width: '70%',
                             height: 'auto',
-                            maxWidth: '80%', // Adjusts size for responsiveness
+                            maxWidth: '80%', 
                             objectFit: 'contain',
                         }}
                     />
@@ -135,7 +144,7 @@ const SignIn = () => {
                                 variant="contained"
                                 color="primary"
                                 fullWidth
-                                disabled={isLoading} // Disable when loading
+                                disabled={isLoading} 
                             >
                                 {isLoading ? 'Signing In...' : 'Sign In'}
                             </Button>
@@ -150,7 +159,7 @@ const SignIn = () => {
                         <Box textAlign="center" sx={{ marginTop: 2 }}>
                             <Typography variant="body2">
                                 Don’t have an account?
-                                <Typography component={Link} to={'/signup'} sx={{ marginLeft: 1 ,color:theme.palette.primary.main }}>
+                                <Typography component={Link} to={'/signup'} sx={{ marginLeft: 1, color: theme.palette.primary.main }}>
                                     Sign Up
                                 </Typography>
                             </Typography>
@@ -164,7 +173,7 @@ const SignIn = () => {
                 open={openSnackbar}
                 autoHideDuration={6000}
                 onClose={handleCloseSnackbar}
-                anchorOrigin={{ vertical: 'top', horizontal: 'center' }} // Position Snackbar
+                anchorOrigin={{ vertical: 'top', horizontal: 'center' }} 
             >
                 <Alert onClose={handleCloseSnackbar} severity={error ? 'error' : 'success'} sx={{ width: '100%' }}>
                     {snackbarMessage}

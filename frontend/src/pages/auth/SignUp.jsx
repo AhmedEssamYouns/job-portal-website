@@ -1,22 +1,23 @@
 import React, { useState } from 'react';
-import { TextField, Button, Typography, Box, Card, CardContent, Grid, useMediaQuery, Alert, IconButton, Snackbar, SnackbarContent } from '@mui/material';
+import { TextField, Button, Typography, Box, Card, CardContent, Grid, useMediaQuery, Alert, IconButton, Snackbar } from '@mui/material';
 import { Visibility, VisibilityOff } from '@mui/icons-material';
 import { useTheme } from '@mui/material/styles';
-import { signup } from '../../services/users';
+import { useSignup } from '../../hooks/useAuth';
 import { useNavigate } from 'react-router-dom';
 import { Link } from 'react-router-dom';
 
 const SignUp = () => {
     const [formData, setFormData] = useState({ username: '', email: '', password: '', confirmPassword: '' });
-    const [error, setError] = useState(''); 
-    const [isLoading, setIsLoading] = useState(false); 
-    const [showPassword, setShowPassword] = useState(false); 
-    const [successMessage, setSuccessMessage] = useState(''); 
-    const [openSnackbar, setOpenSnackbar] = useState(false); 
+    const [error, setError] = useState('');
+    const [showPassword, setShowPassword] = useState(false);
+    const [successMessage, setSuccessMessage] = useState('');
+    const [openSnackbar, setOpenSnackbar] = useState(false);
 
     const navigate = useNavigate();
     const theme = useTheme();
     const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
+
+    const { mutate: signup, isLoading } = useSignup(); // Use signup hook
 
     const handleChange = (e) => {
         setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -28,17 +29,17 @@ const SignUp = () => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        setIsLoading(true);
         setError('');
+        setSuccessMessage('');
 
         // Check if passwords match
         if (formData.password !== formData.confirmPassword) {
             setError('Passwords do not match');
-            setIsLoading(false);
             return;
         }
 
         try {
+            // Using the signup mutation hook
             await signup(formData);
             setSuccessMessage('Sign up successful! Please sign in.');
             setOpenSnackbar(true); // Show success Snackbar
@@ -47,8 +48,6 @@ const SignUp = () => {
             }, 2000); // Redirect to sign-in page after a short delay
         } catch (error) {
             setError(error.message);
-        } finally {
-            setIsLoading(false);
         }
     };
 
@@ -76,7 +75,7 @@ const SignUp = () => {
                         sx={{
                             width: '70%',
                             height: 'auto',
-                            maxWidth: '80%', // Adjusts size for responsiveness
+                            maxWidth: '80%',
                             objectFit: 'contain',
                         }}
                     />
@@ -94,15 +93,10 @@ const SignUp = () => {
                     borderBottomLeftRadius: '100px',
                     justifyContent: 'center',
                     height: 'auto',
-                    borderRadius: '0px',
                     margin: '0px',
                     [theme.breakpoints.down('sm')]: {
-                        borderBottomRightRadius: '100px',
-                        borderTopLeftRadius: '100px',
-                        borderTopRightRadius: '100px',
-                        borderBottomLeftRadius: '100px',
                         marginTop: '20px',
-                        marginBottom:'20px',
+                        marginBottom: '20px',
                         marginRight: '5px',
                         marginLeft: '5px',
                     },
@@ -111,7 +105,7 @@ const SignUp = () => {
                 gap={5}
                 alignItems="center"
             >
-                <Box textAlign="center" paddingRight={3}paddingLeft={3}>
+                <Box textAlign="center" paddingRight={3} paddingLeft={3}>
                     <Typography variant="h7">
                         Create your account and start your journey with us!
                     </Typography>
