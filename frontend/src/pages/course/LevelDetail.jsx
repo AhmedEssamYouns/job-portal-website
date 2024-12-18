@@ -3,17 +3,17 @@ import { Link, useParams } from 'react-router-dom';
 import { completeCourse, completeLevel, fetchCourseById } from '../../services/courses';
 import { Box, Typography, Grid, CircularProgress, IconButton, Card, CardContent } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
-import LevelDrawer from '../../test/Course/client/LevelDrawer';
-import SlideContent from '../../test/Course/client/SlideContent'
-import Question from '../../test/Course/client/Question';
-import NavigationButtons from '../../test/Course/client/NavigationButtons';
+import LevelDrawer from '../../shared/Course/client/LevelDrawer';
+import SlideContent from '../../shared/Course/client/SlideContent'
+import Question from '../../shared/Course/client/Question';
+import NavigationButtons from '../../shared/Course/client/NavigationButtons';
 import { gruvboxDark, coldarkCold } from 'react-syntax-highlighter/dist/esm/styles/prism';
 import MenuIcon from '@mui/icons-material/Menu';
 import { useMediaQuery } from '@mui/material';
 import { checkLogin } from '../../services/users';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import { green } from '@mui/material/colors';
-import HourglassLoader from '../../test/Loaders/Components/Hamster';
+import HourglassLoader from '../../shared/Loaders/Components/Hamster';
 
 const LevelDetail = () => {
     const { courseId, levelId } = useParams();
