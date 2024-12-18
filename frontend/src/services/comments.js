@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 
-const BASE_API_URL = 'http://localhost:5000/api/';
+const BASE_API_URL = 'http://localhost:5000/api';
 
 
 export const addCommentToCourse = async (courseId, commentData) => {
@@ -15,7 +15,7 @@ export const addCommentToCourse = async (courseId, commentData) => {
       return response.data;
     } catch (error) {
       console.error('Error adding comment:', error.response?.data?.message || error.message);
-      throw new Error(error.response?.data?.message || 'Failed to add comment');
+      throw new Error(error.message);
     }
   };
 
@@ -53,6 +53,7 @@ export const deleteComment = async (courseId, commentId) => {
       return response.data; // The response will contain the updated comment
     } catch (error) {
       console.error('Error editing comment:', error.response?.data?.message || error.message);
-      throw new Error(error.response?.data?.message || 'Failed to edit comment');
+      throw new Error(error.message);
+
     }
   };
