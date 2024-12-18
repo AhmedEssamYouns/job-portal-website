@@ -27,6 +27,7 @@ const CommentItem = ({
         borderRadius: 2,
         backgroundColor: "background.paper",
         boxShadow: 2,
+        minHeight: "100px",
         position: "relative",
       }}
     >
@@ -75,14 +76,14 @@ const CommentItem = ({
           </IconButton>
         ) : (
           comment.userId === currentUserId && (
-            <>
+            <Box>
               <IconButton onClick={() => handleEditComment(index)} sx={{ color: "primary.main" }}>
                 <Edit />
               </IconButton>
               <IconButton onClick={() => handleDeleteComment(index)} sx={{ color: green[500] }}>
                 <Delete />
               </IconButton>
-            </>
+            </Box>
           )
         )}
       </Box>

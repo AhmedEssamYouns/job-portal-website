@@ -160,6 +160,8 @@ const CourseDetail = () => {
       {/* Comments Section */}
       <CommentsSection
         currentUserId={CurrentUser?.id}
+        courseId={id}
+        comments={course.comments}
       />
     </Box>
   );

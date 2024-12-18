@@ -4,7 +4,7 @@ import { CssBaseline, Box } from '@mui/material';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query' 
 import { useThemeContext } from './context/ThemeContext';
-import Navbar from './shared/Navbar/Navbar'
+import Navbar from './shared/Navbar/Navbar';
 import HomePage from './pages/home/HomePage';
 import theme from './styles/theme';
 import SignIn from './pages/auth/SignIn';
