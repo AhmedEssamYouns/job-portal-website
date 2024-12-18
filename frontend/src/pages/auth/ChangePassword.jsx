@@ -12,35 +12,19 @@ import {
   Snackbar,
 } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
-import { useLogin } from '../../hooks/useAuth';
-import { useNavigate, Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 
-const SignIn = () => {
-  const [formData, setFormData] = useState({ email: '', password: '' });
+const ChangePassword = () => {
+  const [formData, setFormData] = useState({
+    currentPassword: '',
+    newPassword: '',
+  });
   const [error, setError] = useState('');
   const [openSnackbar, setOpenSnackbar] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState('');
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
   const navigate = useNavigate();
-
-  // Use login hook with success and error callbacks
-  const { mutate: login, isLoading } = useLogin(
-    (data) => {
-      // Success callback
-      setSnackbarMessage('Sign in successful! Welcome back!');
-      console.log(data);
-      setOpenSnackbar(true);
-      navigate('/');
-      window.location.reload();
-    },
-    (error) => {
-      // Error callback
-      setError(error.message);
-      setSnackbarMessage(error.message);
-      setOpenSnackbar(true);
-    }
-  );
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -51,11 +35,24 @@ const SignIn = () => {
     setError('');
     setSnackbarMessage('');
 
-    // Trigger login mutation
+    // Simulate password change API call
     try {
-      await login(formData); // Mutate the formData (trigger login process)
+      // Replace this with actual API integration
+      if (!formData.currentPassword || !formData.newPassword) {
+        throw new Error('All fields are required.');
+      }
+      if (formData.currentPassword === formData.newPassword) {
+        throw new Error(
+          'New password must be different from the current password.'
+        );
+      }
+
+      setSnackbarMessage('Password changed successfully!');
+      setOpenSnackbar(true);
+      // Navigate or reload as necessary after success
+      navigate('/dashboard');
     } catch (error) {
-      // Error is handled in the mutation's onError callback
+      setError(error.message);
       setSnackbarMessage(error.message);
       setOpenSnackbar(true);
     }
@@ -84,7 +81,7 @@ const SignIn = () => {
         >
           <Box
             component='img'
-            src='https://cdni.iconscout.com/illustration/premium/thumb/sign-up-8694031-6983270.png'
+            src='https://cdni.iconscout.com/illustration/premium/thumb/password-reset-8694031-6983270.png'
             alt='Illustrative image'
             sx={{
               width: '70%',
@@ -96,7 +93,7 @@ const SignIn = () => {
         </Grid>
       )}
 
-      {/* Right Side: Sign In Form */}
+      {/* Right Side: Change Password Form */}
       <Grid
         item
         xs={12}
@@ -128,8 +125,7 @@ const SignIn = () => {
       >
         <Box textAlign='center'>
           <Typography variant='h6'>
-            Discover new skills with our courses. Your learning journey starts
-            here!
+            Secure your account by updating your password regularly.
           </Typography>
         </Box>
 
@@ -142,25 +138,26 @@ const SignIn = () => {
               align='center'
               gutterBottom
             >
-              Sign In
+              Change Password
             </Typography>
 
             <form onSubmit={handleSubmit}>
               <TextField
-                label='Email'
-                name='email'
+                label='Current Password'
+                type='password'
+                name='currentPassword'
                 required
-                value={formData.email}
+                value={formData.currentPassword}
                 onChange={handleChange}
                 fullWidth
                 sx={{ marginBottom: 2 }}
               />
               <TextField
-                label='Password'
+                label='New Password'
                 type='password'
-                name='password'
+                name='newPassword'
                 required
-                value={formData.password}
+                value={formData.newPassword}
                 onChange={handleChange}
                 fullWidth
                 sx={{ marginBottom: 2 }}
@@ -170,9 +167,8 @@ const SignIn = () => {
                 variant='contained'
                 color='primary'
                 fullWidth
-                disabled={isLoading}
               >
-                {isLoading ? 'Signing In...' : 'Sign In'}
+                Change Password
               </Button>
             </form>
 
@@ -184,34 +180,6 @@ const SignIn = () => {
                 {error}
               </Alert>
             )}
-
-            <Box
-              textAlign='center'
-              sx={{ marginTop: 2 }}
-            >
-              <Typography variant='body2'>
-                Don’t have an account?
-                <Typography
-                  component={Link}
-                  to={'/signup'}
-                  sx={{ marginLeft: 1, color: theme.palette.primary.main }}
-                >
-                  Sign Up
-                </Typography>
-              </Typography>
-              <Typography
-                variant='body2'
-                sx={{ marginTop: 1 }}
-              >
-                <Typography
-                  component={Link}
-                  to={'/ForgetPassword'}
-                  sx={{ color: theme.palette.primary.main }}
-                >
-                  Reset your password
-                </Typography>
-              </Typography>
-            </Box>
           </CardContent>
         </Card>
       </Grid>
@@ -235,4 +203,4 @@ const SignIn = () => {
   );
 };
 
-export default SignIn;
+export default ChangePassword;

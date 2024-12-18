@@ -2,13 +2,15 @@ import React from 'react';
 import { ThemeProvider } from '@mui/material/styles';
 import { CssBaseline, Box } from '@mui/material';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query' 
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query'; 
 import { useThemeContext } from './context/ThemeContext';
-import Navbar from './shared/Navbar/Navbar'
+import Navbar from './shared/Navbar/Navbar';
 import HomePage from './pages/home/HomePage';
 import theme from './styles/theme';
 import SignIn from './pages/auth/SignIn';
 import SignUp from './pages/auth/SignUp';
+import ChangePassword from './pages/auth/ChangePassword';
+import ForgetPassword from './pages/auth/ForgetPassword';
 import { checkLogin } from './services/users';
 import CourseDetail from './pages/course/CourseDetail';
 import LevelDetail from './pages/course/LevelDetail';
@@ -49,7 +51,9 @@ const App = () => {
                 <Route path="/admin/addCourse" element={<AddCoursePage />} />
                 <Route path="/signin" element={<SignIn />} />
                 <Route path="/search" element={<SearchResultsPage />} />
+                <Route path="/forgetpassword" element={<ForgetPassword />} />
                 <Route path="/signup" element={<SignUp />} />
+                <Route path="/changepassword" element={isLoggedIn ? <ChangePassword /> : <SignIn />} />
                 <Route path="/courses" element={<CoursesPage />} />
                 <Route path="/profile" element={isLoggedIn ? <UserProfile /> : <SignIn />} />
                 <Route path="/course/:id" element={isLoggedIn ? <CourseDetail /> : <SignIn />} />
