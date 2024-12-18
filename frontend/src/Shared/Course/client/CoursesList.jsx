@@ -1,63 +1,61 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import CourseCard from './CourseCard';
 import { Grid, CircularProgress, Typography, Box, Button } from '@mui/material';
-import { fetchCourses, fetchCoursesWithCompletionStatus, fetchIncompletedCourses } from '../../../api/courses';
-import { checkLogin } from '../../../api/users';
+import { useFetchCourses, useFetchCoursesWithCompletionStatus, useFetchIncompletedCourses } from '../../../hooks/useCourses';
 import { useNavigate } from 'react-router-dom';
 import HourglassLoader from '../../Loaders/Components/Hamster';
+import { checkLogin } from '../../../services/users';
 
 const CoursesList = ({ fetchType }) => {
-  const [courses, setCourses] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
   const navigate = useNavigate();
+  const user = checkLogin();
 
-  useEffect(() => {
-    const loadCourses = async () => {
-      try {
-        let coursesData;
+  // Always call hooks unconditionally
+  const { data: completedCourses = [], isLoading: isLoadingCompleted, isError: isErrorCompleted, error: errorCompleted } = useFetchCoursesWithCompletionStatus();
+  const { data: incompletedCourses = [], isLoading: isLoadingIncompleted, isError: isErrorIncompleted, error: errorIncompleted } = useFetchIncompletedCourses(user?.id);
+  const { data: allCourses = [], isLoading: isLoadingAll, isError: isErrorAll, error: errorAll } = useFetchCourses();
 
-        switch (fetchType) {
-          case 'completed':
-            coursesData = await fetchCoursesWithCompletionStatus();
-            break;
-          case 'incompleted':
-            const user = checkLogin();
-            if (!user) throw new Error('User not logged in');
-            coursesData = await fetchIncompletedCourses(user.id);
-            break;
-          default:
-            coursesData = await fetchCourses();
-        }
+  let courses = [];
+  let isLoading = false;
+  let isError = false;
+  let error = null;
 
-        setCourses(coursesData);
-      } catch (err) {
-        setError(err.message);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    loadCourses();
-  }, [fetchType]);
-
-  if (loading) {
+  // Select the appropriate data and state based on `fetchType`
+  switch (fetchType) {
+    case 'completed':
+      courses = completedCourses;
+      isLoading = isLoadingCompleted;
+      isError = isErrorCompleted;
+      error = errorCompleted;
+      break;
+    case 'incompleted':
+      courses = incompletedCourses;
+      isLoading = isLoadingIncompleted;
+      isError = isErrorIncompleted;
+      error = errorIncompleted;
+      break;
+    default:
+      courses = allCourses;
+      isLoading = isLoadingAll;
+      isError = isErrorAll;
+      error = errorAll;
+  }
+  if (isLoading) {
     return (
       <Box
         sx={{
           display: 'flex',
           justifyContent: 'center',
           alignItems: 'center',
-          paddingTop: '100px'
+          paddingTop: '100px',
         }}
       >
         <HourglassLoader />
       </Box>
-
     );
   }
 
-  if (error) return <Typography color="error">Error: {error}</Typography>;
+  if (isError) return <Typography color="error">Error: {error.message}</Typography>;
 
   return (
     <Box>
@@ -94,7 +92,7 @@ const CoursesList = ({ fetchType }) => {
                 py: 1,
                 borderRadius: '20px',
                 fontWeight: 'bold',
-                boxShadow: theme => theme.shadows[4],
+                boxShadow: (theme) => theme.shadows[4],
               }}
             >
               Browse Courses
@@ -102,7 +100,7 @@ const CoursesList = ({ fetchType }) => {
           )}
         </Box>
       ) : (
-        <Grid container spacing={2} sx={{ paddingBottom: '20px', marginTop: 2, justifyContent: 'center', }}>
+        <Grid container spacing={2} sx={{ paddingBottom: '20px', marginTop: 2, justifyContent: 'center' }}>
           {courses.map((course) => (
             <Grid item xs={12} sm={6} md={4} key={course._id}>
               <CourseCard course={course} />
