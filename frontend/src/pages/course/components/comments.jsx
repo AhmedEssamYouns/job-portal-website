@@ -11,6 +11,7 @@ import {
   IconButton,
   Alert,
   Snackbar,
+  Rating,
 } from "@mui/material";
 import {
   ExpandMore,
@@ -23,41 +24,68 @@ import {
 } from "@mui/icons-material";
 import { useTheme } from "@mui/material/styles";
 import { green } from "@mui/material/colors";
-
-const CommentsSection = ({
-  comments = [],
-  onAddComment,
-  onEditComment,
-  onDeleteComment,
-  currentUserId,
-}) => {
+const CommentsSection = ({ currentUserId }) => {
   const [expanded, setExpanded] = useState(false);
+  const [comments, setComments] = useState([
+    {
+      id: 1,
+      userId: 1,
+      img: "user1.jpg",
+      name: "John Doe",
+      comment: "Great course! Learned a lot.",
+      rating: 4, // Add the rating here
+      date: "2024-12-18",
+    },
+    {
+      id: 2,
+      userId: 2,
+      img: "user2.jpg",
+      name: "Jane Smith",
+      comment: "Very informative. Highly recommended!",
+      rating: 5, // Add the rating here
+      date: "2024-12-17",
+    },
+  ]);
   const [newComment, setNewComment] = useState("");
   const [editingIndex, setEditingIndex] = useState(null);
   const [editedComment, setEditedComment] = useState("");
+  const [editedRating, setEditedRating] = useState(0); // State for edited rating
   const [alertOpen, setAlertOpen] = useState(false);
   const [commentToDelete, setCommentToDelete] = useState(null);
   const [snackBarOpen, setSnackBarOpen] = useState(false);
+  const [newRating, setNewRating] = useState(0); // State for new rating
   const theme = useTheme();
 
   const handleAddComment = () => {
     if (newComment.trim()) {
-      onAddComment(newComment);
+      const newCommentData = {
+        comment: newComment,
+        rating: newRating,
+        userId: currentUserId,
+        name: "User Name", // Replace with actual user name
+        img: "", // User avatar URL can go here
+        date: new Date().toLocaleDateString(),
+      };
+      setComments([...comments, newCommentData]);
       setNewComment("");
+      setNewRating(0); // Reset the rating after comment is added
     }
   };
 
   const handleEditComment = (index) => {
     setEditingIndex(index);
     setEditedComment(comments[index].comment);
+    setEditedRating(comments[index].rating); // Set the current rating for editing
   };
 
   const handleSaveEdit = (index) => {
-    if (editedComment.trim() !== comments[index].comment) {
-      onEditComment(index, editedComment);
-    }
+    const updatedComments = [...comments];
+    updatedComments[index].comment = editedComment;
+    updatedComments[index].rating = editedRating; // Save the edited rating
+    setComments(updatedComments);
     setEditingIndex(null);
     setEditedComment("");
+    setEditedRating(0); // Reset the edited rating after saving
   };
 
   const handleDeleteComment = (index) => {
@@ -66,20 +94,26 @@ const CommentsSection = ({
   };
 
   const confirmDelete = () => {
-    if (commentToDelete !== null) {
-      onDeleteComment(commentToDelete);
-      setAlertOpen(false);
-      setSnackBarOpen(true); // Show confirmation snackbar
-    }
+    const updatedComments = comments.filter(
+      (_, index) => index !== commentToDelete
+    );
+    setComments(updatedComments);
+    setAlertOpen(false);
+    setSnackBarOpen(true); // Show confirmation snackbar
   };
 
   const cancelDelete = () => {
     setAlertOpen(false);
   };
-
-  // Handle text formatting
   const handleFormatting = (command) => {
-    document.execCommand(command, false, null);
+    const selection = window.getSelection();
+    const range = selection.getRangeAt(0);
+
+    const span = document.createElement("span");
+    span.style.fontWeight = command === "bold" ? "bold" : "normal";
+    span.style.fontStyle = command === "italic" ? "italic" : "normal";
+
+    range.surroundContents(span); // Wrap selected content with the span element
   };
 
   return (
@@ -112,11 +146,27 @@ const CommentsSection = ({
                 marginBottom: 2,
                 width: "100%",
                 "&:focus-within": {
-                  borderColor: "#3f51b5", 
+                  borderColor: "#3f51b5",
                   boxShadow: "0 0 5px rgba(75, 219, 255, 0.85)",
                 },
               }}
             >
+              <Box
+                sx={{
+                  zIndex: 2,
+                  right: "35px",
+                  display: "flex",
+                  alignItems: "center",
+                  position: "absolute",
+                  marginBottom: 2,
+                }}
+              >
+                <Rating
+                  name="comment-rating"
+                  value={newRating}
+                  onChange={(event, newValue) => setNewRating(newValue)}
+                />
+              </Box>
               <TextField
                 label="Add a comment"
                 fullWidth
@@ -163,6 +213,7 @@ const CommentsSection = ({
             </Box>
 
             {/* Comments List */}
+
             {comments.length > 0 ? (
               comments.map((comment, index) => (
                 <Box
@@ -175,6 +226,7 @@ const CommentsSection = ({
                     borderRadius: 2,
                     backgroundColor: theme.palette.background.paper,
                     boxShadow: 2,
+                    position: "relative", 
                   }}
                 >
                   <Avatar
@@ -183,26 +235,47 @@ const CommentsSection = ({
                     sx={{ marginRight: 2 }}
                   />
                   <Box sx={{ flex: 1 }}>
-                    <Typography
-                      variant="body1"
-                      sx={{
-                        fontWeight: "bold",
-                        color: theme.palette.text.primary,
-                      }}
+          
+                    <Box
+                      sx={{ display: "flex", justifyContent: "space-between" }}
                     >
-                      {comment.name}
-                    </Typography>
-
-                    {/* If editing, show TextField, else show the comment */}
-                    {editingIndex === index ? (
-                      <TextField
-                        value={editedComment}
-                        onChange={(e) => setEditedComment(e.target.value)}
-                        multiline
-                        rows={2}
-                        variant="outlined"
-                        sx={{ width: "100%", marginTop: 1 }}
+                      <Typography
+                        variant="body1"
+                        sx={{
+                          fontWeight: "bold",
+                          color: theme.palette.text.primary,
+                        }}
+                      >
+                        {comment.name}
+                      </Typography>
+                    {editingIndex !== index && 
+                      <Rating
+                        value={comment.rating}
+                        readOnly
+                        sx={{ marginLeft: 1 }}
                       />
+                    }
+                    </Box>
+
+                    
+                    {editingIndex === index ? (
+                      <Box>
+                        <TextField
+                          value={editedComment}
+                          onChange={(e) => setEditedComment(e.target.value)}
+                          multiline
+                          rows={2}
+                          variant="outlined"
+                          sx={{ width: "100%", marginTop: 1 }}
+                        />
+                        <Rating
+                          value={editedRating}
+                          onChange={(event, newValue) =>
+                            setEditedRating(newValue)
+                          }
+                          sx={{ marginTop: 1 }}
+                        />
+                      </Box>
                     ) : (
                       <Typography
                         variant="body2"
@@ -212,6 +285,7 @@ const CommentsSection = ({
                       </Typography>
                     )}
 
+                    {/* Display the comment date */}
                     <Typography
                       variant="caption"
                       sx={{ color: theme.palette.text.disabled }}
@@ -220,8 +294,16 @@ const CommentsSection = ({
                     </Typography>
                   </Box>
 
-                  {/* Edit and Delete buttons */}
-                  <Box sx={{ marginLeft: 1 }}>
+                  {/* Edit and Delete buttons positioned at the bottom right */}
+                  <Box
+                    sx={{
+                      position: "absolute",
+                      bottom: 10, // Space from the bottom
+                      right: 10, // Space from the right edge
+                      display: "flex",
+                      gap: 1, // Adds space between the buttons
+                    }}
+                  >
                     {editingIndex === index ? (
                       <IconButton
                         onClick={() => handleSaveEdit(index)}
@@ -299,5 +381,4 @@ const CommentsSection = ({
     </Box>
   );
 };
-
 export default CommentsSection;
