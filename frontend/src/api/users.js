@@ -1,4 +1,5 @@
-const BASE_API_URL = 'https://localhost:5000/api/';
+const BASE_API_URL = 'https://job-portal-website-production.up.railway.app/api/';
+
 
 
 export const signup = async (userData) => {
