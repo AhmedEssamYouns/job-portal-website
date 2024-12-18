@@ -7,7 +7,7 @@ import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import AddIcon from '@mui/icons-material/Add';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
-import { addCourse } from '../api/courses';
+import { addCourse } from '../../api/courses';
 
 const AddCoursePage = () => {
     const [courseData, setCourseData] = useState({

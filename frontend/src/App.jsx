@@ -4,20 +4,20 @@ import { CssBaseline, Box } from '@mui/material';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import { useThemeContext } from './context/ThemeContext';
 import Navbar from './Shared/Navbar/Navbar';
-import HomePage from './pages/HomePage';
+import HomePage from './pages/home/HomePage';
 import theme from './styles/theme';
-import SignIn from './pages/SignIn';
-import SignUp from './pages/SignUp';
+import SignIn from './pages/auth/SignIn';
+import SignUp from './pages/auth/SignUp';
 import { checkLogin } from './api/users';
-import CourseDetail from './pages/CourseDetail';
-import LevelDetail from './pages/LevelDetail';
+import CourseDetail from './pages/course/CourseDetail';
+import LevelDetail from './pages/course/LevelDetail';
 import Footer from './Shared/Fotter/Fotter';
-import CoursesPage from './pages/CoursePage';
-import UserProfile from './pages/Profile';
+import CoursesPage from './pages/course/CoursePage';
+import UserProfile from './pages/profile/Profile';
 import ScrollToTop from './utils/scrolltotop'
-import SearchResultsPage from './pages/SearchResultsPage';
-import AdminPanal from './pages/admin';
-import AddCoursePage from './pages/addCourse';
+import SearchResultsPage from './pages/course/SearchResultsPage'
+import AdminPanal from './pages/admin/admin';
+import AddCoursePage from './pages/admin/addCourse';
 
 
 

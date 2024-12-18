@@ -8,11 +8,12 @@ import {
   TextField,
   useTheme,
   useMediaQuery,
-  Snackbar, // Import Snackbar
-  Alert, // Import Alert
+  Snackbar, 
+  Alert,
+  Grid2, 
 } from '@mui/material';
 import { keyframes } from '@emotion/react';
-import RobotLoader from '../Shared/Loaders/Components/Robot';
+import RobotLoader from '../../Shared/Loaders/Components/Robot';
 import { Link } from 'react-router-dom';
 
 const fadeIn = keyframes`
@@ -26,7 +27,6 @@ const fadeIn = keyframes`
   }
 `;
 
-// Button hover animation
 const bounce = keyframes`
   0%, 100% {
     transform: translateY(0);
@@ -37,30 +37,26 @@ const bounce = keyframes`
 `;
 
 const HomePage = () => {
-  const theme = useTheme(); // Access theme to detect light or dark mode
+  const theme = useTheme(); 
   const isMobile = useMediaQuery('(max-width:970px)');
-  const [email, setEmail] = useState(''); // State to store email
-  const [openSnackbar, setOpenSnackbar] = useState(false); // State to control Snackbar visibility
+  const [email, setEmail] = useState(''); 
+  const [openSnackbar, setOpenSnackbar] = useState(false); 
 
-  // Function to handle subscribe button click
   const handleSubscribe = (e) => {
-    e.preventDefault(); // Prevent default form submission
+    e.preventDefault(); 
   
-    if (!email) return; // Exit function if email is null or empty
+    if (!email) return; 
   
-    // Show Snackbar when the user subscribes
     setOpenSnackbar(true);
-    setEmail(''); // Clear the email input after subscription
+    setEmail(''); 
   };
   
-  // Function to handle Snackbar close
   const handleCloseSnackbar = () => {
     setOpenSnackbar(false);
   };
 
   return (
     <Container sx={{ marginTop: isMobile ? 1 : 7, minHeight: '100vh' }}>
-      {/* Hero Section */}
       <Box
         sx={{
           background:
@@ -72,7 +68,7 @@ const HomePage = () => {
           marginBottom: 4,
         }}
       >
-        <Grid
+        <Grid2
           container
           spacing={4}
           alignItems="center"
@@ -81,8 +77,7 @@ const HomePage = () => {
             textAlign: { xs: 'center', md: 'left' },
           }}
         >
-          {/* Welcome Text Section */}
-          <Grid item xs={12} md={6}>
+          <Grid2 item xs={12} md={6}>
             <Box
               sx={{
                 animation: `${fadeIn} 1.5s ease-out`,
@@ -111,7 +106,7 @@ const HomePage = () => {
               >
                 Discover programming courses, track your progress, and unlock new skills.
               </Typography>
-              <Link to="/courses" style={{ textDecoration: 'none' }}> {/* Replace "/courses" with the actual path */}
+              <Link to="/courses" style={{ textDecoration: 'none' }}> 
                 <Button
                   variant="contained"
                   color="secondary"
@@ -124,16 +119,14 @@ const HomePage = () => {
                 </Button>
               </Link>
             </Box>
-          </Grid>
+          </Grid2>
 
-          {/* Robot Animation Section */}
-          <Grid item xs={12} md={6} display="flex" justifyContent="center">
+          <Grid2 item xs={12} md={6} display="flex" justifyContent="center">
             <RobotLoader />
-          </Grid>
-        </Grid>
+          </Grid2>
+        </Grid2>
       </Box>
 
-      {/* Subscribe Now Section */}
       <Box
         sx={{
           borderRadius: 4,

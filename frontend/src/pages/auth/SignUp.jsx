@@ -2,17 +2,17 @@ import React, { useState } from 'react';
 import { TextField, Button, Typography, Box, Card, CardContent, Grid, useMediaQuery, Alert, IconButton, Snackbar, SnackbarContent } from '@mui/material';
 import { Visibility, VisibilityOff } from '@mui/icons-material';
 import { useTheme } from '@mui/material/styles';
-import { signup } from '../api/users';
+import { signup } from '../../api/users';
 import { useNavigate } from 'react-router-dom';
 import { Link } from 'react-router-dom';
 
 const SignUp = () => {
     const [formData, setFormData] = useState({ username: '', email: '', password: '', confirmPassword: '' });
-    const [error, setError] = useState(''); // State to store error message
-    const [isLoading, setIsLoading] = useState(false); // Optional: Loading state
-    const [showPassword, setShowPassword] = useState(false); // Toggle password visibility
-    const [successMessage, setSuccessMessage] = useState(''); // Success message for Snackbar
-    const [openSnackbar, setOpenSnackbar] = useState(false); // Snackbar state
+    const [error, setError] = useState(''); 
+    const [isLoading, setIsLoading] = useState(false); 
+    const [showPassword, setShowPassword] = useState(false); 
+    const [successMessage, setSuccessMessage] = useState(''); 
+    const [openSnackbar, setOpenSnackbar] = useState(false); 
 
     const navigate = useNavigate();
     const theme = useTheme();

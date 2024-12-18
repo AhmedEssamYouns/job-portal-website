@@ -1,17 +1,17 @@
 import React, { useState } from 'react';
 import { TextField, Button, Typography, Box, Card, CardContent, Grid, useMediaQuery, Alert, Snackbar } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
-import { login } from '../api/users';
+import { login } from '../../api/users';
 import { useNavigate,Link } from 'react-router-dom';
 
 const SignIn = () => {
     const [formData, setFormData] = useState({ email: '', password: '' });
-    const [error, setError] = useState(''); // Store error messages
-    const [isLoading, setIsLoading] = useState(false); // Track loading state
-    const [openSnackbar, setOpenSnackbar] = useState(false); // Snackbar open state
-    const [snackbarMessage, setSnackbarMessage] = useState(''); // Snackbar message
+    const [error, setError] = useState(''); 
+    const [isLoading, setIsLoading] = useState(false); 
+    const [openSnackbar, setOpenSnackbar] = useState(false); 
+    const [snackbarMessage, setSnackbarMessage] = useState(''); 
     const theme = useTheme();
-    const isMobile = useMediaQuery(theme.breakpoints.down('sm')); // Check if screen is mobile
+    const isMobile = useMediaQuery(theme.breakpoints.down('sm')); 
 
     const handleChange = (e) => {
         setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -19,21 +19,21 @@ const SignIn = () => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        setIsLoading(true); // Start loading
-        setError(''); // Clear previous errors
+        setIsLoading(true); 
+        setError(''); 
 
         try {
-            const data = await login(formData); // Call login API
-            setSnackbarMessage('Sign in successful! Welcome back!'); // Set success message
-            setOpenSnackbar(true); // Show success Snackbar
-            console.log(data); // Log response (optional)
+            const data = await login(formData); 
+            setSnackbarMessage('Sign in successful! Welcome back!'); 
+            setOpenSnackbar(true); 
+            console.log(data); 
             window.location.href = '/';
         } catch (error) {
-            setError(error.message); // Display error message
-            setSnackbarMessage(error.message); // Set error message for Snackbar
-            setOpenSnackbar(true); // Show error Snackbar
+            setError(error.message); 
+            setSnackbarMessage(error.message);
+            setOpenSnackbar(true);
         } finally {
-            setIsLoading(false); // Stop loading
+            setIsLoading(false); 
         }
     };
 

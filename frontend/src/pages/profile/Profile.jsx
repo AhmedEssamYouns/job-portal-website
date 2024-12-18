@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import { Box, Typography, Avatar, CircularProgress, Paper, useTheme, Button, Grid } from '@mui/material';
-import { fetchUserById, checkLogin } from '../api/users';
-import CoursesList from '../Shared/Course/client/CoursesList';
+import { fetchUserById, checkLogin } from '../../api/users';
+import CoursesList from '../../Shared/Course/client/CoursesList';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
-import HourglassLoader from '../Shared/Loaders/Components/Hamster';
-import SignIn from './SignIn';
+import HourglassLoader from '../../Shared/Loaders/Components/Hamster';
+import SignIn from '../auth/SignIn';
 
 const UserProfile = () => {
     const [user, setUser] = useState(null);

@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { TextField, Button, Container, Typography, Box, Grid, CircularProgress, Snackbar } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
-import AdminCourseCard from '../Shared/Course/admin/AdminCourseCard';
-import { fetchCourses, deleteCourse } from '../api/courses'; 
+import AdminCourseCard from '../../Shared/Course/admin/AdminCourseCard';
+import { fetchCourses, deleteCourse } from '../../api/courses'; 
 import { Link } from 'react-router-dom';
 
 const AdminPanal = () => {

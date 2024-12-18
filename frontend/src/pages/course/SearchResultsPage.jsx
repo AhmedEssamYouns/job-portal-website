@@ -1,10 +1,9 @@
-// SearchResultsPage.js
 import React, { useEffect, useState } from 'react';
-import CourseCard from '../Shared/Course/client/CourseCard';
-import { Grid, CircularProgress, Typography, Box } from '@mui/material';
-import { fetchCourses } from '../api/courses';
+import CourseCard from '../../Shared/Course/client/CourseCard';
+import { Grid2, CircularProgress, Typography, Box } from '@mui/material';
+import { fetchCourses } from '../../api/courses';
 import { useLocation } from 'react-router-dom';
-import HourglassLoader from '../Shared/Loaders/Components/Hamster';
+import HourglassLoader from '../../Shared/Loaders/Components/Hamster';
 
 const SearchResultsPage = () => {
   const [courses, setCourses] = useState([]);
@@ -53,21 +52,21 @@ const SearchResultsPage = () => {
       <Typography variant="h5" gutterBottom>
         Search Results for: "{query}"
       </Typography>
-      <Grid container spacing={2}>
+      <Grid2 container spacing={2}>
         {filteredCourses.length > 0 ? (
           filteredCourses.map((course) => (
-            <Grid item xs={12} sm={6} md={4} key={course._id}>
+            <Grid2 item xs={12} sm={6} md={4} key={course._id}>
               <CourseCard course={course} />
-            </Grid>
+            </Grid2>
           ))
         ) : (
-          <Grid item xs={12}>
+          <Grid2 item xs={12}>
             <Typography variant="h6" align="center">
               No courses found.
             </Typography>
-          </Grid>
+          </Grid2>
         )}
-      </Grid>
+      </Grid2>
     </Box>
   );
 };
