@@ -27,24 +27,24 @@ import { green } from "@mui/material/colors";
 const CommentsSection = ({ currentUserId }) => {
   const [expanded, setExpanded] = useState(false);
   const [comments, setComments] = useState([
-    {
-      id: 1,
-      userId: 1,
-      img: "user1.jpg",
-      name: "John Doe",
-      comment: "Great course! Learned a lot.",
-      rating: 4, // Add the rating here
-      date: "2024-12-18",
-    },
-    {
-      id: 2,
-      userId: 2,
-      img: "user2.jpg",
-      name: "Jane Smith",
-      comment: "Very informative. Highly recommended!",
-      rating: 5, // Add the rating here
-      date: "2024-12-17",
-    },
+    // {
+    //   id: 1,
+    //   userId: 1,
+    //   img: "user1.jpg",
+    //   name: "John Doe",
+    //   comment: "Great course! Learned a lot.",
+    //   rating: 4, // Add the rating here
+    //   date: "2024-12-18",
+    // },
+    // {
+    //   id: 2,
+    //   userId: 2,
+    //   img: "user2.jpg",
+    //   name: "Jane Smith",
+    //   comment: "Very informative. Highly recommended!",
+    //   rating: 5, // Add the rating here
+    //   date: "2024-12-17",
+    // },
   ]);
   const [newComment, setNewComment] = useState("");
   const [editingIndex, setEditingIndex] = useState(null);
@@ -132,7 +132,7 @@ const CommentsSection = ({ currentUserId }) => {
       >
         <AccordionSummary expandIcon={<ExpandMore />}>
           <Typography variant="h6" sx={{ fontWeight: "bold" }}>
-            {expanded ? "Hide Comments" : "Show Comments"}
+            {expanded ? "Hide Comments" : `Show ${comments.length>0 ? comments.length : ''} Comments`}
           </Typography>
         </AccordionSummary>
         <AccordionDetails>
