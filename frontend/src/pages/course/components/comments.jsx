@@ -6,7 +6,7 @@ import CommentItem from "./commentItem";
 import { useAddComment, useDeleteComment, useEditComment } from "../../../hooks/useComments";
 import { checkLogin } from "../../../services/users";
 
-const CommentsSection = ({ currentUserId, courseId, comments: initialComments = [] }) => {
+const CommentsSection = ({ currentUserId, courseId, comments: initialComments, onUpdateRating }) => {
   const [expanded, setExpanded] = useState(false);
   const [comments, setComments] = useState(initialComments);
   const [newComment, setNewComment] = useState("");
@@ -17,8 +17,8 @@ const CommentsSection = ({ currentUserId, courseId, comments: initialComments = 
   const [alertOpen, setAlertOpen] = useState(false);
   const [commentToDelete, setCommentToDelete] = useState(null);
   const [snackBarOpen, setSnackBarOpen] = useState(false);
-  const [alertMessage, setAlertMessage] = useState("");  // State for alert message
-  const [alertSeverity, setAlertSeverity] = useState("success");  // State for alert severity
+  const [alertMessage, setAlertMessage] = useState("");
+  const [alertSeverity, setAlertSeverity] = useState("success");
   const [user, setUser] = useState(null);
 
   // Debugging user login
@@ -39,7 +39,9 @@ const CommentsSection = ({ currentUserId, courseId, comments: initialComments = 
   const { mutate: addComment } = useAddComment(
     (data) => {
       console.log("Add comment success:", data);
-      setComments([data.comment, ...comments]);
+      const updatedComments = [data.comment, ...comments];
+      setComments(updatedComments);
+      onUpdateRating(updatedComments); // Call the parent function to update rating
       setAlertMessage("Comment added successfully!");
       setAlertSeverity("success");
       setSnackBarOpen(true);
@@ -55,7 +57,9 @@ const CommentsSection = ({ currentUserId, courseId, comments: initialComments = 
   const { mutate: deleteComment } = useDeleteComment(
     () => {
       console.log("Delete comment success");
-      setComments(comments.filter((_, index) => index !== commentToDelete));
+      const updatedComments = comments.filter((_, index) => index !== commentToDelete);
+      setComments(updatedComments);
+      onUpdateRating(updatedComments); // Call the parent function to update rating
       setAlertMessage("Comment deleted successfully!");
       setAlertSeverity("success");
       setSnackBarOpen(true);
@@ -75,6 +79,7 @@ const CommentsSection = ({ currentUserId, courseId, comments: initialComments = 
       const updatedComments = [...comments];
       updatedComments[editingIndex] = data.comment;
       setComments(updatedComments);
+      onUpdateRating(updatedComments); // Call the parent function to update rating
       setEditingIndex(null);
       setEditedComment("");
       setEditedRating(0);
