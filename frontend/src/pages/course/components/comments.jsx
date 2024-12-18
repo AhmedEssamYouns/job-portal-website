@@ -1,12 +1,38 @@
-import React, { useState } from 'react';
-import { Accordion, AccordionSummary, AccordionDetails, Typography, Button, TextField, Box, Avatar, IconButton, Alert, Snackbar } from '@mui/material';
-import { ExpandMore, Edit, Delete, Save } from '@mui/icons-material';
-import { useTheme } from '@mui/material/styles';
-import { green } from '@mui/material/colors';
+import React, { useState } from "react";
+import {
+  Accordion,
+  AccordionSummary,
+  AccordionDetails,
+  Typography,
+  Button,
+  TextField,
+  Box,
+  Avatar,
+  IconButton,
+  Alert,
+  Snackbar,
+} from "@mui/material";
+import {
+  ExpandMore,
+  Edit,
+  Delete,
+  Save,
+  FormatBold,
+  FormatItalic,
+  Link,
+} from "@mui/icons-material";
+import { useTheme } from "@mui/material/styles";
+import { green } from "@mui/material/colors";
 
-const CommentsSection = ({ comments = [], onAddComment, onEditComment, onDeleteComment, currentUserId }) => {
+const CommentsSection = ({
+  comments = [],
+  onAddComment,
+  onEditComment,
+  onDeleteComment,
+  currentUserId,
+}) => {
   const [expanded, setExpanded] = useState(false);
-  const [newComment, setNewComment] = useState(""); 
+  const [newComment, setNewComment] = useState("");
   const [editingIndex, setEditingIndex] = useState(null);
   const [editedComment, setEditedComment] = useState("");
   const [alertOpen, setAlertOpen] = useState(false);
@@ -43,7 +69,7 @@ const CommentsSection = ({ comments = [], onAddComment, onEditComment, onDeleteC
     if (commentToDelete !== null) {
       onDeleteComment(commentToDelete);
       setAlertOpen(false);
-      setSnackBarOpen(true);  // Show confirmation snackbar
+      setSnackBarOpen(true); // Show confirmation snackbar
     }
   };
 
@@ -51,25 +77,46 @@ const CommentsSection = ({ comments = [], onAddComment, onEditComment, onDeleteC
     setAlertOpen(false);
   };
 
+  // Handle text formatting
+  const handleFormatting = (command) => {
+    document.execCommand(command, false, null);
+  };
+
   return (
-    <Box 
-      sx={{ 
-        display: 'flex', 
-        flexDirection: 'column', 
-        justifyContent: 'center', 
-        alignItems: 'center', 
+    <Box
+      sx={{
+        display: "flex",
+        flexDirection: "column",
+        justifyContent: "center",
+        alignItems: "center",
       }}
     >
-      <Accordion expanded={expanded} onChange={() => setExpanded(!expanded)} sx={{ width: '100%', maxWidth: 800 }}>
+      <Accordion
+        expanded={expanded}
+        onChange={() => setExpanded(!expanded)}
+        sx={{ width: "100%", maxWidth: 800 }}
+      >
         <AccordionSummary expandIcon={<ExpandMore />}>
-          <Typography variant="h6" sx={{ fontWeight: 'bold' }}>
+          <Typography variant="h6" sx={{ fontWeight: "bold" }}>
             {expanded ? "Hide Comments" : "Show Comments"}
           </Typography>
         </AccordionSummary>
         <AccordionDetails>
           <Box>
             {/* Comment Input */}
-            <Box sx={{ marginBottom: 2 }}>
+            <Box
+              border="1px solid #ccc"
+              borderRadius={5}
+              sx={{
+                padding: 2,
+                marginBottom: 2,
+                width: "100%",
+                "&:focus-within": {
+                  borderColor: "#3f51b5", 
+                  boxShadow: "0 0 5px rgba(75, 219, 255, 0.85)",
+                },
+              }}
+            >
               <TextField
                 label="Add a comment"
                 fullWidth
@@ -77,38 +124,72 @@ const CommentsSection = ({ comments = [], onAddComment, onEditComment, onDeleteC
                 onChange={(e) => setNewComment(e.target.value)}
                 multiline
                 rows={4}
-                variant="outlined"
-                sx={{ marginBottom: 2 }}
+                variant="standard"
+                sx={{
+                  marginBottom: 2,
+                  input: { borderBottom: "2px solid #ccc" },
+                }}
               />
-              <Button
-                variant="contained"
-                color="primary"
-                onClick={handleAddComment}
-                disabled={!newComment.trim()}
-                sx={{ width: '100%' }}
+
+              {/* Toolbar with formatting icons */}
+              <Box
+                sx={{
+                  display: "flex",
+                  justifyContent: "space-between",
+                  marginTop: 1,
+                }}
               >
-                Post Comment
-              </Button>
+                <Box>
+                  <IconButton onClick={() => handleFormatting("bold")}>
+                    <FormatBold />
+                  </IconButton>
+                  <IconButton onClick={() => handleFormatting("italic")}>
+                    <FormatItalic />
+                  </IconButton>
+                  <IconButton onClick={() => handleFormatting("createLink")}>
+                    <Link />
+                  </IconButton>
+                </Box>
+                <Button
+                  variant="contained"
+                  color="primary"
+                  onClick={handleAddComment}
+                  disabled={!newComment.trim()}
+                  sx={{ height: "100%" }}
+                >
+                  Comment
+                </Button>
+              </Box>
             </Box>
 
             {/* Comments List */}
             {comments.length > 0 ? (
               comments.map((comment, index) => (
-                <Box 
-                  key={index} 
-                  sx={{ 
-                    display: 'flex', 
-                    alignItems: 'center', 
+                <Box
+                  key={index}
+                  sx={{
+                    display: "flex",
+                    alignItems: "center",
                     marginBottom: 2,
-                    padding: '10px 20px', 
-                    borderRadius: 2, 
+                    padding: "10px 20px",
+                    borderRadius: 2,
                     backgroundColor: theme.palette.background.paper,
-                    boxShadow: 2 
+                    boxShadow: 2,
                   }}
                 >
-                  <Avatar alt={comment.name} src={comment.img} sx={{ marginRight: 2 }} />
+                  <Avatar
+                    alt={comment.name}
+                    src={comment.img}
+                    sx={{ marginRight: 2 }}
+                  />
                   <Box sx={{ flex: 1 }}>
-                    <Typography variant="body1" sx={{ fontWeight: 'bold', color: theme.palette.text.primary }}>
+                    <Typography
+                      variant="body1"
+                      sx={{
+                        fontWeight: "bold",
+                        color: theme.palette.text.primary,
+                      }}
+                    >
                       {comment.name}
                     </Typography>
 
@@ -120,15 +201,21 @@ const CommentsSection = ({ comments = [], onAddComment, onEditComment, onDeleteC
                         multiline
                         rows={2}
                         variant="outlined"
-                        sx={{ width: '100%', marginTop: 1 }}
+                        sx={{ width: "100%", marginTop: 1 }}
                       />
                     ) : (
-                      <Typography variant="body2" sx={{ color: theme.palette.text.secondary }}>
+                      <Typography
+                        variant="body2"
+                        sx={{ color: theme.palette.text.secondary }}
+                      >
                         {comment.comment}
                       </Typography>
                     )}
 
-                    <Typography variant="caption" sx={{ color: theme.palette.text.disabled }}>
+                    <Typography
+                      variant="caption"
+                      sx={{ color: theme.palette.text.disabled }}
+                    >
                       {comment.date}
                     </Typography>
                   </Box>
@@ -136,16 +223,25 @@ const CommentsSection = ({ comments = [], onAddComment, onEditComment, onDeleteC
                   {/* Edit and Delete buttons */}
                   <Box sx={{ marginLeft: 1 }}>
                     {editingIndex === index ? (
-                      <IconButton onClick={() => handleSaveEdit(index)} sx={{ color: theme.palette.primary.main }}>
+                      <IconButton
+                        onClick={() => handleSaveEdit(index)}
+                        sx={{ color: theme.palette.primary.main }}
+                      >
                         <Save />
                       </IconButton>
                     ) : (
                       comment.userId === currentUserId && (
                         <>
-                          <IconButton onClick={() => handleEditComment(index)} sx={{ color: theme.palette.primary.main }}>
+                          <IconButton
+                            onClick={() => handleEditComment(index)}
+                            sx={{ color: theme.palette.primary.main }}
+                          >
                             <Edit />
                           </IconButton>
-                          <IconButton onClick={() => handleDeleteComment(index)} sx={{ color: green[500] }}>
+                          <IconButton
+                            onClick={() => handleDeleteComment(index)}
+                            sx={{ color: green[500] }}
+                          >
                             <Delete />
                           </IconButton>
                         </>
@@ -155,7 +251,13 @@ const CommentsSection = ({ comments = [], onAddComment, onEditComment, onDeleteC
                 </Box>
               ))
             ) : (
-              <Typography variant="body2" sx={{ color: theme.palette.text.secondary, textAlign: 'center' }}>
+              <Typography
+                variant="body2"
+                sx={{
+                  color: theme.palette.text.secondary,
+                  textAlign: "center",
+                }}
+              >
                 No comments yet.
               </Typography>
             )}
@@ -173,8 +275,12 @@ const CommentsSection = ({ comments = [], onAddComment, onEditComment, onDeleteC
           severity="warning"
           action={
             <>
-              <Button color="inherit" size="small" onClick={cancelDelete}>Cancel</Button>
-              <Button color="inherit" size="small" onClick={confirmDelete}>Confirm</Button>
+              <Button color="inherit" size="small" onClick={cancelDelete}>
+                Cancel
+              </Button>
+              <Button color="inherit" size="small" onClick={confirmDelete}>
+                Confirm
+              </Button>
             </>
           }
         >
