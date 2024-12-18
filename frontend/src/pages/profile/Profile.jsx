@@ -113,7 +113,7 @@ const UserProfile = () => {
                     }}
                 />
                 <Typography variant="h5" fontWeight="bold" gutterBottom>
-                    {CurrentUser.id}
+                    {user.name}
                 </Typography>
                 <Typography variant="body1" sx={{ mb: 1 }}>
                     {user.email}

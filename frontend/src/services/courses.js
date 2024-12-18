@@ -1,113 +1,55 @@
+import axios from 'axios';
 import { checkLogin, fetchUserById } from "./users";
 
 const BASE_API_URL = 'http://localhost:5000/api/';
 
-
-
-
 export const addCourse = async (courseData) => {
     try {
-        const response = await fetch(`${BASE_API_URL}courses/add`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(courseData), 
-        });
-
-        if (!response.ok) {
-            const errorData = await response.json();
-            throw new Error(errorData.message || 'Failed to add course');
-        }
-
-        const data = await response.json(); 
-        return data;
+        const response = await axios.post(`${BASE_API_URL}courses/add`, courseData);
+        return response.data;
     } catch (error) {
-        console.error('Error adding course:', error.message);
-        throw new Error(`${error.message}`);
+        console.error('Error adding course:', error.response?.data?.message || error.message);
+        throw new Error(error.response?.data?.message || 'Failed to add course');
     }
 };
 
 export const fetchCourses = async () => {
     try {
-        const response = await fetch(`${BASE_API_URL}courses`, {
-            method: 'GET',
-            headers: { 'Content-Type': 'application/json' },
-        });
-
-        if (!response.ok) {
-            const errorData = await response.json();
-            throw new Error(errorData.message || 'Failed to fetch courses');
-        }
-
-        return await response.json(); // Return the list of courses
+        const response = await axios.get(`${BASE_API_URL}courses`);
+        return response.data;
     } catch (error) {
-        console.error(`Fetch courses error: ${error.message}`);
-        throw new Error(`${error.message}`);
+        console.error('Error fetching courses:', error.response?.data?.message || error.message);
+        throw new Error(error.response?.data?.message || 'Failed to fetch courses');
     }
 };
 
 export const fetchCourseById = async (courseId) => {
     try {
-        const response = await fetch(`${BASE_API_URL}courses/${courseId}`, {
-            method: 'GET',
-            headers: { 'Content-Type': 'application/json' },
-        });
-
-        if (!response.ok) {
-            const errorData = await response.json();
-            throw new Error(errorData.message || 'Failed to fetch course details');
-        }
-
-        return await response.json(); // Return the course details
+        const response = await axios.get(`${BASE_API_URL}courses/${courseId}`);
+        return response.data;
     } catch (error) {
-        console.error(`Fetch course error: ${error.message}`);
-        throw new Error(`${error.message}`);
+        console.error('Error fetching course details:', error.response?.data?.message || error.message);
+        throw new Error(error.response?.data?.message || 'Failed to fetch course details');
     }
 };
 
 export const completeLevel = async (levelId, userId) => {
     try {
-        const response = await fetch(`${BASE_API_URL}progress/complete-level/${levelId}`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ userId }),
-        });
-
-        if (!response.ok) {
-            const errorData = await response.json();
-            throw new Error(errorData.message || 'Failed to complete level');
-        }
-
-        const data = await response.json();
-        return data;
+        const response = await axios.post(`${BASE_API_URL}progress/complete-level/${levelId}`, { userId });
+        return response.data;
     } catch (error) {
-        console.error('Error completing level:', error);
+        console.error('Error completing level:', error.response?.data?.message || error.message);
+        throw new Error(error.response?.data?.message || 'Failed to complete level');
     }
 };
 
 export const completeCourse = async (courseId, userId) => {
     try {
-        const response = await fetch(`${BASE_API_URL}progress/completed-course`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ userId, courseId }),
-        });
-
-        if (!response.ok) {
-            const errorData = await response.json();
-            throw new Error(errorData.message || 'Failed to complete course');
-        }
-
-        const data = await response.json();
-        return data; // Return the result of the course completion
+        const response = await axios.post(`${BASE_API_URL}progress/completed-course`, { userId, courseId });
+        return response.data;
     } catch (error) {
-        console.error('Error completing course:', error);
-        throw new Error(`${error.message}`);
+        console.error('Error completing course:', error.response?.data?.message || error.message);
+        throw new Error(error.response?.data?.message || 'Failed to complete course');
     }
 };
 
@@ -120,63 +62,39 @@ export const fetchCoursesWithCompletionStatus = async () => {
             throw new Error('User not logged in');
         }
 
-        const user = await fetchUserById(currentUser.id); // Fetch user details
+        const user = await fetchUserById(currentUser.id);
 
-        // Step 3: Filter courses by whether the user has completed them
         const completedCourses = courses.filter(course =>
-            user?.completedCourses.includes(course._id) // Check if course is in completedCourses
+            user?.completedCourses.includes(course._id)
         );
 
-        return completedCourses; // Return all courses with completion status
+        return completedCourses;
     } catch (error) {
-        console.error(`Error fetching courses with completion status: ${error.message}`);
-        throw new Error(`${error.message}`);
+        console.error('Error fetching courses with completion status:', error.response?.data?.message || error.message);
+        throw new Error(error.response?.data?.message || 'Failed to fetch courses with completion status');
     }
 };
 
-
 export const fetchIncompletedCourses = async (userId) => {
     try {
-        const response = await fetch(`${BASE_API_URL}courses/incompleted-courses/${userId}`, {
-            method: 'GET',
+        const response = await axios.get(`${BASE_API_URL}courses/incompleted-courses/${userId}`, {
             headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${localStorage.getItem('token')}`, // Include token if needed
+                'Authorization': `Bearer ${localStorage.getItem('token')}`,
             },
         });
-
-        if (!response.ok) {
-            const errorData = await response.json();
-            throw new Error(errorData.message || 'Failed to fetch incompleted courses');
-        }
-
-        return await response.json(); // Return the list of incompleted courses
+        return response.data;
     } catch (error) {
-        console.error(`Fetch incompleted courses error: ${error.message}`);
-        throw new Error(`${error.message}`);
+        console.error('Error fetching incompleted courses:', error.response?.data?.message || error.message);
+        throw new Error(error.response?.data?.message || 'Failed to fetch incompleted courses');
     }
 };
 
 export const deleteCourse = async (courseId) => {
-
-
     try {
-        const response = await fetch(`${BASE_API_URL}courses/course/${courseId}`, {
-            method: 'DELETE',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-        });
-
-        if (!response.ok) {
-            const errorData = await response.json();
-            throw new Error(errorData.message || 'Failed to delete course');
-        }
-
-        const data = await response.json(); // Response confirming the deletion
-        return data;
+        const response = await axios.delete(`${BASE_API_URL}courses/course/${courseId}`);
+        return response.data;
     } catch (error) {
-        console.error('Error deleting course:', error.message);
-        throw new Error(`${error.message}`);
+        console.error('Error deleting course:', error.response?.data?.message || error.message);
+        throw new Error(error.response?.data?.message || 'Failed to delete course');
     }
 };
