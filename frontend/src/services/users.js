@@ -35,9 +35,7 @@ export const login = async (userData) => {
         }
 
         const data = await response.json();
-        localStorage.setItem('token', data.token); // Save the token
-        window.location.href = '/'; // Redirect to sign-in
-        window.location.reload(); // Refresh the page after login
+        localStorage.setItem('token', data.token);
         return data;
     } catch (error) {
         console.error(`Sign in error: ${error.message}`);
@@ -55,12 +53,11 @@ export const checkLogin = () => {
     if (!token) return false;
 
     try {
-        // Decode JWT and parse it to an object
         const payload = JSON.parse(atob(token.split('.')[1]));
-        return payload;  // Return user data as an object
+        return payload; 
     } catch (error) {
         console.error('Invalid token:', error);
-        return false;  // Handle invalid token case
+        return false;  
     }
 };
 

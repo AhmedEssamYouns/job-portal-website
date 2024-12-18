@@ -17,7 +17,21 @@ const SignUp = () => {
     const theme = useTheme();
     const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
 
-    const { mutate: signup, isLoading } = useSignup(); // Use signup hook
+    const { mutate: signup, isLoading } = useSignup(
+        (data) => {
+            setSuccessMessage('Sign up successful! Please sign in.');
+            setOpenSnackbar(true);
+            console.log(data)
+            setTimeout(() => {
+                navigate('/signin');
+            }, 2000);
+        },
+        (error) => {
+            console.log(error)
+            setError(error.message);
+            setOpenSnackbar(true);
+        }
+    );
 
     const handleChange = (e) => {
         setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -40,14 +54,9 @@ const SignUp = () => {
 
         try {
             // Using the signup mutation hook
-            await signup(formData);
-            setSuccessMessage('Sign up successful! Please sign in.');
-            setOpenSnackbar(true); // Show success Snackbar
-            setTimeout(() => {
-                navigate('/signin');
-            }, 2000); // Redirect to sign-in page after a short delay
+            await signup(formData); // Triggers signup mutation
         } catch (error) {
-            setError(error.message);
+            // Error is handled in the mutation's onError callback
         }
     };
 

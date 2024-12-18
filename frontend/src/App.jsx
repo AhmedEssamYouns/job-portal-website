@@ -19,12 +19,13 @@ import ScrollToTop from './utils/scrolltotop';
 import SearchResultsPage from './pages/course/SearchResultsPage';
 import AdminPanal from './pages/admin/admin';
 import AddCoursePage from './pages/admin/addCourse';
+import { useCheckLogin } from './hooks/useAuth';
 
 const queryClient = new QueryClient(); 
 
 const App = () => {
   const { themeMode } = useThemeContext();
-  const isLoggedIn = checkLogin();
+  const isLoggedIn = useCheckLogin();
 
   return (
     <QueryClientProvider client={queryClient}> 

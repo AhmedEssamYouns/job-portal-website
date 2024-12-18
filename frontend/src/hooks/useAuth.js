@@ -2,25 +2,27 @@ import { useMutation, useQuery } from '@tanstack/react-query';
 import { signup, login, logout, checkLogin, fetchUserById } from '../services/users';
 
 // Hook to sign up a new user
-export const useSignup = () => {
-  return useMutation({
-    mutationFn: signup,
-    onError: (error) => {
-      console.error('Signup failed:', error.message);
-    },
-  });
-};
+export const useSignup = (onSuccessCallback, onErrorCallback) => {
+    return useMutation({
+      mutationFn: signup,
+      onSuccess: (data) => {
+        if (onSuccessCallback) onSuccessCallback(data);
+
+      },
+      onError: (error) => {
+        if (onErrorCallback) onErrorCallback(error);
+      },
+    });
+  };
 
 // Hook to log in a user
 export const useLogin = (onSuccessCallback, onErrorCallback) => {
     return useMutation({
       mutationFn: login,
       onSuccess: (data) => {
-        // Call onSuccess callback if provided
         if (onSuccessCallback) onSuccessCallback(data);
       },
       onError: (error) => {
-        // Call onError callback if provided
         if (onErrorCallback) onErrorCallback(error);
       },
     });
