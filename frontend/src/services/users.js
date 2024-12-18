@@ -1,51 +1,36 @@
+import axios from 'axios';
+
 const BASE_API_URL = 'http://localhost:5000/api/';
-
-
 
 export const signup = async (userData) => {
     try {
-        const response = await fetch(`${BASE_API_URL}auth/signup`, {
-            method: 'POST',
+        const response = await axios.post(`${BASE_API_URL}auth/signup`, userData, {
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(userData),
         });
-
-        if (!response.ok) {
-            const errorData = await response.json();
-            throw new Error(errorData.message || 'Sign up failed');
-        }
-
-        return await response.json();
+        return response.data;
     } catch (error) {
-        throw new Error(`${error.message}`);
+        throw new Error(error.response?.data?.message || 'Sign up failed');
     }
 };
 
 export const login = async (userData) => {
     try {
-        const response = await fetch(`${BASE_API_URL}auth/signin`, {
-            method: 'POST',
+        const response = await axios.post(`${BASE_API_URL}auth/signin`, userData, {
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(userData),
         });
 
-        if (!response.ok) {
-            const errorData = await response.json();
-            throw new Error(errorData.message || 'Sign in failed');
-        }
-
-        const data = await response.json();
-        localStorage.setItem('token', data.token);
-        return data;
+        const { token } = response.data;
+        localStorage.setItem('token', token);
+        return response.data;
     } catch (error) {
-        console.error(`Sign in error: ${error.message}`);
-        throw new Error(`${error.message}`);
+        console.error(`Sign in error: ${error.response?.data?.message}`);
+        throw new Error(error.response?.data?.message || 'Sign in failed');
     }
 };
 
 export const logout = () => {
-    window.location.href = '/signin';
     localStorage.removeItem('token');
+    window.location.href = '/signin';
 };
 
 export const checkLogin = () => {
@@ -54,33 +39,24 @@ export const checkLogin = () => {
 
     try {
         const payload = JSON.parse(atob(token.split('.')[1]));
-        return payload; 
+        return payload;
     } catch (error) {
         console.error('Invalid token:', error);
-        return false;  
+        return false;
     }
 };
 
 export const fetchUserById = async (userId) => {
     try {
-        const response = await fetch(`${BASE_API_URL}auth/${userId}`, {
-            method: 'GET',
+        const response = await axios.get(`${BASE_API_URL}auth/${userId}`, {
             headers: {
                 'Content-Type': 'application/json',
-                'Authorization': `Bearer ${localStorage.getItem('token')}`, 
+                'Authorization': `Bearer ${localStorage.getItem('token')}`,
             },
         });
-
-        if (!response.ok) {
-            const errorData = await response.json();
-            throw new Error(errorData.message || 'Failed to fetch user data');
-        }
-
-        return await response.json(); // Return the user data
+        return response.data;
     } catch (error) {
-        console.error(`Fetch user by ID error: ${error.message}`);
-        throw new Error(`${error.message}`);
+        console.error(`Fetch user by ID error: ${error.response?.data?.message}`);
+        throw new Error(error.response?.data?.message || 'Failed to fetch user data');
     }
 };
-
-
