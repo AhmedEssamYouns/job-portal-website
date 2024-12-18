@@ -1,65 +1,31 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { fetchCourseById } from '../../services/courses';
+import { useFetchCourseById } from '../../hooks/useCourses'; 
+import { useFetchUserById } from '../../hooks/useAuth'; 
 import { Card, CardContent, Typography, Grid, Box } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
-import { checkLogin, fetchUserById } from '../../services/users';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import { green } from '@mui/material/colors';
 import HourglassLoader from '../../shared/Loaders/Components/Hamster';
+import { checkLogin } from '../../services/users';
 
 const CourseDetail = () => {
   const { id } = useParams();
-  const [course, setCourse] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
   const theme = useTheme();
   const CurrentUser = checkLogin();
+
+  const { data: course, isLoading, isError, error } = useFetchCourseById(id);
+  const { data: user, isLoading: userLoading } = useFetchUserById(CurrentUser?.id);
 
   const isLevelCompletedByUser = (level) => {
     return level.completedByUsers.some(user => user.userId === CurrentUser.id);
   };
 
   const allPreviousLevelsCompleted = (index) => {
-    return course.levels.slice(0, index).every(level => isLevelCompletedByUser(level));
+    return course?.levels.slice(0, index).every(level => isLevelCompletedByUser(level));
   };
 
-  useEffect(() => {
-    const loadCourse = async () => {
-      try {
-        const courseData = await fetchCourseById(id); 
-        setCourse(courseData);
-      } catch (err) {
-        setError(err.message);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    loadCourse();
-  }, [id]);
-
-  const [user, setUser] = useState(null);
-
-  useEffect(() => {
-    const loadUser = async () => {
-      const currentUser = checkLogin();
-      if (currentUser) {
-        try {
-          const userData = await fetchUserById(currentUser.id);
-          setUser(userData);
-        } catch (err) {
-          console.error(err); 
-        }
-      }
-    };
-
-    loadUser();
-  }, []);
-
-  const isCourseCompleted = user?.completedCourses.includes(course?._id);
-
-  if (loading) {
+  if (isLoading || userLoading) {
     return (
       <Box
         sx={{
@@ -75,7 +41,11 @@ const CourseDetail = () => {
     );
   }
 
-  if (error) return <Typography color="error">Error: {error}</Typography>;
+  if (isError || !course) {
+    return <Typography color="error">Error: {error?.message || 'Unable to fetch course data'}</Typography>;
+  }
+
+  const isCourseCompleted = user?.completedCourses.includes(course?._id);
 
   return (
     <Box sx={{ padding: 4, backgroundColor: theme.palette.background.default }}>

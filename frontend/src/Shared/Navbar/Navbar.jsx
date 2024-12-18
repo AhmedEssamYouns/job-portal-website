@@ -157,7 +157,7 @@ const Navbar = () => {
                                     ref={inputRef}
                                     variant="outlined"
                                     size="small"
-                                    placeholder="Search jobs..."
+                                    placeholder="Search..."
                                     value={searchQuery}
                                     onKeyDown={handleSearchSubmit}
                                     onChange={handleSearchChange}
@@ -216,7 +216,7 @@ const Navbar = () => {
                                 ref={inputRef}
                                 variant="outlined"
                                 size="small"
-                                placeholder="Search jobs..."
+                                placeholder="Search..."
                                 value={searchQuery}
                                 onKeyDown={handleSearchSubmit}
                                 onChange={handleSearchChange}
