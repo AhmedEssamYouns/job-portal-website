@@ -161,13 +161,13 @@ const Navbar = () => {
                                     value={searchQuery}
                                     onKeyDown={handleSearchSubmit}
                                     onChange={handleSearchChange}
-                                    onFocus={() => setShowDropdown(true)} // Show dropdown on focus
+                                    onFocus={() => setShowDropdown(true)} 
                                     sx={{
                                         marginLeft: 2,
                                         marginRight: 2,
                                         borderRadius: 1,
                                         backgroundColor: theme.palette.background.paper,
-                                        width: '100%', // Set a fixed width for the TextField
+                                        width: '100%', 
                                     }}
                                 />
                             </Slide>

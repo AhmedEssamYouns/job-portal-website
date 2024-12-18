@@ -1,18 +1,24 @@
 import React, { useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { useFetchCourseById } from '../../hooks/useCourses'; 
-import { useFetchUserById } from '../../hooks/useAuth'; 
+import { useFetchCourseById } from '../../hooks/useCourses';
+import { useFetchUserById } from '../../hooks/useAuth';
 import { Card, CardContent, Typography, Grid, Box } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import { green } from '@mui/material/colors';
 import HourglassLoader from '../../shared/Loaders/Components/Hamster';
 import { checkLogin } from '../../services/users';
+import CommentsSection from './components/comments';
 
 const CourseDetail = () => {
   const { id } = useParams();
   const theme = useTheme();
   const CurrentUser = checkLogin();
+
+  const [comments, setComments] = useState([
+    { id: 1, userId: 1, img: 'user1.jpg', name: 'John Doe', comment: 'Great course! Learned a lot.', date: '2024-12-18' },
+    { id: 2, userId: 2, img: 'user2.jpg', name: 'Jane Smith', comment: 'Very informative. Highly recommended!', date: '2024-12-17' },
+  ]);
 
   const { data: course, isLoading, isError, error } = useFetchCourseById(id);
   const { data: user, isLoading: userLoading } = useFetchUserById(CurrentUser?.id);
@@ -47,6 +53,28 @@ const CourseDetail = () => {
 
   const isCourseCompleted = user?.completedCourses.includes(course?._id);
 
+  const handleAddComment = (newComment) => {
+    const newCommentData = {
+      id: comments.length + 1,  // Ensure a unique ID for each comment
+      userId: CurrentUser?.id,  // Link the comment to the logged-in user
+      img: 'user-avatar.jpg',  // Placeholder for current user image
+      name: CurrentUser?.name || 'Guest',
+      comment: newComment,
+      date: new Date().toLocaleDateString(),
+    };
+    setComments([...comments, newCommentData]);
+  };
+
+  const handleEditComment = (id, editedComment) => {
+    setComments(comments.map((comment) =>
+      comment.id === id ? { ...comment, comment: editedComment } : comment
+    ));
+  };
+
+  const handleDeleteComment = (id) => {
+    setComments(comments.filter(comment => comment.id !== id));
+  };
+
   return (
     <Box sx={{ padding: 4, backgroundColor: theme.palette.background.default }}>
       <Typography variant="h4" gutterBottom sx={{ fontWeight: 'bold', color: theme.palette.primary.main }}>
@@ -78,7 +106,7 @@ const CourseDetail = () => {
       <Typography variant="h5" gutterBottom sx={{ marginTop: 4, fontWeight: 'bold' }}>
         Levels
       </Typography>
-      <Grid container spacing={2}>
+      <Grid container spacing={2} pb={5} borderBottom={1} mb={2} borderColor={theme.palette.divider}>
         {course.levels.map((level, index) => (
           <Grid item xs={12} sm={6} md={4} key={level._id}>
             <Link
@@ -151,6 +179,15 @@ const CourseDetail = () => {
           </Grid>
         ))}
       </Grid>
+
+      {/* Comments Section */}
+      <CommentsSection
+        comments={comments}
+        onAddComment={handleAddComment}
+        onEditComment={handleEditComment}
+        onDeleteComment={handleDeleteComment}
+        currentUserId={CurrentUser?.id}
+      />
     </Box>
   );
 };
