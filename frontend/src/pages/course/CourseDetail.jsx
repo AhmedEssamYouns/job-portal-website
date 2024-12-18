@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import { useFetchCourseById } from "../../hooks/useCourses";
 import { useFetchUserById } from "../../hooks/useAuth";
@@ -27,6 +27,12 @@ const CourseDetail = () => {
     );
   };
 
+  useEffect(() => {
+    if (course && course.comments) {
+      const newRating = calculateAverageRating(course.comments);
+      setUpdatedRating(newRating); 
+    }
+  }, [course]);
   const allPreviousLevelsCompleted = (index) => {
     return course?.levels
       .slice(0, index)

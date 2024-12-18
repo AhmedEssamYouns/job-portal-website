@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const BASE_API_URL = 'https://job-portal-website-production.up.railway.app/api';
+const BASE_API_URL = 'https:/job-portal-website-production.up.railway.app/api/';
 
 
 
