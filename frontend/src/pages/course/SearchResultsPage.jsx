@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from 'react';
-import CourseCard from '../../shared/Course/client/CourseCard';
+import CourseCard from '../../test/Course/client/CourseCard';
 import { Grid2, CircularProgress, Typography, Box } from '@mui/material';
 import { fetchCourses } from '../../services/courses';
 import { useLocation } from 'react-router-dom';
-import HourglassLoader from '../../shared/Loaders/Components/Hamster';
+import HourglassLoader from '../../test/Loaders/Components/Hamster';
 
 const SearchResultsPage = () => {
   const [courses, setCourses] = useState([]);

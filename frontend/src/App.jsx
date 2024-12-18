@@ -4,7 +4,7 @@ import { CssBaseline, Box } from '@mui/material';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query' 
 import { useThemeContext } from './context/ThemeContext';
-import Navbar from './shared/Navbar/Navbar'
+import Navbar from './test/Navbar/Navbar'
 import HomePage from './pages/home/HomePage';
 import theme from './styles/theme';
 import SignIn from './pages/auth/SignIn';
@@ -12,7 +12,7 @@ import SignUp from './pages/auth/SignUp';
 import { checkLogin } from './services/users';
 import CourseDetail from './pages/course/CourseDetail';
 import LevelDetail from './pages/course/LevelDetail';
-import Footer from './shared/Fotter/Fotter';
+import Footer from './test/Fotter/Fotter';
 import CoursesPage from './pages/course/CoursePage';
 import UserProfile from './pages/profile/Profile';
 import ScrollToTop from './utils/scrolltotop';

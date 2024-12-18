@@ -1,6 +1,6 @@
 import React from 'react';
 import { Container, Typography } from '@mui/material';
-import CoursesList from '../../shared/Course/client/CoursesList';
+import CoursesList from '../../test/Course/client/CoursesList';
 
 const CoursesPage = () => {
     return (

@@ -6,7 +6,7 @@ import { Card, CardContent, Typography, Grid, Box } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import { green } from '@mui/material/colors';
-import HourglassLoader from '../../shared/Loaders/Components/Hamster';
+import HourglassLoader from '../../test/Loaders/Components/Hamster';
 import { checkLogin } from '../../services/users';
 import CommentsSection from './components/comments';
 

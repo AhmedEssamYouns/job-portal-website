@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { Box, Typography, Avatar, CircularProgress, Paper, useTheme, Button, Grid } from '@mui/material';
 import { fetchUserById, checkLogin } from '../../services/users';
-import CoursesList from '../../shared/Course/client/CoursesList';
+import CoursesList from '../../test/Course/client/CoursesList';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
-import HourglassLoader from '../../shared/Loaders/Components/Hamster';
+import HourglassLoader from '../../test/Loaders/Components/Hamster';
 import SignIn from '../auth/SignIn';
 
 const UserProfile = () => {
