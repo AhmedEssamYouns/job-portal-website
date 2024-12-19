@@ -125,7 +125,7 @@ const CourseDetail = () => {
       </Typography>
 
 {/* Pricing Section */}
-{!course.isFree && (
+{course.price > 0 && (
         <Box
           sx={{
             padding: 2,
@@ -149,7 +149,7 @@ const CourseDetail = () => {
               width: { xs: "100%", sm: "auto" }, // Full width on mobile
             }}
           >
-            Price: ${course.price || "99.99"}
+            Price: ${course.price}
           </Typography>
 
           <Box

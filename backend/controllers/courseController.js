@@ -149,9 +149,8 @@ exports.deleteComment = async (req, res) => {
   }
 };
 
-
 exports.addCourse = async (req, res) => {
-  const { title, description, language, levels } = req.body;
+  const { title, description, language, levels, price } = req.body; // Add price to the destructuring
 
   try {
     // Create Levels and Slides
@@ -203,17 +202,24 @@ exports.addCourse = async (req, res) => {
     }));
 
     // Create the Course and associate it with its levels
-    const course = await Course.create({
+    const courseData = {
       title,
       description,
       language,
       levels: createdLevels.map((l) => l._id),
-    });
+    };
+
+    // If price is provided, include it in the course data
+    if (price !== undefined) {
+      courseData.price = price;
+    }
+
+    const course = await Course.create(courseData);
 
     res.status(201).json({ message: 'Course created successfully!', course });
   } catch (error) {
     console.error(error);
-    res.status(500).json({ message: `Failed to create course ${error.message}` });
+    res.status(500).json({ message: `Failed to create course: ${error.message}` });
   }
 };
 
