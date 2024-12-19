@@ -5,14 +5,94 @@ const httpStatusText = require("../utils/httpStatusText");
 const crypto = require("crypto");
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
-const nodemailer = require("nodemailer");
+
+const crypto = require('crypto'); // Import crypto
+const nodemailer = require('nodemailer'); // Ensure you install Nodemailer if not already installed
+
+// Configure Nodemailer
+const transporter = nodemailer.createTransport({
+    service: process.env.EMAIL_SERVICE, // e.g., 'gmail'
+    auth: {
+        user: process.env.EMAIL_USER,
+        pass: process.env.EMAIL_PASS,
+    },
+});
+
+// Function to send the reset email
+const sendResetEmail = async (email, token) => {
+    const resetURL = `http://localhost:3000/reset-password?token=${token}`; // Adjust URL if needed
+
+    const mailOptions = {
+        from: process.env.EMAIL_USER, // Your email
+        to: email,
+        subject: 'Password Reset',
+        text: `Please use the following link to reset your password: ${resetURL}`,
+    };
+
+    await transporter.sendMail(mailOptions);
+};
+// Forgot Password
+const forgotPassword = async (req, res) => {
+    const { email } = req.body;
+
+    try {
+        const user = await User.findOne({ email });
+        if (!user) {
+            return res.status(400).json({ message: 'User with this email does not exist' });
+        }
+
+        // Generate a reset token and expiry date
+        const resetToken = crypto.randomBytes(32).toString('hex');
+        const resetTokenExpiry = Date.now() + 3600000; // Token valid for 1 hour
+
+        user.resetPasswordToken = resetToken;
+        user.resetPasswordExpiry = resetTokenExpiry;
+        await user.save();
+
+        await sendResetEmail(user.email, resetToken);
+
+        res.status(200).json({ message: 'Password reset email sent' });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'Server error' });
+    }
+};
+
+// Reset Password
+const resetPassword = async (req, res) => {
+    const { token, newPassword } = req.body;
+
+    try {
+        const user = await User.findOne({
+            resetPasswordToken: token,
+            resetPasswordExpiry: { $gt: Date.now() }, // Check if the token is still valid
+        });
+
+        if (!user) {
+            return res.status(400).json({ message: 'Invalid or expired reset token' });
+        }
+
+        // Hash and save the new password
+        user.password = await bcrypt.hash(newPassword, 10);
+        user.resetPasswordToken = undefined;
+        user.resetPasswordExpiry = undefined;
+        await user.save();
+
+        res.status(200).json({ message: 'Password reset successful' });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'Server error' });
+    }
+};
+
+
 // Sign Up
 const signUp = async (req, res) => {
     const { username, email, password } = req.body;
 
     // Email and password validation
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/; // Valid email pattern
-    const passwordRegex = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$/; // At least 8 chars, 1 letter, 1 number
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    const passwordRegex = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$/;
 
     if (!emailRegex.test(email)) {
         return res.status(400).json({ message: 'Invalid email format.' });
@@ -44,8 +124,6 @@ const signUp = async (req, res) => {
     }
 };
 
-
-
 // Sign In
 const signIn = async (req, res) => {
     const { email, password } = req.body;
@@ -67,6 +145,7 @@ const signIn = async (req, res) => {
         res.status(500).json({ message: error.message });
     }
 };
+
 
 // Configure Nodemailer
 const transporter = nodemailer.createTransport({
@@ -265,16 +344,16 @@ const resetPassword = asyncWrapper(async (req, res, next) => {
 });
 
 
+
 // Function to add a completed course to a user
 const addCompletedCourse = async (req, res) => {
-    const { userId, courseId } = req.body; // Expecting userId and courseId in the request body
+    const { userId, courseId } = req.body;
 
     try {
-        // Find the user by ID and update their completedCourses array
         const user = await User.findByIdAndUpdate(
             userId,
-            { $addToSet: { completedCourses: courseId } }, // Use $addToSet to avoid duplicates
-            { new: true } // Return the updated user document
+            { $addToSet: { completedCourses: courseId } },
+            { new: true }
         );
 
         if (!user) {
@@ -288,13 +367,12 @@ const addCompletedCourse = async (req, res) => {
     }
 };
 
-
 // Fetch User Data by ID
 const getUserById = async (req, res) => {
-    const { id } = req.params; // Extract user ID from request parameters
+    const { id } = req.params;
 
     try {
-        const user = await User.findById(id).select('-password'); // Exclude the password field from the response
+        const user = await User.findById(id).select('-password');
         if (!user) {
             return res.status(404).json({ message: 'User not found' });
         }
@@ -306,4 +384,5 @@ const getUserById = async (req, res) => {
 };
 
 module.exports = { signUp, signIn, addCompletedCourse, getUserById , forgotPassword , verifyResetCode , resetPassword };
+
 
