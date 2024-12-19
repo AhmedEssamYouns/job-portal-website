@@ -103,12 +103,16 @@ const SignUp = () => {
                     justifyContent: 'center',
                     height: 'auto',
                     margin: '0px',
-                    [theme.breakpoints.down('sm')]: {
-                        marginTop: '20px',
-                        marginBottom: '20px',
-                        marginRight: '5px',
-                        marginLeft: '5px',
-                    },
+                    [theme.breakpoints.down("sm")]: {
+                        borderBottomRightRadius: "100px",
+                        borderTopLeftRadius: "100px",
+                        borderTopRightRadius: "100px",
+                        borderBottomLeftRadius: "100px",
+                        marginTop: "20px",
+                        marginRight: "10px",
+                        marginLeft: "10px",
+                        height: "75vh",
+                      },
                 }}
                 padding={1}
                 gap={5}

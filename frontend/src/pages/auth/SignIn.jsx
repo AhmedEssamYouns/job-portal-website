@@ -106,7 +106,6 @@ const SignIn = () => {
           borderBottomLeftRadius: "100px",
           justifyContent: "center",
           height: "auto",
-          borderRadius: "0px",
           margin: "0px",
           [theme.breakpoints.down("sm")]: {
             borderBottomRightRadius: "100px",
