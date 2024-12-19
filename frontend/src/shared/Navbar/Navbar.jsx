@@ -46,14 +46,13 @@ const Navbar = () => {
     useEffect(() => {
         const getCourses = async () => {
             const data = await fetchCourses();
-            setCourses(data); // Assuming fetchCourses returns an array of course objects
+            setCourses(data); 
         };
 
         getCourses();
     }, []);
 
     useEffect(() => {
-        // Check if courses is an array before filtering
         if (Array.isArray(courses)) {
             setFilteredCourses(courses.filter(course => course.title.toLowerCase().includes(searchQuery.toLowerCase())));
         } else {
