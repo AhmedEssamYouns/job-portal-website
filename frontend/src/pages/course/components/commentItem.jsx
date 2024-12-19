@@ -34,7 +34,7 @@ const CommentItem = ({
       <Avatar alt={comment.name} src={comment.img} sx={{ marginRight: 2 }} />
       <Box sx={{ flex: 1 }}>
         <Box sx={{ display: "flex", justifyContent: "space-between" }}>
-          <Typography variant="body1" sx={{ fontWeight: "bold" }}>
+          <Typography fontSize={"0.9rem"} variant="body1" sx={{ fontWeight: "bold" }}>
             {comment.name}
           </Typography>
           {editingIndex !== index && (

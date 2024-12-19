@@ -138,7 +138,7 @@ const CommentsSection = ({ currentUserId, courseId, comments: initialComments, o
       return;
     }
   
-    if (user && comments.some((comment) => comment.userId === user.id)) {
+    if (user && comments.some((comment) => comment.userId === CurrentUser.id)) {
       console.warn("You have already commented on this course.");
       setAlertMessage("You have already commented on this course.");
       setAlertSeverity("info");

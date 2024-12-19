@@ -284,7 +284,7 @@ const CourseDetail = () => {
             variant="body1"
             sx={{ color: green[500], fontWeight: "bold", mr: 1 }}
           >
-            Completed
+            Course Completed
           </Typography>
           <CheckCircleIcon sx={{ color: green[500] }} />
         </Box>
