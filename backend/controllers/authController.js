@@ -92,123 +92,138 @@ const sendVerificationEmail = async (email, code) => {
 // Forgot Password - Generate and Send Verification Code
 const forgotPassword = asyncWrapper(async (req, res, next) => {
   try {
-    const { email } = req.body;
+      const { email } = req.body;
 
-    // Check if user exists
-    const user = await User.findOne({ email: email.trim().toLowerCase() });
-    if (!user) {
-      const error = appError.create("User not found.", 404, httpStatusText.FAIL);
-      return next(error);
-    }
+      // Check if user exists
+      const user = await User.findOne({ email: email.trim().toLowerCase() });
+      if (!user) {
+          const error = appError.create("User not found.", 404, httpStatusText.FAIL);
+          return next(error);
+      }
 
-    // Generate 6-digit verification code
-    const verificationCode = Math.floor(100000 + Math.random() * 900000).toString();
+      // Generate 6-digit verification code
+      const verificationCode = Math.floor(100000 + Math.random() * 900000).toString();
 
-    // Hash the verification code
-    const hashedCode = crypto.createHash("sha256").update(verificationCode).digest("hex");
+      // Save the verification code to the user
+      user.passwordResetCode = verificationCode; 
+      user.passwordResetVerified = false; 
+      await user.save();
 
-    // Save the hashed code and expiry to the user
-    user.passwordResetCode = hashedCode;
-    user.passwordResetExpire = Date.now() + 10 * 60 * 1000; // 10 minutes
-    user.passwordResetVerified = false;
-    await user.save();
+      // Send verification code to user's email
+      await sendVerificationEmail(email, verificationCode);
 
-    // Send verification code to user's email
-    await sendVerificationEmail(email, verificationCode);
-
-    res.status(200).json({
-      status: "success",
-      message: "Verification code sent successfully to your email.",
-    });
+      res.status(200).json({
+          status: "success",
+          message: "Verification code sent successfully to your email.",
+      });
   } catch (err) {
-    console.error("Error in forgotPassword:", err);
-    next(
-      appError.create(
-        "An error occurred while sending the verification email.",
-        500,
-        httpStatusText.FAIL
-      )
-    );
+      console.error("Error in forgotPassword:", err);
+      next(
+          appError.create(
+              "An error occurred while sending the verification email.",
+              500,
+              httpStatusText.FAIL
+          )
+      );
   }
 });
 
-// Verify Reset Code
 // Verify Reset Code
 const verifyResetCode = asyncWrapper(async (req, res, next) => {
   const { email, resetCode } = req.body;
 
   // Validate input
   if (!email || !resetCode) {
-    const error = appError.create(
-      "Email and reset code are required.",
-      400,
-      httpStatusText.FAIL
-    );
-    return next(error);
+      const error = appError.create(
+          "Email and reset code are required.",
+          400,
+          httpStatusText.FAIL
+      );
+      return next(error);
   }
 
   // Find user
   const user = await User.findOne({ email: email.trim().toLowerCase() });
   if (!user) {
-    const error = appError.create("User not found.", 404, httpStatusText.FAIL);
-    return next(error);
+      const error = appError.create("User not found.", 404, httpStatusText.FAIL);
+      return next(error);
   }
 
-  // Hash the reset code
-  const hashedCode = crypto.createHash("sha256").update(resetCode).digest("hex");
-
-  // Check if the code matches and is not expired
-  const verification = await User.findOne({
-    passwordResetCode: hashedCode, // Use the correct variable here
-    passwordResetExpire: { $gt: Date.now() }, // Ensure the code is not expired
-  });
-
-  if (!verification) {
-    const error = appError.create(
-      "Invalid or expired reset code.",
-      400,
-      httpStatusText.FAIL
-    );
-    return next(error);
+  // Check if the code matches
+  if (user.passwordResetCode !== resetCode) {
+      const error = appError.create(
+          "Invalid reset code.",
+          400,
+          httpStatusText.FAIL
+      );
+      return next(error);
   }
 
   try {
-    // Mark the reset code as verified
-    await user.set({ passwordResetVerified: true }).save();
+      // Mark the reset code as verified
+      user.passwordResetVerified = true;
+      const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: '1h' });
 
-    res.status(200).json({
-      status: "success",
-      message: "Verification code is valid.",
-    });
+      await user.save();
+
+      res.status(200).json({
+          status: "success",
+          message: "Verification code is valid.",
+          token: token
+      });
   } catch (err) {
-    console.error("Error in verifyResetCode:", err);
-    next(
-      appError.create(
-        "An error occurred while verifying the reset code.",
-        500,
-        httpStatusText.FAIL
-      )
-    );
+      console.error("Error in verifyResetCode:", err);
+      next(
+          appError.create(
+              "An error occurred while verifying the reset code.",
+              500,
+              httpStatusText.FAIL
+          )
+      );
   }
 });
 
-// Reset Password - Update Password After Verification
 const resetPassword = asyncWrapper(async (req, res, next) => {
   try {
-    const { email, newPassword } = req.body;
+    const { newPassword } = req.body;
 
-    // Validate input
-    if (!email || !newPassword) {
+    // Ensure newPassword is provided
+    if (!newPassword) {
       const error = appError.create(
-        "Email and new password are required.",
+        "New password is required.",
         400,
         httpStatusText.FAIL
       );
       return next(error);
     }
 
-    // Find user
-    const user = await User.findOne({ email: email.trim().toLowerCase() });
+    // Get token from Authorization header
+    const token = req.headers.authorization?.split(" ")[1];
+    if (!token) {
+      const error = appError.create(
+        "Authorization token is required.",
+        401,
+        httpStatusText.UNAUTHORIZED
+      );
+      return next(error);
+    }
+
+    // Verify the token
+    let userId;
+    try {
+      const decoded = jwt.verify(token, process.env.JWT_SECRET);
+      userId = decoded.id;
+    } catch (err) {
+      const error = appError.create(
+        "Invalid or expired token.",
+        401,
+        httpStatusText.UNAUTHORIZED
+      );
+      return next(error);
+    }
+
+    // Find the user by ID
+    const user = await User.findById(userId);
     if (!user) {
       const error = appError.create("User not found.", 404, httpStatusText.FAIL);
       return next(error);
@@ -231,7 +246,6 @@ const resetPassword = asyncWrapper(async (req, res, next) => {
     user.password = hashedPassword;
     user.passwordResetVerified = false; // Reset the verified flag
     user.passwordResetCode = undefined; // Clear reset code
-    user.passwordResetExpire = undefined; // Clear reset expiry
     await user.save();
 
     res.status(200).json({
