@@ -17,16 +17,17 @@ export const useSignup = (onSuccessCallback, onErrorCallback) => {
 
 // Hook to log in a user
 export const useLogin = (onSuccessCallback, onErrorCallback) => {
-    return useMutation({
-      mutationFn: login,
-      onSuccess: (data) => {
-        if (onSuccessCallback) onSuccessCallback(data);
-      },
-      onError: (error) => {
-        if (onErrorCallback) onErrorCallback(error);
-      },
-    });
-  };
+  return useMutation({
+    mutationFn: login, // Function to perform the login request
+    onSuccess: (data) => {
+      if (onSuccessCallback) onSuccessCallback(data);
+    },
+    onError: (error) => {
+      if (onErrorCallback) onErrorCallback(error);
+    },
+  });
+};
+
 
 // Hook to fetch user data by ID
 export const useFetchUserById = (userId) => {

@@ -61,12 +61,26 @@ const signIn = async (req, res) => {
             return res.status(400).json({ message: 'Invalid email or password' });
         }
 
+        // Generate token
         const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: '1h' });
-        res.json({ token });
+
+        // Exclude password from user data
+        const { password: _, ...userData } = user.toObject();
+
+        res.json({
+            message: "Login successful",
+            token,
+            username: userData.username,
+            email: userData.email,
+            userId: userData._id,
+            avatar: userData.avatar
+
+        });
     } catch (error) {
         res.status(500).json({ message: error.message });
     }
 };
+
 
 // Configure Nodemailer
 const transporter = nodemailer.createTransport({

@@ -4,7 +4,7 @@ import { ExpandMore } from "@mui/icons-material";
 import CommentInput from "./commentInput";
 import CommentItem from "./commentItem";
 import { useAddComment, useDeleteComment, useEditComment } from "../../../hooks/useComments";
-import { checkLogin } from "../../../services/users";
+import { checkLogin, fetchUserById } from "../../../services/users";
 
 const CommentsSection = ({ currentUserId, courseId, comments: initialComments, onUpdateRating }) => {
   const [expanded, setExpanded] = useState(false);
@@ -20,13 +20,39 @@ const CommentsSection = ({ currentUserId, courseId, comments: initialComments, o
   const [alertMessage, setAlertMessage] = useState("");
   const [alertSeverity, setAlertSeverity] = useState("success");
   const [user, setUser] = useState(null);
-
+      const CurrentUser = checkLogin();
+  
+      useEffect(() => {
+          const loadUser = async () => {
+              try {
+                  if (CurrentUser) {
+                      const userData = await fetchUserById(CurrentUser.id);
+                      setUser(userData);
+  
+                      // Check if there's a stored avatar and name that matches the current user
+                      const storedAvatar = localStorage.getItem('userAvatar');
+                      const storedUserName = localStorage.getItem('userName');
+  
+                      if (storedUserName === userData.username) {
+                          setUser(prevUser => ({ ...prevUser, avatar: storedAvatar }));
+                      }
+                  } else {
+                      // setError('User not logged in.');
+                  }
+              } catch (err) {
+                  // setError(err.message);
+              } finally {
+                  // setLoading(false);
+              }
+          };
+  
+          loadUser();
+      }, [CurrentUser]);
   // Debugging user login
   useEffect(() => {
     const fetchUser = async () => {
       try {
         const loggedInUser = await checkLogin();
-        setUser(loggedInUser);
         console.log("Logged-in user:", loggedInUser);
   
         // Check if the user has already commented on this course
@@ -126,7 +152,7 @@ const CommentsSection = ({ currentUserId, courseId, comments: initialComments, o
         comment: newComment,
         rating: newRating,
         userId: currentUserId,
-        name: user?.name || "Guest",
+        name: user?.username || "Guest",
       },
     });
     setNewComment("");

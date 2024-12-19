@@ -2,7 +2,14 @@ import React, { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import { useFetchCourseById } from "../../hooks/useCourses";
 import { useFetchUserById } from "../../hooks/useAuth";
-import { Card, CardContent, Typography, Grid, Box, Button } from "@mui/material";
+import {
+  Card,
+  CardContent,
+  Typography,
+  Grid,
+  Box,
+  Button,
+} from "@mui/material";
 import { useTheme } from "@mui/material/styles";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import HourglassLoader from "../../shared/Loaders/Components/Hamster";
@@ -13,7 +20,9 @@ import AddShoppingCartIcon from "@mui/icons-material/AddShoppingCart";
 import FavoriteIcon from "@mui/icons-material/Favorite";
 import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
 import PaymentIcon from "@mui/icons-material/Payment";
-import { green, pink } from "@mui/material/colors";
+import { blue, green, pink } from "@mui/material/colors";
+import RobotHi from "../../assets/svgs/RobotHi.svg";
+
 const CourseDetail = () => {
   const { id } = useParams();
   const theme = useTheme();
@@ -33,7 +42,7 @@ const CourseDetail = () => {
   useEffect(() => {
     if (course && course.comments) {
       const newRating = calculateAverageRating(course.comments);
-      setUpdatedRating(newRating); 
+      setUpdatedRating(newRating);
     }
   }, [course]);
   const allPreviousLevelsCompleted = (index) => {
@@ -59,7 +68,10 @@ const CourseDetail = () => {
   };
   const calculateAverageRating = (comments) => {
     if (!comments || comments.length === 0) return 0;
-    const totalRating = comments.reduce((acc, comment) => acc + comment.rating, 0);
+    const totalRating = comments.reduce(
+      (acc, comment) => acc + comment.rating,
+      0
+    );
     return totalRating / comments.length;
   };
 
@@ -106,8 +118,28 @@ const CourseDetail = () => {
       <Typography variant="h6" gutterBottom>
         Description:
       </Typography>
+      <Box
+      
+        sx={{
+          position: "absolute",
+          right: "0px",
+          top: "80px",
+          "@media (max-width: 600px)": {
+            top: "120px",
+          },
+        }}
+      >
+        <img
+          src={RobotHi}
+          alt="Robot Hi"
+          style={{ width: "180px", height: "250px" }} // Adjust size as needed
+        />
+      </Box>
+
       <Typography
+        zIndex={3000} // Ensure text is above the image
         variant="body1"
+        width={"70%"}
         paragraph
         sx={{ color: theme.palette.text.secondary }}
       >
@@ -124,8 +156,8 @@ const CourseDetail = () => {
         {course.language}
       </Typography>
 
-{/* Pricing Section */}
-{course.price > 0 && (
+      {/* Pricing Section */}
+      {course.price > 0 && (
         <Box
           sx={{
             padding: 2,
@@ -134,8 +166,8 @@ const CourseDetail = () => {
             borderRadius: 2,
             backgroundColor: theme.palette.background.paper,
             display: "flex",
-            flexDirection: { xs: "column", sm: "row" }, // Stacks on mobile, horizontal on larger screens
-            gap: 2, // Adds spacing between elements
+            flexDirection: { xs: "column", sm: "row" },
+            gap: 2,
             justifyContent: { sm: "space-between" },
             alignItems: "center",
           }}
@@ -168,8 +200,8 @@ const CourseDetail = () => {
               sx={{
                 height: 55,
 
-                backgroundColor: theme.palette.secondary.main,
-                color: theme.palette.common.white,
+                backgroundColor: '#e91e63',
+                color: 'white',
                 "&:hover": {
                   backgroundColor: theme.palette.secondary.dark,
                 },
@@ -189,10 +221,12 @@ const CourseDetail = () => {
             >
               {!isEnrolled ? (
                 <Button
+                
                   variant="contained"
                   startIcon={<AddShoppingCartIcon />}
                   sx={{
-                    backgroundColor: theme.palette.primary.main,
+                    height: 55,
+                    backgroundColor: blue[500],
                     color: theme.palette.common.white,
                     "&:hover": {
                       backgroundColor: theme.palette.primary.dark,
@@ -243,7 +277,6 @@ const CourseDetail = () => {
         </Box>
       )}
 
-      
       {/* Display course completion status */}
       {isCourseCompleted && (
         <Box sx={{ display: "flex", alignItems: "center", mt: 2 }}>
