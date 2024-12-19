@@ -2,15 +2,18 @@ import React, { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import { useFetchCourseById } from "../../hooks/useCourses";
 import { useFetchUserById } from "../../hooks/useAuth";
-import { Card, CardContent, Typography, Grid, Box } from "@mui/material";
+import { Card, CardContent, Typography, Grid, Box, Button } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
-import { green } from "@mui/material/colors";
 import HourglassLoader from "../../shared/Loaders/Components/Hamster";
 import { checkLogin } from "../../services/users";
 import CommentsSection from "./components/comments";
 import Rating from "@mui/material/Rating"; // Import Rating component
-
+import AddShoppingCartIcon from "@mui/icons-material/AddShoppingCart";
+import FavoriteIcon from "@mui/icons-material/Favorite";
+import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
+import PaymentIcon from "@mui/icons-material/Payment";
+import { green, pink } from "@mui/material/colors";
 const CourseDetail = () => {
   const { id } = useParams();
   const theme = useTheme();
@@ -41,6 +44,19 @@ const CourseDetail = () => {
 
   const [updatedRating, setUpdatedRating] = useState(course?.rating || 0);
 
+  const [isEnrolled, setIsEnrolled] = useState(false); // Static state for enrollment
+  const [isInWishlist, setIsInWishlist] = useState(false); // Static state for wishlist
+  const handleEnrollClick = () => {
+    setIsEnrolled(true);
+  };
+
+  const handleAddToWishlist = () => {
+    setIsInWishlist(true);
+  };
+
+  const handleBuyNowClick = () => {
+    alert("Redirecting to payment gateway...");
+  };
   const calculateAverageRating = (comments) => {
     if (!comments || comments.length === 0) return 0;
     const totalRating = comments.reduce((acc, comment) => acc + comment.rating, 0);
@@ -108,6 +124,124 @@ const CourseDetail = () => {
         {course.language}
       </Typography>
 
+{/* Pricing Section */}
+{!course.isFree && (
+        <Box
+          sx={{
+            padding: 2,
+            marginBottom: 4,
+            border: `2px solid ${theme.palette.divider}`,
+            borderRadius: 2,
+            backgroundColor: theme.palette.background.paper,
+            display: "flex",
+            flexDirection: { xs: "column", sm: "row" }, // Stacks on mobile, horizontal on larger screens
+            gap: 2, // Adds spacing between elements
+            justifyContent: { sm: "space-between" },
+            alignItems: "center",
+          }}
+        >
+          <Typography
+            variant="h5"
+            sx={{
+              fontWeight: "bold",
+              color: theme.palette.text.primary,
+              textAlign: { xs: "center", sm: "left" }, // Center align on mobile
+              width: { xs: "100%", sm: "auto" }, // Full width on mobile
+            }}
+          >
+            Price: ${course.price || "99.99"}
+          </Typography>
+
+          <Box
+            sx={{
+              display: "flex",
+              flexDirection: { xs: "column", sm: "row" }, // Stacks buttons on mobile
+              gap: 2,
+              alignItems: "center",
+              justifyContent: { xs: "center", sm: "flex-end" }, // Center on mobile
+              width: "100%", // Ensures buttons take full width on mobile
+            }}
+          >
+            <Button
+              variant="contained"
+              startIcon={<PaymentIcon />}
+              sx={{
+                height: 55,
+
+                backgroundColor: theme.palette.secondary.main,
+                color: theme.palette.common.white,
+                "&:hover": {
+                  backgroundColor: theme.palette.secondary.dark,
+                },
+                width: { xs: "100%", sm: "auto" }, // Full width on mobile
+              }}
+              onClick={handleBuyNowClick}
+            >
+              Buy Now
+            </Button>
+            <Box
+              sx={{
+                display: "flex",
+                flexDirection: { xs: "row", sm: "row" }, // Row on all screen sizes
+                gap: 2, // Add spacing between buttons
+                alignItems: "stretch", // Ensure buttons have the same height
+              }}
+            >
+              {!isEnrolled ? (
+                <Button
+                  variant="contained"
+                  startIcon={<AddShoppingCartIcon />}
+                  sx={{
+                    backgroundColor: theme.palette.primary.main,
+                    color: theme.palette.common.white,
+                    "&:hover": {
+                      backgroundColor: theme.palette.primary.dark,
+                    },
+                    flex: { xs: 1, sm: "none" }, // Take equal space on mobile
+                  }}
+                  onClick={handleEnrollClick}
+                >
+                  Enroll Now
+                </Button>
+              ) : (
+                <Button
+                  variant="contained"
+                  startIcon={<ShoppingCartIcon />}
+                  sx={{
+                    backgroundColor: green[500],
+                    color: theme.palette.common.white,
+                    "&:hover": {
+                      backgroundColor: green[700],
+                    },
+                    flex: { xs: 1, sm: "none" },
+                    height: 55,
+                  }}
+                >
+                  Go to Cart
+                </Button>
+              )}
+
+              <Button
+                variant="outlined"
+                startIcon={<FavoriteIcon />}
+                sx={{
+                  borderColor: isInWishlist ? pink[500] : theme.palette.divider,
+                  color: isInWishlist ? pink[500] : theme.palette.text.primary,
+                  "&:hover": {
+                    borderColor: pink[700],
+                    color: pink[700],
+                  },
+                  flex: { xs: 1, sm: "none" },
+                  height: 55,
+                }}
+                onClick={handleAddToWishlist}
+              >
+                {isInWishlist ? "Wishlisted" : "Add Wishlist"}
+              </Button>
+            </Box>
+          </Box>
+        </Box>
+      )}
       {/* Display course completion status */}
       {isCourseCompleted && (
         <Box sx={{ display: "flex", alignItems: "center", mt: 2 }}>

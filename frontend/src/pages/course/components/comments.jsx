@@ -112,14 +112,13 @@ const CommentsSection = ({ currentUserId, courseId, comments: initialComments, o
       return;
     }
   
-    if (user && comments.some((comment) => comment.userId === user._id)) {
+    if (user && comments.some((comment) => comment.userId === user.id)) {
       console.warn("You have already commented on this course.");
       setAlertMessage("You have already commented on this course.");
       setAlertSeverity("info");
       setSnackBarOpen(true);
-      return;
+      return 0;
     }
-  
     console.log("Adding comment:", { newComment, newRating });
     addComment({
       courseId,
