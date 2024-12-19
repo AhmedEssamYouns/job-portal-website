@@ -53,10 +53,14 @@ const Navbar = () => {
     }, []);
 
     useEffect(() => {
-        // Filter courses based on search query
-        setFilteredCourses(courses.filter(course => course.title.toLowerCase().includes(searchQuery.toLowerCase())));
+        // Check if courses is an array before filtering
+        if (Array.isArray(courses)) {
+            setFilteredCourses(courses.filter(course => course.title.toLowerCase().includes(searchQuery.toLowerCase())));
+        } else {
+            console.error('courses is not an array:', courses);
+        }
     }, [searchQuery, courses]);
-
+    
     const handleMenuClick = (event) => {
         setAnchorEl(event.currentTarget);
     };
