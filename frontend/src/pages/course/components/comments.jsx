@@ -28,12 +28,21 @@ const CommentsSection = ({ currentUserId, courseId, comments: initialComments, o
         const loggedInUser = await checkLogin();
         setUser(loggedInUser);
         console.log("Logged-in user:", loggedInUser);
+  
+        // Check if the user has already commented on this course
+        const userHasCommented = comments.some((comment) => comment.userId === loggedInUser._id);
+        if (userHasCommented) {
+          setAlertMessage("You have already commented on this course.");
+          setAlertSeverity("info");
+          setSnackBarOpen(true);
+        }
       } catch (error) {
         console.error("Error fetching user:", error);
       }
     };
     fetchUser();
-  }, []);
+  }, [comments]); // Re-run the effect when comments change
+  
 
   // Hooks for API interactions
   const { mutate: addComment } = useAddComment(
@@ -94,7 +103,6 @@ const CommentsSection = ({ currentUserId, courseId, comments: initialComments, o
       setSnackBarOpen(true);
     }
   );
-
   const handleAddComment = () => {
     if (!newComment.trim()) {
       console.warn("Cannot add empty comment.");
@@ -103,6 +111,15 @@ const CommentsSection = ({ currentUserId, courseId, comments: initialComments, o
       setSnackBarOpen(true);
       return;
     }
+  
+    if (user && comments.some((comment) => comment.userId === user._id)) {
+      console.warn("You have already commented on this course.");
+      setAlertMessage("You have already commented on this course.");
+      setAlertSeverity("info");
+      setSnackBarOpen(true);
+      return;
+    }
+  
     console.log("Adding comment:", { newComment, newRating });
     addComment({
       courseId,
@@ -116,6 +133,7 @@ const CommentsSection = ({ currentUserId, courseId, comments: initialComments, o
     setNewComment("");
     setNewRating(0);
   };
+  
 
   const handleEditComment = (index) => {
     console.log("Editing comment at index:", index);

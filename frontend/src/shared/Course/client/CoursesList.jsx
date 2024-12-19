@@ -78,13 +78,26 @@ const CoursesList = ({ fetchType }) => {
   // Handle errors
   if (isError) {
     console.error('Error loading courses:', error);
-    return <Typography color="error">Error: {error.message}</Typography>;
+    return (
+      <Box textAlign="center" sx={{ marginTop: 4 }}>
+        <Typography color="error" gutterBottom>
+          Failed to load courses. Please try again later.
+        </Typography>
+        {error?.message && <Typography color="error">{error.message}</Typography>}
+      </Box>
+    );
   }
 
   // Validate courses
   if (!Array.isArray(courses)) {
     console.error('Unexpected data format for courses:', courses);
-    return <Typography color="error">Unexpected data format</Typography>;
+    return (
+      <Box textAlign="center" sx={{ marginTop: 4 }}>
+        <Typography color="error" gutterBottom>
+          Unexpected data format received. Please contact support.
+        </Typography>
+      </Box>
+    );
   }
 
   return (
