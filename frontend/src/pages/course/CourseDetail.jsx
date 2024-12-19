@@ -242,6 +242,8 @@ const CourseDetail = () => {
           </Box>
         </Box>
       )}
+
+      
       {/* Display course completion status */}
       {isCourseCompleted && (
         <Box sx={{ display: "flex", alignItems: "center", mt: 2 }}>

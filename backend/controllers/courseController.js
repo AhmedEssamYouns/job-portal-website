@@ -312,6 +312,33 @@ exports.fetchIncompletedCourses = async (req, res) => {
   }
 };
 
+exports.editCourse = async (req, res) => {
+  const { courseId } = req.params;
+  const { title, description, language, price } = req.body;
+
+  try {
+    // Find the course by ID
+    const course = await Course.findById(courseId);
+    if (!course) {
+      return res.status(404).json({ message: 'Course not found' });
+    }
+
+    // Update the course with the new values (if provided)
+    if (title) course.title = title;
+    if (description) course.description = description;
+    if (language) course.language = language;
+    if (price !== undefined) course.price = price; // Allow price to be 0 or not provided
+
+    // Save the updated course
+    await course.save();
+
+    res.status(200).json({ message: 'Course updated successfully', course });
+  } catch (error) {
+    console.error('Error editing course:', error);
+    res.status(500).json({ message: 'Failed to update course', error: error.message });
+  }
+};
+
 
 exports.searchCourses = async (req, res) => {
   const { title, language } = req.query;
