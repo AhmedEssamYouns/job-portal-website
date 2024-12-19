@@ -102,7 +102,7 @@ const SignUp = () => {
                     borderBottomLeftRadius: '100px',
                     justifyContent: 'center',
                     height: 'auto',
-                    margin: '0px',
+                    mb: 2,
                     [theme.breakpoints.down("sm")]: {
                         borderBottomRightRadius: "100px",
                         borderTopLeftRadius: "100px",
@@ -111,10 +111,8 @@ const SignUp = () => {
                         marginTop: "20px",
                         marginRight: "10px",
                         marginLeft: "10px",
-                        height: "75vh",
                       },
                 }}
-                padding={1}
                 gap={5}
                 alignItems="center"
             >

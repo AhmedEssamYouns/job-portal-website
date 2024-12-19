@@ -38,7 +38,7 @@ const CommentItem = ({
             {comment.name}
           </Typography>
           {editingIndex !== index && (
-            <Rating value={comment.rating} readOnly sx={{ marginLeft: 1 }} />
+            <Rating size="small" value={comment.rating} readOnly sx={{ marginLeft: 1, position:'absolute',top:'10px',right:'10px' }} />
           )}
         </Box>
 
