@@ -8,6 +8,7 @@ import {
   Navigate,
 } from "react-router-dom";
 import CartPage from "../src/pages/home/purchase-flow/cartpage";
+import WishList from"../src/pages/wishlist/wishlist";
 import PaymentPage from "../src/pages/home/purchase-flow/paymentpage";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Provider } from "react-redux";
@@ -30,8 +31,8 @@ import AddCoursePage from "./pages/admin/addCourse";
 import { useCheckLogin } from "./hooks/useAuth";
 import { fetchUserById } from "./services/users";
 import HourglassLoader from "./shared/Loaders/Components/Hamster";
-import ForgetPassword from "./pages/auth/ForgetPassword";
-import ChangePassword from "./pages/auth/ChangePassword";
+
+
 const queryClient = new QueryClient();
 
 const App = () => {
@@ -74,6 +75,7 @@ const App = () => {
     );
 
   return (
+
     <Provider store={store}>
       <QueryClientProvider client={queryClient}>
         <ThemeProvider theme={theme[themeMode]}>
@@ -96,19 +98,13 @@ const App = () => {
                   <Route path="/signup" element={<SignUp />} />
                   <Route path="/search" element={<SearchResultsPage />} />
                   <Route path="/courses" element={<CoursesPage />} />
-                  <Route path="/cart" element={<CartPage />} />
-                  <Route path="/paymentpage" element={<PaymentPage />} />
-                  <Route path="/forgetPassword" element={<ForgetPassword />} />
-
+                  <Route path= "/cart" element={<CartPage />} />
+                  <Route path= "/paymentpage" element={<PaymentPage />} />
+                  <Route path= "/wishlist" element={<WishList />} />
                   <Route
                     path="/profile"
                     element={isLoggedIn ? <UserProfile /> : <SignIn />}
                   />
-                  <Route
-                    path="/changePassword"
-                    element={isLoggedIn ? <ChangePassword /> : <SignIn />}
-                  />
-                  
                   <Route
                     path="/course/:id"
                     element={isLoggedIn ? <CourseDetail /> : <SignIn />}
@@ -138,6 +134,7 @@ const App = () => {
         </ThemeProvider>
       </QueryClientProvider>
     </Provider>
+
   );
 };
 
