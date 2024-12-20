@@ -29,6 +29,7 @@ import { useCheckLogin } from "./hooks/useAuth";
 import { fetchUserById } from "./services/users";
 import HourglassLoader from "./shared/Loaders/Components/Hamster";
 
+
 const queryClient = new QueryClient();
 
 const App = () => {
@@ -71,6 +72,7 @@ const App = () => {
     );
 
   return (
+
     <Provider store={store}>
       <QueryClientProvider client={queryClient}>
         <ThemeProvider theme={theme[themeMode]}>
@@ -126,6 +128,7 @@ const App = () => {
         </ThemeProvider>
       </QueryClientProvider>
     </Provider>
+
   );
 };
 
