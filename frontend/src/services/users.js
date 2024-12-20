@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const BASE_API_URL = 'https://job-portal-website-production.up.railway.app/api/';
+const BASE_API_URL = 'http://localhost:5000/api/';
 
 
 
@@ -30,6 +30,52 @@ export const login = async (userData) => {
         throw new Error(error.response?.data?.message || 'Sign in failed');
     }
 };
+
+export const forgotPassword = async (email) => {
+    try {
+        const response = await axios.post(`${BASE_API_URL}auth/forgotPassword`, { email }, {
+            headers: { 'Content-Type': 'application/json' },
+        });
+        return response.data; // You can return the success message or other data
+    } catch (error) {
+        console.error(`Forgot password error: ${error.response?.data?.message}`);
+        throw new Error(error.response?.message || 'user not found');
+    }
+};
+
+export const verifyResetCode = async (email, resetCode) => {
+    try {
+        const response = await axios.post(`${BASE_API_URL}auth/verifyResetCode`, { email, resetCode }, {
+            headers: { 'Content-Type': 'application/json' },
+        });
+        return response.data;  // You can return the success message or token here
+    } catch (error) {
+        console.error(`Verify reset code error: ${error.response?.data?.message}`);
+        throw new Error(error.response?.data?.message || 'Verification failed');
+    }
+};
+
+export const resetPassword = async (newPassword,token) => {
+    try {
+        if (!token) {
+            throw new Error('Reset token is required.');
+        }
+
+        const response = await axios.put(`${BASE_API_URL}auth/resetPassword`, { newPassword }, {
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`,
+            },
+        });
+
+        return response.data;  // You can return the success message after resetting the password
+    } catch (error) {
+        console.error(`Reset password error: ${error}`);
+        throw new Error(error.response?.data?.message || 'Password reset failed');
+    }
+};
+
+
 
 export const logout = () => {
     localStorage.removeItem('token');

@@ -28,6 +28,7 @@ import AddCoursePage from "./pages/admin/addCourse";
 import { useCheckLogin } from "./hooks/useAuth";
 import { fetchUserById } from "./services/users";
 import HourglassLoader from "./shared/Loaders/Components/Hamster";
+import ForgetPassword from "./pages/auth/ForgetPassword";
 
 
 const queryClient = new QueryClient();
@@ -44,12 +45,12 @@ const App = () => {
         const userId = isLoggedIn.id;
         if (userId) {
           const userData = await fetchUserById(userId);
-          setIsAdmin(userData?.isAdmin || false); // Set admin status
+          setIsAdmin(userData?.isAdmin || false); 
         }
       } catch (error) {
         console.error("Error verifying admin status:", error.message);
       } finally {
-        setLoading(false); // End loading
+        setLoading(false);
       }
     };
 
@@ -106,6 +107,10 @@ const App = () => {
                   <Route
                     path="/course/:courseId/level/:levelId"
                     element={isLoggedIn ? <LevelDetail /> : <SignIn />}
+                  />
+                    <Route
+                    path="/forgetPassword"
+                    element={<ForgetPassword />}
                   />
                   {/* Admin Routes */}
                   <Route

@@ -207,10 +207,10 @@ const SignIn = () => {
               >
                 <Typography
                   component={Link}
-                  to={'/ForgetPassword'}
+                  to={'/forgetPassword'}
                   sx={{ color: theme.palette.primary.main }}
                 >
-                  Reset your password
+                  Forgot your password?
                 </Typography>
               </Typography>
             </Box>
