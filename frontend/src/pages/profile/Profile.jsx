@@ -53,7 +53,7 @@ const UserProfile = () => {
     }
   };
 
-  if (loading) {
+  if (loading || imageLoading || userLoading) {
     return (
       <Box
         sx={{
