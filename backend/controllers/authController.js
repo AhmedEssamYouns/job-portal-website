@@ -319,4 +319,26 @@ const getUserById = async (req, res) => {
     }
 };
 
-module.exports = { signUp, signIn, addCompletedCourse, getUserById , forgotPassword , verifyResetCode , resetPassword };
+
+const setAdminStatus = async (req, res) => {
+  const { userId } = req.params;
+
+  try {
+    // Find user by ID
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({ message: "Uses not found",userId: userId });
+    }
+
+    // Update isAdmin status to true
+    user.isAdmin = true;
+    await user.save();
+
+    res.status(200).json({ message: "User has been granted admin privileges.", user });
+  } catch (error) {
+    console.error("Error setting admin status:", error.message);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
+module.exports = { signUp, signIn, addCompletedCourse, getUserById , forgotPassword , verifyResetCode , resetPassword ,setAdminStatus};
