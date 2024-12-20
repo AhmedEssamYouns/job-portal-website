@@ -132,7 +132,7 @@ const CartPage = () => {
                             marginTop: 4,
                             padding: 2,
                             backgroundColor: theme.palette.mode === 'dark' ? '#333' : '#ffffff',
-                            '&:hover': { transform: 'scale(1.05)', boxShadow: 5 },
+                            '&:hover': { boxShadow: 5 },
                             borderRadius: 2,
                             boxShadow: 2,
                         }}
