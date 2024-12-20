@@ -2,12 +2,13 @@ import React, { useEffect, useState } from 'react';
 import {
   Box, Typography, Avatar, Paper, useTheme, Button, Grid, CircularProgress,
 } from '@mui/material';
-import { fetchUserById, checkLogin } from '../../services/users';
+import { fetchUserById, checkLogin, useProfileImage } from '../../services/users';
 import { uploadProfileImage, getProfileImage } from '../../services/users';
 import CoursesList from '../../shared/Course/client/CoursesList';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import HourglassLoader from '../../shared/Loaders/Components/Hamster';
 import SignIn from '../auth/SignIn';
+import { useFetchUserById } from '../../hooks/useAuth';
 
 const UserProfile = () => {
   const [user, setUser] = useState(null);
@@ -16,31 +17,25 @@ const UserProfile = () => {
   const [avatarLoading, setAvatarLoading] = useState(false);
   const CurrentUser = checkLogin();
   const theme = useTheme();
+  const { data: userData, isLoading: userLoading, isError: userError, error: userFetchError } = useFetchUserById(CurrentUser?.id);
 
-  useEffect(() => {
-    const loadUser = async () => {
-      try {
-        if (CurrentUser) {
-          const userData = await fetchUserById(CurrentUser.id);
+  // Fetch profile image if user has one
+  const { data: imageUrl, isLoading: imageLoading, isError: imageError, error: imageFetchError } = useProfileImage(userData?.profileImage);
 
-          if (userData.profileImage) {
-            const imageSrc = await getProfileImage(userData.profileImage);
-            userData.avatar = imageSrc;
-          }
-
-          setUser(userData);
-        } else {
-          setError('User not logged in.');
-        }
-      } catch (err) {
-        setError(err.message);
-      } finally {
-        setLoading(false);
+  // Combine user data and image once both are fetched
+  React.useEffect(() => {
+    if (userData) {
+      if (userData.profileImage) {
+        setUser({
+          ...userData,
+          avatar: imageUrl,
+        });
+      } else {
+        setUser(userData); // No profile image available
       }
-    };
-
-    loadUser();
-  }, [CurrentUser]);
+      setLoading(false);
+    }
+  }, [userData, imageUrl]);
 
   const handleImageUpload = async (event) => {
     const file = event.target.files[0];
@@ -108,7 +103,14 @@ const UserProfile = () => {
         }}
       >
         {avatarLoading ? (
-          <CircularProgress color="secondary" />
+         <Box 
+         height="350px" 
+         display="flex" 
+         justifyContent="center" 
+         alignItems="center"
+       >
+         <CircularProgress color="secondary" />
+       </Box>
         ) : (
           <Avatar
             src={user.avatar || 'https://th.bing.com/th/id/OIP.XmhhHP-RnTJSSDJsNshpUQHaHa?w=186&h=186&c=7&r=0&o=5&dpr=1.3&pid=1.7'}

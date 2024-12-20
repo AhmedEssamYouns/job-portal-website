@@ -39,7 +39,6 @@ const App = () => {
   const isLoggedIn = useCheckLogin();
   const [isAdmin, setIsAdmin] = useState(false);
   const [loading, setLoading] = useState(true);
-
   useEffect(() => {
     const checkAdminStatus = async () => {
       try {
