@@ -6,6 +6,10 @@ const crypto = require("crypto");
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const nodemailer = require("nodemailer");
+const GridFS = require('../config/gridfsConfig');
+const { getGFS } = require('../config/gridfsConfig');  // Adjust the path if needed
+const mongoose = require('mongoose');
+
 // Sign Up
 const signUp = async (req, res) => {
     const { username, email, password } = req.body;
@@ -151,17 +155,130 @@ const changePassword = asyncWrapper(async (req, res, next) => {
     });
   }
 });
-
+const { getGridFSBucket } = require('../config/gridfsConfig'); // Adjust the path as needed
 const uploadImage = async (req, res) => {
   try {
-    const user = await User.findById(req.user._id);  // Assuming user is authenticated
-    user.profileImage = `/uploads/${req.file.filename}`;  // Save the path of the image
-    await user.save();
-    res.status(200).send({ message: 'Image uploaded successfully', user });
+    const bucket = getGridFSBucket();
+    const { file } = req; // Multer adds the file to the request
+    const { userId } = req.params; // Assuming user ID is passed as a URL parameter
+
+    if (!file) {
+      return res.status(400).send({ message: 'No file provided' });
+    }
+
+    // Open upload stream
+    const uploadStream = bucket.openUploadStream(file.originalname, {
+      contentType: file.mimetype,
+    });
+
+    // Pipe file buffer to upload stream
+    uploadStream.end(file.buffer);
+
+    uploadStream.on('finish', async () => {
+      try {
+        console.log('File uploaded successfully:', uploadStream.id);
+
+        // Save the file's _id to the user's profile
+        const user = await User.findByIdAndUpdate(
+          userId,
+          { profileImage: uploadStream.id.toString() }, // Save _id as a string
+          { new: true }
+        );
+
+        if (!user) {
+          return res.status(404).send({ message: 'User not found' });
+        }
+
+        res.status(200).send({
+          message: 'Profile image uploaded and updated successfully',
+          user,
+        });
+      } catch (err) {
+        console.error('Error updating user profile:', err);
+        res.status(500).send({
+          message: 'Error updating user profile',
+          error: err.message,
+        });
+      }
+    });
+
+    uploadStream.on('error', (err) => {
+      console.error('Error saving image to GridFS:', err);
+      res.status(500).send({
+        message: 'Error saving image',
+        error: err.message,
+      });
+    });
   } catch (err) {
-    res.status(500).send({ message: 'Error uploading image', error: err });
+    console.error('Error uploading profile image:', err);
+    res.status(500).send({
+      message: 'Error uploading profile image',
+      error: err.message,
+    });
   }
-}
+};
+
+
+
+const getProfileImage = async (req, res) => {
+  try {
+    const bucket = getGridFSBucket();
+    const { filename } = req.params; // Filename from URL parameter
+
+    if (!filename) {
+      return res.status(400).send({ message: 'No filename provided' });
+    }
+
+    // Open download stream by filename
+    const downloadStream = bucket.openDownloadStreamByName(filename);
+
+    downloadStream.on('error', (err) => {
+      console.error('Error retrieving image:', err);
+      res.status(404).send({ message: 'Image not found', error: err.message });
+    });
+
+    // Pipe the stream to the response
+    downloadStream.pipe(res);
+  } catch (err) {
+    console.error('Error retrieving profile image:', err);
+    res.status(500).send({
+      message: 'Error retrieving profile image',
+      error: err.message,
+    });
+  }
+};
+
+const getProfileImageById = async (req, res) => {
+  try {
+    const bucket = getGridFSBucket();
+    const { id } = req.params; // Get the image ID from the request parameters
+
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return res.status(400).send({ message: 'Invalid image ID' });
+    }
+
+    // Open download stream by ObjectId
+    const downloadStream = bucket.openDownloadStream(new mongoose.Types.ObjectId(id));
+
+    downloadStream.on('error', (err) => {
+      console.error('Error retrieving image:', err);
+      res.status(404).send({ message: 'Image not found', error: err.message });
+    });
+
+    // Pipe the stream to the response
+    res.set('Content-Type', 'image/jpeg'); // Set the correct content type if known
+    downloadStream.pipe(res);
+  } catch (err) {
+    console.error('Error retrieving profile image:', err);
+    res.status(500).send({
+      message: 'Error retrieving profile image',
+      error: err.message,
+    });
+  }
+};
+
+
+
 // Configure Nodemailer
 const transporter = nodemailer.createTransport({
   service: "gmail",
@@ -421,4 +538,4 @@ const setAdminStatus = async (req, res) => {
   }
 };
 
-module.exports = { signUp, signIn,changePassword,uploadImage, addCompletedCourse, getUserById , forgotPassword , verifyResetCode , resetPassword ,setAdminStatus};
+module.exports = { signUp, signIn,changePassword,uploadImage, addCompletedCourse, getUserById , forgotPassword ,getProfileImageById, verifyResetCode , resetPassword ,setAdminStatus};

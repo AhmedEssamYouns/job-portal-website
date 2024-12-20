@@ -7,6 +7,7 @@ const path = require('path'); // Import path module
 const authRoutes = require('./routes/authRoutes'); 
 const progressRoutes = require('./routes/progressRoutes');
 const courseRoutes = require('./routes/courses');
+const { initGridFSBucket } = require('./config/gridfsConfig');
 
 dotenv.config();
 
@@ -20,8 +21,10 @@ app.use(cors({
 
 // MongoDB connection
 mongoose.connect(process.env.MONGODB_URI, { useNewUrlParser: true, useUnifiedTopology: true })
-    .then(() => console.log('MongoDB connected'))
-    .catch(err => console.error('MongoDB connection error:', err));
+.then(() => {
+    console.log('MongoDB connected');
+    initGridFSBucket(); // Initialize GridFSBucket here
+  }).catch(err => console.error('MongoDB connection error:', err));
 
 // Routes
 app.use('/api/auth', authRoutes);
