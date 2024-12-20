@@ -102,3 +102,13 @@ export const deleteCourse = async (courseId) => {
         throw new Error(error.response?.data?.message || 'Failed to delete course');
     }
 };
+
+export const editCourse = async (courseId, courseData) => {
+    try {
+        const response = await axios.put(`${BASE_API_URL}courses/${courseId}/edit`, courseData);
+        return response.data;
+    } catch (error) {
+        console.error('Error editing course:', error.response?.data?.message || error.message);
+        throw new Error(error.response?.data?.message || 'Failed to edit course');
+    }
+};
