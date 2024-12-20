@@ -267,9 +267,9 @@ exports.getAllCourses = async (req, res) => {
     const courses = await Course.find()
       .populate({
         path: 'levels',
-        select: 'title' // Only fetch the title of the levels
+        select: 'title' 
       })
-      .select('title description language levels'); // Select only the required fields
+      .select('title description language levels price'); // Select only the required fields
 
     res.status(200).json(courses);
   } catch (error) {

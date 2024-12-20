@@ -123,6 +123,9 @@ const AdminCourseCard = ({ course, onEdit, onDelete }) => {
                 <Typography variant="body2" color="text.secondary">
                     <strong>Language:</strong> {course.language}
                 </Typography>
+                <Typography variant="body2" color="text.secondary">
+                    <strong>price:</strong> {course.price}
+                </Typography>
             </CardContent>
         </Card>
     );
