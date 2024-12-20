@@ -1,13 +1,19 @@
 import axios from 'axios';
 import { checkLogin, fetchUserById } from "./users";
 
-const BASE_API_URL = 'https://job-portal-website-production.up.railway.app/api/';
+const BASE_API_URL = 'http://localhost:5000/api/';
 
 
 
-
-
-
+export const enrollCourses = async (userId, courseIds) => {
+    try {
+        const response = await axios.post(`${BASE_API_URL}courses/enroll`, { userId, courseIds });
+        return response.data;
+    } catch (error) {
+        console.error('Error enrolling in courses:', error.response?.data?.message || error.message);
+        throw error
+    }
+};
 
 
 export const addCourse = async (courseData) => {

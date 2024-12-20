@@ -15,7 +15,7 @@ import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import HourglassLoader from "../../shared/Loaders/Components/Hamster";
 import { checkLogin } from "../../services/users";
 import CommentsSection from "./components/comments";
-import Rating from "@mui/material/Rating"; // Import Rating component
+import Rating from "@mui/material/Rating";
 import AddShoppingCartIcon from "@mui/icons-material/AddShoppingCart";
 import FavoriteIcon from "@mui/icons-material/Favorite";
 import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
@@ -23,7 +23,6 @@ import PaymentIcon from "@mui/icons-material/Payment";
 import { blue, green, pink } from "@mui/material/colors";
 import RobotHi from "../../assets/svgs/RobotHi.svg";
 import { getCartItems, saveCartItems } from "../../utils/storage";
-
 const CourseDetail = () => {
   const { id } = useParams();
   const theme = useTheme();
@@ -46,6 +45,7 @@ const CourseDetail = () => {
       setUpdatedRating(newRating);
     }
   }, [course]);
+
   const allPreviousLevelsCompleted = (index) => {
     return course?.levels
       .slice(0, index)
@@ -58,7 +58,6 @@ const CourseDetail = () => {
   const [isInWishlist, setIsInWishlist] = useState(false);
   const navigate = useNavigate();
 
-  
   useEffect(() => {
     const cartItems = getCartItems();
     const isCourseInCart = cartItems.some((item) => item?._id === course?._id);
@@ -119,6 +118,10 @@ const CourseDetail = () => {
 
   const isCourseCompleted = user?.completedCourses.includes(course?._id);
 
+  // Determine if the pricing and enrollment section should be shown
+  const showPricingSection =
+    course.price > 0 && !user?.enrolledCourses.includes(course?._id);
+
   return (
     <Box sx={{ padding: 4, backgroundColor: theme.palette.background.default }}>
       <Typography
@@ -169,7 +172,7 @@ const CourseDetail = () => {
       </Typography>
 
       {/* Pricing Section */}
-      {course.price > 0 && (
+      {showPricingSection && (
         <Box
           sx={{
             padding: 2,
@@ -322,29 +325,43 @@ const CourseDetail = () => {
           <Grid item xs={12} sm={6} md={4} key={level._id}>
             <Link
               to={
-                allPreviousLevelsCompleted(index) ||
-                isLevelCompletedByUser(level)
-                  ? `/course/${id}/level/${level._id}`
-                  : "#"
+                showPricingSection ||
+                !(
+                  allPreviousLevelsCompleted(index) ||
+                  isLevelCompletedByUser(level) ||
+                  isCourseCompleted
+                )
+                  ? "#"
+                  : `/course/${id}/level/${level._id}`
               }
               style={{
                 textDecoration: "none",
                 pointerEvents:
-                  allPreviousLevelsCompleted(index) ||
-                  isLevelCompletedByUser(level)
-                    ? "auto"
-                    : "none",
+                  showPricingSection ||
+                  !(
+                    allPreviousLevelsCompleted(index) ||
+                    isLevelCompletedByUser(level) ||
+                    isCourseCompleted
+                  )
+                    ? "none"
+                    : "auto",
                 opacity:
-                  allPreviousLevelsCompleted(index) ||
-                  isLevelCompletedByUser(level)
-                    ? 1
-                    : 0.5,
+                  showPricingSection ||
+                  !(
+                    allPreviousLevelsCompleted(index) ||
+                    isLevelCompletedByUser(level) ||
+                    isCourseCompleted
+                  )
+                    ? 0.5
+                    : 1,
               }}
               onClick={(e) => {
                 if (
+                  showPricingSection ||
                   !(
                     allPreviousLevelsCompleted(index) ||
-                    isLevelCompletedByUser(level)
+                    isLevelCompletedByUser(level) ||
+                    isCourseCompleted
                   )
                 ) {
                   e.preventDefault();

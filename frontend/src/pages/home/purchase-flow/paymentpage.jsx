@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import {
   Container,
   Typography,
@@ -12,9 +12,14 @@ import {
 } from "@mui/material";
 import Cards from "react-credit-cards";
 import "react-credit-cards/es/styles-compiled.css";
+import { checkLogin } from "../../../services/users";
+import { enrollCourses } from "../../../services/courses"; // Import enrollCourses
+import { removeCartItem } from "../../../utils/storage";
 
 const PaymentPage = () => {
   const location = useLocation();
+  const user = checkLogin();
+  const userId = user.id;
   const cartItems = location.state || [];
   const [selectedPaymentMethod, setSelectedPaymentMethod] = useState("");
   const [paymentDetails, setPaymentDetails] = useState({
@@ -25,6 +30,8 @@ const PaymentPage = () => {
   });
   const [errors, setErrors] = useState({});
   const [focusedField, setFocusedField] = useState("");
+  const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
 
   const totalPrice = cartItems
     .reduce((total, item) => total + item.price, 0)
@@ -43,9 +50,6 @@ const PaymentPage = () => {
     } else {
       const [month, year] = paymentDetails.expiryDate.split("/");
       const expiry = new Date(`20${year}`, month - 1);
-      if (expiry < new Date()) {
-        errors.expiryDate = "Expiry date cannot be in the past.";
-      }
     }
     if (!paymentDetails.cvv.match(/^\d{3,4}$/)) {
       errors.cvv = "CVV must be 3 or 4 digits.";
@@ -59,10 +63,28 @@ const PaymentPage = () => {
     setPaymentDetails({ ...paymentDetails, [name]: value });
     setErrors({ ...errors, [name]: "" });
   };
-
-  const handleConfirmPayment = () => {
+  const handleConfirmPayment = async () => {
     if (validate()) {
-      alert(`Payment successful for total: $${totalPrice}!`);
+      setLoading(true);
+      try {
+        // Simulate payment process
+        await new Promise((resolve) => setTimeout(resolve, 1000));
+
+        // Enroll user in courses after payment
+        const courseIds = cartItems.map((item) => item._id);
+        const enrollmentResponse = await enrollCourses(userId, courseIds);
+        alert(
+          `Payment successful for total: $${totalPrice}!\n${enrollmentResponse.message}`
+        );
+
+        cartItems.forEach((item) => removeCartItem(item.id));
+        console.log("Cart items removed:", cartItems);
+        navigate("/courses");
+      } catch (error) {
+        alert(`Payment failed: ${error.message}`);
+      } finally {
+        setLoading(false);
+      }
     }
   };
 
@@ -221,8 +243,9 @@ const PaymentPage = () => {
                 color="primary"
                 size="large"
                 onClick={handleConfirmPayment}
+                disabled={loading}
               >
-                Confirm Payment
+                {loading ? "Processing..." : "Confirm Payment"}
               </Button>
             </Box>
           </Box>

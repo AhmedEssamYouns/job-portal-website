@@ -1,6 +1,7 @@
 const Question = require('../models/Question');
 const Level = require('../models/Level');
 const User = require('../models/User');
+const Course = require("../models/Course");
 
 exports.submitAnswer = async (req, res) => {
   const { questionId } = req.params;
@@ -38,7 +39,6 @@ exports.submitAnswer = async (req, res) => {
     res.status(500).json({ message: 'Server error', error });
   }
 };
-
 exports.completeLevel = async (req, res) => {
   const { levelId } = req.params;
   const userId = req.body.userId; // Accept userId from the request body
@@ -54,9 +54,11 @@ exports.completeLevel = async (req, res) => {
       // Check if the user has already completed this level
       const alreadyCompleted = level.completedByUsers.some(user => user.userId.toString() === userId);
       if (alreadyCompleted) {
-          return res.status(400).json({ message: 'Level already completed by this user' });
+          // Do nothing if the level is already completed
+          return res.status(200).json({ message: 'Level already completed by this user' });
       }
 
+      // Proceed to mark the level as completed if not already done
       level.completedByUsers.push({ userId, completed: true });
       await level.save();
 
@@ -77,4 +79,5 @@ exports.completeLevel = async (req, res) => {
       res.status(500).json({ message: 'Server error', error });
   }
 };
+
 

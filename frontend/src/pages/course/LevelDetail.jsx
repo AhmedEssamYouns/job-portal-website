@@ -14,7 +14,8 @@ import { checkLogin } from '../../services/users';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import { green } from '@mui/material/colors';
 import HourglassLoader from '../../shared/Loaders/Components/Hamster';
-
+import { useFetchUserById } from '../../hooks/useAuth';
+import Robot from '../../assets/imgs/image.png';
 const LevelDetail = () => {
     const { courseId, levelId } = useParams();
     const [course, setCourse] = useState(null);
@@ -50,7 +51,32 @@ const LevelDetail = () => {
             .slice(0, levelIndex) // Get all previous levels
             .every(level => isLevelCompletedByUser(level)); // Check if each is completed
     };
-
+    const { data: user, isLoading: userLoading } = useFetchUserById(
+        CurrentUser?.id
+      );
+    const userIsEnrolled = user?.enrolledCourses.includes(course?._id);
+    const isPaidCourse = course?.price > 0;
+  
+  
+    if (isPaidCourse && !userIsEnrolled) {
+        return (
+          <Box
+            sx={{
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+              flexDirection: "column", 
+              height: "90vh",
+            }}
+          >
+            <img src={Robot} alt="Robot" style={{ width: "200px", height: "200px" }} />
+            <Typography variant="h5" color="error" textAlign="center">
+              Sorry, you don't have access to this course.
+            </Typography>
+          </Box>
+        );
+      }
+      
     if (loading) {
         return (
             <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '90vh', }}>
