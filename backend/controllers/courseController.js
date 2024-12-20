@@ -9,7 +9,7 @@ const mongoose = require("mongoose");
 
 exports.addCommentToCourse = async (req, res) => {
   const { courseId } = req.params;
-  const { userId, name, comment, rating, avatar } = req.body;
+  const { userId, name, comment, rating, } = req.body;
 
   // Validate input
   const schema = Joi.object({
@@ -33,7 +33,6 @@ exports.addCommentToCourse = async (req, res) => {
     const newComment = new Comment({
       userId,
       name,
-      avatar,
       comment,
       rating,
       createdAt: Date.now(),
@@ -266,7 +265,7 @@ exports.getCourse = async (req, res) => {
       })
       .populate({
         path: "comments", // Populate comments field
-        select: "userId name comment rating createdAt edited avatar", 
+        select: "userId name comment rating createdAt edited", // Fetch these fields from the Comment model
       });
 
     if (!course) {

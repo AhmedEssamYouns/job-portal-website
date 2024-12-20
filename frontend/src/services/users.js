@@ -3,6 +3,7 @@ import axios from 'axios';
 const BASE_API_URL = 'http://localhost:5000/api/';
 
 
+
 export const uploadProfileImage = async (userId, file) => {
     try {
       const formData = new FormData();
@@ -23,8 +24,8 @@ export const uploadProfileImage = async (userId, file) => {
       throw new Error(error);
     }
   };
-  // Retrieve profile image by ID
-export const getProfileImage = async (imageId) => {
+
+  export const getProfileImage = async (imageId) => {
     try {
       const response = await axios.get(`${BASE_API_URL}auth/profile-image/${imageId}`, {
         responseType: 'blob', // To handle image files
@@ -37,16 +38,20 @@ export const getProfileImage = async (imageId) => {
   };
 
 
-export const signup = async (userData) => {
+  export const signup = async (userData) => {
     try {
-        const response = await axios.post(`${BASE_API_URL}auth/signup`, userData, {
-            headers: { 'Content-Type': 'application/json' },
-        });
-        return response.data;
+      const response = await axios.post(`${BASE_API_URL}auth/signup`, userData, {
+        headers: { 'Content-Type': 'application/json' },
+      });
+      return response.data;
     } catch (error) {
-        throw new Error(error.response?.data?.message || 'Sign up failed');
+      // Log the error for debugging
+      console.error('Signup error:', error.response?.data?.message || error.message);
+  
+      // Throw the original Axios error to preserve its structure
+      throw error;
     }
-};
+  };
 
 export const login = async (userData) => {
     try {
@@ -69,11 +74,10 @@ export const changePassword = async (currentPassword, newPassword) => {
         { currentPassword, newPassword },
         { headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } }
       );
-      return response.data; // Handle success (e.g., show a success message)
+      return response.data;
     } catch (error) {
-      console.error('Error before password:', error.response || error);  // Log the error response from Axios
+      console.error('Error before password:', error.response || error);  
       if (error.response) {
-        // If there's a response from the server, throw the error message from the response
         throw new Error(error.response.data.message || 'An error occurred.');
       }
       throw new Error('An unknown error occurred.');

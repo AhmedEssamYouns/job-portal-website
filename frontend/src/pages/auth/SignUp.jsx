@@ -27,9 +27,8 @@ const SignUp = () => {
             }, 2000);
         },
         (error) => {
-            console.log(error)
-            setError(error.message);
-            setOpenSnackbar(true);
+            console.error('Error sso signing up:', error)
+            setError(error.response.data.message);
         }
     );
 

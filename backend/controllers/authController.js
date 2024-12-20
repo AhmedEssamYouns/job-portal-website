@@ -10,13 +10,14 @@ const GridFS = require('../config/gridfsConfig');
 const { getGFS } = require('../config/gridfsConfig');  // Adjust the path if needed
 const mongoose = require('mongoose');
 
-// Sign Up
+
 const signUp = async (req, res) => {
     const { username, email, password } = req.body;
 
     // Email and password validation
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/; // Valid email pattern
-    const passwordRegex = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$/; // At least 8 chars, 1 letter, 1 number
+    const passwordRegex = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d@$!%*?&]{8,}$/;
+
 
     if (!emailRegex.test(email)) {
         return res.status(400).json({ message: 'Invalid email format.' });

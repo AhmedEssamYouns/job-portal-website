@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import {
   Box,
   Typography,
@@ -10,10 +10,6 @@ import {
 import { Edit, Delete, Save } from "@mui/icons-material";
 import { green } from "@mui/material/colors";
 import { format } from "date-fns";
-import { getProfileImage } from "../../../services/users";
-
-const DEFAULT_AVATAR =
-  "https://th.bing.com/th/id/OIP.XmhhHP-RnTJSSDJsNshpUQHaHa?w=186&h=186&c=7&r=0&o=5&dpr=1.3&pid=1.7";
 
 const CommentItem = ({
   comment,
@@ -28,28 +24,11 @@ const CommentItem = ({
   handleDeleteComment,
   currentUserId,
 }) => {
-  const [userAvatar, setUserAvatar] = useState(DEFAULT_AVATAR);
-
-  // Fetch user avatar on mount
-  useEffect(() => {
-    const fetchAvatar = async () => {
-      try {
-        const imageUrl = await getProfileImage(comment.userId);
-        setUserAvatar(imageUrl);
-      } catch (error) {
-        console.error("Error fetching user avatar:", error);
-        setUserAvatar(DEFAULT_AVATAR);
-      }
-    };
-
-    fetchAvatar();
-  }, [comment.userId]);
-
-  // Format createdAt
+  // Check if 'createdAt' is valid
   const isValidCreatedAt =
     comment.createdAt && !isNaN(new Date(comment.createdAt).getTime());
   const formattedCreatedAt = isValidCreatedAt
-    ? format(new Date(comment.createdAt), "MMM dd, hh:mm a")
+    ? format(new Date(comment.createdAt), "MMM dd, hh:mm a") // New format
     : "Invalid date";
 
   return (
@@ -63,14 +42,14 @@ const CommentItem = ({
         borderRadius: 2,
         backgroundColor: "background.paper",
         boxShadow: 2,
-        py: 4,
+        py:4,
         minHeight: "100px",
         position: "relative",
       }}
     >
-      <Avatar alt={comment.name} src={userAvatar} sx={{ marginRight: 2 }} />
+      <Avatar alt={comment.name} src={'https://th.bing.com/th/id/OIP.XmhhHP-RnTJSSDJsNshpUQHaHa?w=186&h=186&c=7&r=0&o=5&dpr=1.3&pid=1.7'} sx={{ marginRight: 2 }} />
       <Box sx={{ flex: 1 }}>
-        <Box sx={{ display: "flex", justifyContent: "space-between" }}>
+        <Box  sx={{ display: "flex", justifyContent: "space-between" }}>
           <Typography
             fontSize={"0.9rem"}
             variant="body1"
