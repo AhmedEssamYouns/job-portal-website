@@ -152,7 +152,16 @@ const changePassword = asyncWrapper(async (req, res, next) => {
   }
 });
 
-
+const uploadImage = async (req, res) => {
+  try {
+    const user = await User.findById(req.user._id);  // Assuming user is authenticated
+    user.profileImage = `/uploads/${req.file.filename}`;  // Save the path of the image
+    await user.save();
+    res.status(200).send({ message: 'Image uploaded successfully', user });
+  } catch (err) {
+    res.status(500).send({ message: 'Error uploading image', error: err });
+  }
+}
 // Configure Nodemailer
 const transporter = nodemailer.createTransport({
   service: "gmail",
@@ -412,4 +421,4 @@ const setAdminStatus = async (req, res) => {
   }
 };
 
-module.exports = { signUp, signIn,changePassword, addCompletedCourse, getUserById , forgotPassword , verifyResetCode , resetPassword ,setAdminStatus};
+module.exports = { signUp, signIn,changePassword,uploadImage, addCompletedCourse, getUserById , forgotPassword , verifyResetCode , resetPassword ,setAdminStatus};

@@ -7,8 +7,8 @@ const userSchema = new mongoose.Schema({
   completedCourses: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Course' }],
   passwordResetCode: { type: String, default: null },
   passwordResetVerified: { type: Boolean, default: false },
-  isAdmin: { type: Boolean, default: false }, 
-
+  isAdmin: { type: Boolean, default: false },
+  profileImage: { type: String, default: null }, 
 });
 
 module.exports = mongoose.model('User', userSchema);

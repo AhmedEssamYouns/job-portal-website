@@ -2,7 +2,7 @@ const jwt = require('jsonwebtoken');
 const User = require('../models/User');  // Assuming you have a User model
 
 const adminAuth = async (req, res, next) => {
-  const token = req.header('Authorization')?.replace('Bearer ', ''); // Extract token from Authorization header
+  const token = req.header('Authorization')?.replace('Bearer ', ''); 
 
   if (!token) {
     return res.status(401).json({ message: "Authentication required" });
@@ -10,7 +10,7 @@ const adminAuth = async (req, res, next) => {
 
   try {
     // Verify the token
-    const decoded = jwt.verify(token, process.env.JWT_SECRET); // Verify token with your JWT_SECRET
+    const decoded = jwt.verify(token, process.env.JWT_SECRET); 
     const user = await User.findById(decoded.id); 
 
     if (!user) {
@@ -25,7 +25,7 @@ const adminAuth = async (req, res, next) => {
       return res.status(403).json({ message: "Access denied. Admins only." });
     }
 
-    next(); // Proceed to the next middleware or route handler if the user is an admin
+    next(); 
   } catch (error) {
     console.error("Error verifying token:", error.message);
     return res.status(401).json({ message: "Invalid or expired token" });

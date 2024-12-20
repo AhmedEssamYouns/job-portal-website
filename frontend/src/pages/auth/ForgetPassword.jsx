@@ -286,7 +286,7 @@ const ForgetPassword = () => {
                             onChange={(e) => handleCodeChange(e, index)}
                             inputProps={{
                               maxLength: 1,
-                              style: { textAlign: "center", fontSize: "18px" },
+                              style: { textAlign: "center", fontSize: "18px",padding:"5px" },
                             }}
                             required
                             variant="outlined"
