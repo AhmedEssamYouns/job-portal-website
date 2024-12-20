@@ -1,16 +1,15 @@
-const Course = require('../models/Course');
-const Level = require('../models/Level');
-const Slide = require('../models/Slide');
-const Question = require('../models/Question');
-const User =require('../models/User')
+const Course = require("../models/Course");
+const Level = require("../models/Level");
+const Slide = require("../models/Slide");
+const Question = require("../models/Question");
+const User = require("../models/User");
 const Joi = require("joi");
-const Comment = require('../models/comment');
-const mongoose = require('mongoose');
-
+const Comment = require("../models/comment");
+const mongoose = require("mongoose");
 
 exports.addCommentToCourse = async (req, res) => {
   const { courseId } = req.params;
-  const { userId, name, comment, rating } = req.body;
+  const { userId, name, comment, rating, avatar } = req.body;
 
   // Validate input
   const schema = Joi.object({
@@ -34,6 +33,7 @@ exports.addCommentToCourse = async (req, res) => {
     const newComment = new Comment({
       userId,
       name,
+      avatar,
       comment,
       rating,
       createdAt: Date.now(),
@@ -54,11 +54,11 @@ exports.addCommentToCourse = async (req, res) => {
     });
   } catch (error) {
     console.error("Error adding comment:", error);
-    res.status(500).json({ message: "Failed to add comment", error: error.message });
+    res
+      .status(500)
+      .json({ message: "Failed to add comment", error: error.message });
   }
 };
-
-
 
 exports.editComment = async (req, res) => {
   const { courseId, commentId } = req.params;
@@ -102,42 +102,53 @@ exports.editComment = async (req, res) => {
     await commentToEdit.save();
     await course.save();
 
-    res.status(200).json({ message: "Comment edited successfully", comment: commentToEdit });
+    res
+      .status(200)
+      .json({ message: "Comment edited successfully", comment: commentToEdit });
   } catch (error) {
     console.error("Error editing comment:", error);
-    res.status(500).json({ message: "Failed to edit comment", error: error.message });
+    res
+      .status(500)
+      .json({ message: "Failed to edit comment", error: error.message });
   }
 };
-
 
 // Delete a comment from a course
 exports.deleteComment = async (req, res) => {
   const { courseId, commentId } = req.params;
 
   try {
-    const mongoose = require('mongoose');
-    if (!mongoose.Types.ObjectId.isValid(courseId) || !mongoose.Types.ObjectId.isValid(commentId)) {
-      return res.status(400).json({ message: 'Invalid courseId or commentId' });
+    const mongoose = require("mongoose");
+    if (
+      !mongoose.Types.ObjectId.isValid(courseId) ||
+      !mongoose.Types.ObjectId.isValid(commentId)
+    ) {
+      return res.status(400).json({ message: "Invalid courseId or commentId" });
     }
 
     const course = await Course.findById(courseId);
     if (!course) {
-      return res.status(404).json({ message: 'Course not found' });
+      return res.status(404).json({ message: "Course not found" });
     }
 
     const commentToDelete = await Comment.findById(commentId);
     if (!commentToDelete) {
-      return res.status(404).json({ message: 'Comment not found' });
+      return res.status(404).json({ message: "Comment not found" });
     }
 
     if (!course.comments.includes(commentId)) {
-      return res.status(400).json({ message: 'Comment does not belong to the specified course' });
+      return res
+        .status(400)
+        .json({ message: "Comment does not belong to the specified course" });
     }
 
     // Update the totalRating and commentCount
     course.totalRating -= commentToDelete.rating; // Subtract the rating of the deleted comment
     course.commentCount -= 1; // Decrease the comment count
-    course.rating = course.commentCount === 0 ? 0 : Math.min(course.totalRating / course.commentCount, 5);
+    course.rating =
+      course.commentCount === 0
+        ? 0
+        : Math.min(course.totalRating / course.commentCount, 5);
 
     // Remove the comment from the course's comments array
     course.comments.pull(commentId);
@@ -146,10 +157,12 @@ exports.deleteComment = async (req, res) => {
     // Delete the comment itself using the new method
     await Comment.deleteOne({ _id: commentId });
 
-    res.status(200).json({ message: 'Comment deleted successfully' });
+    res.status(200).json({ message: "Comment deleted successfully" });
   } catch (error) {
-    console.error('Error in deleteComment:', error.message);
-    res.status(500).json({ message: 'Failed to delete comment', error: error.message });
+    console.error("Error in deleteComment:", error.message);
+    res
+      .status(500)
+      .json({ message: "Failed to delete comment", error: error.message });
   }
 };
 
@@ -158,52 +171,59 @@ exports.addCourse = async (req, res) => {
 
   try {
     // Create Levels and Slides
-    const createdLevels = await Promise.all(levels.map(async (level) => {
-      // Create slides for the level
-      const createdSlides = await Promise.all(level.slides.map(async (slide) => {
+    const createdLevels = await Promise.all(
+      levels.map(async (level) => {
+        // Create slides for the level
+        const createdSlides = await Promise.all(
+          level.slides.map(async (slide) => {
+            // Create the slide first
+            const createdSlide = await Slide.create({
+              sections: [], // Initialize with empty sections for now
+            });
 
-        // Create the slide first
-        const createdSlide = await Slide.create({
-          sections: [],  // Initialize with empty sections for now
+            // Now, create the sections for the slide
+            const sections = await Promise.all(
+              slide.sections.map(async (section) => {
+                // Create questions if provided in the section
+                const createdQuestions = await Promise.all(
+                  (section.questions || []).map(async (question) => {
+                    const createdQuestion = await Question.create({
+                      questionText: question.questionText,
+                      type: question.type,
+                      options: question.options,
+                      correctAnswers: question.correctAnswers,
+                      code: question.code, // Add code if present
+                      slideId: createdSlide._id, // Now set the slideId after the slide is created
+                    });
+                    return createdQuestion._id; // Return the created question's ObjectId
+                  })
+                );
+
+                return {
+                  content: section.content,
+                  code: section.code,
+                  questions: createdQuestions, // Store the created question IDs
+                };
+              })
+            );
+
+            // Now update the created slide with the sections
+            createdSlide.sections = sections;
+            await createdSlide.save(); // Save the slide after adding sections
+
+            return createdSlide; // Return the created slide
+          })
+        );
+
+        // Create the level and associate it with its slides
+        const createdLevel = await Level.create({
+          title: level.title,
+          slides: createdSlides.map((s) => s._id),
         });
 
-        // Now, create the sections for the slide
-        const sections = await Promise.all(slide.sections.map(async (section) => {
-          // Create questions if provided in the section
-          const createdQuestions = await Promise.all((section.questions || []).map(async (question) => {
-            const createdQuestion = await Question.create({
-              questionText: question.questionText,
-              type: question.type,
-              options: question.options,
-              correctAnswers: question.correctAnswers,
-              code: question.code, // Add code if present
-              slideId: createdSlide._id // Now set the slideId after the slide is created
-            });
-            return createdQuestion._id;  // Return the created question's ObjectId
-          }));
-
-          return {
-            content: section.content,
-            code: section.code,
-            questions: createdQuestions, // Store the created question IDs
-          };
-        }));
-
-        // Now update the created slide with the sections
-        createdSlide.sections = sections;
-        await createdSlide.save(); // Save the slide after adding sections
-
-        return createdSlide; // Return the created slide
-      }));
-
-      // Create the level and associate it with its slides
-      const createdLevel = await Level.create({
-        title: level.title,
-        slides: createdSlides.map((s) => s._id),
-      });
-
-      return createdLevel; // Return the created level
-    }));
+        return createdLevel; // Return the created level
+      })
+    );
 
     // Create the Course and associate it with its levels
     const courseData = {
@@ -220,14 +240,14 @@ exports.addCourse = async (req, res) => {
 
     const course = await Course.create(courseData);
 
-    res.status(201).json({ message: 'Course created successfully!', course });
+    res.status(201).json({ message: "Course created successfully!", course });
   } catch (error) {
     console.error(error);
-    res.status(500).json({ message: `Failed to create course: ${error.message}` });
+    res
+      .status(500)
+      .json({ message: `Failed to create course: ${error.message}` });
   }
 };
-
-
 
 exports.getCourse = async (req, res) => {
   const courseId = req.params.id; // Get the course ID from the URL parameters
@@ -236,80 +256,81 @@ exports.getCourse = async (req, res) => {
     // Populate levels, slides, sections, questions, and comments (with full content)
     const course = await Course.findById(courseId)
       .populate({
-        path: 'levels',
+        path: "levels",
         populate: {
-          path: 'slides',
+          path: "slides",
           populate: {
-            path: 'sections.questions', // Populate questions within each section of slides
+            path: "sections.questions", // Populate questions within each section of slides
           },
         },
       })
       .populate({
-        path: 'comments',  // Populate comments field
-        select: 'userId name comment rating createdAt edited',  // Fetch these fields from the Comment model
+        path: "comments", // Populate comments field
+        select: "userId name comment rating createdAt edited avatar", 
       });
 
     if (!course) {
-      return res.status(404).json({ message: 'Course not found' });
+      return res.status(404).json({ message: "Course not found" });
     }
 
     res.status(200).json(course);
   } catch (error) {
     console.error(error);
-    res.status(500).json({ message: 'Failed to retrieve course', error });
+    res.status(500).json({ message: "Failed to retrieve course", error });
   }
 };
 
-  
 exports.getAllCourses = async (req, res) => {
   try {
     // Fetch courses and populate levels with title only
     const courses = await Course.find()
       .populate({
-        path: 'levels',
-        select: 'title' 
+        path: "levels",
+        select: "title",
       })
-      .select('title description language levels price'); // Select only the required fields
+      .select("title description language levels price"); // Select only the required fields
 
     res.status(200).json(courses);
   } catch (error) {
     console.error(error);
-    res.status(500).json({ message: 'Failed to fetch courses', error });
+    res.status(500).json({ message: "Failed to fetch courses", error });
   }
 };
-
 
 exports.fetchIncompletedCourses = async (req, res) => {
   const userId = req.params.userId;
 
   try {
     // Fetch user details
-    const user = await User.findById(userId).populate('completedCourses');
+    const user = await User.findById(userId).populate("completedCourses");
 
     if (!user) {
-      return res.status(404).json({ message: 'User not found' });
+      return res.status(404).json({ message: "User not found" });
     }
 
-    const completedCoursesIds = user.completedCourses.map(course => course._id.toString());
+    const completedCoursesIds = user.completedCourses.map((course) =>
+      course._id.toString()
+    );
 
     // Fetch all courses and populate levels with slides and sections
-    const courses = await Course.find()
-      .populate({
-        path: 'levels',
+    const courses = await Course.find().populate({
+      path: "levels",
+      populate: {
+        path: "slides",
         populate: {
-          path: 'slides',
-          populate: {
-            path: 'sections.questions', // Populate sections and their questions
-          },
+          path: "sections.questions", // Populate sections and their questions
         },
-      });
+      },
+    });
 
     // Filter for incompleted courses
-    const incompletedCourses = courses.filter(course => {
+    const incompletedCourses = courses.filter((course) => {
       const isCompleted = completedCoursesIds.includes(course._id.toString());
 
-      const hasUserCompletedLevel = course.levels.some(level =>
-        level.completedByUsers.some(completedUser => completedUser.userId.toString() === userId)
+      const hasUserCompletedLevel = course.levels.some((level) =>
+        level.completedByUsers.some(
+          (completedUser) => completedUser.userId.toString() === userId
+        )
       );
 
       return !isCompleted && hasUserCompletedLevel; // Include if not completed and has at least one level completed by user
@@ -330,7 +351,7 @@ exports.editCourse = async (req, res) => {
     // Find the course by ID
     const course = await Course.findById(courseId);
     if (!course) {
-      return res.status(404).json({ message: 'Course not found' });
+      return res.status(404).json({ message: "Course not found" });
     }
 
     // Update the course with the new values (if provided)
@@ -342,40 +363,40 @@ exports.editCourse = async (req, res) => {
     // Save the updated course
     await course.save();
 
-    res.status(200).json({ message: 'Course updated successfully', course });
+    res.status(200).json({ message: "Course updated successfully", course });
   } catch (error) {
-    console.error('Error editing course:', error);
-    res.status(500).json({ message: 'Failed to update course', error: error.message });
+    console.error("Error editing course:", error);
+    res
+      .status(500)
+      .json({ message: "Failed to update course", error: error.message });
   }
 };
 
-
 exports.searchCourses = async (req, res) => {
   const { title, language } = req.query;
-  
+
   try {
-     
     const searchCriteria = {};
     if (title) {
-      searchCriteria.title = { $regex: title, $options: 'i' }; 
+      searchCriteria.title = { $regex: title, $options: "i" };
     }
     if (language) {
-      searchCriteria.language = { $regex: language, $options: 'i' }; 
+      searchCriteria.language = { $regex: language, $options: "i" };
     }
 
     // Find courses based on the search criteria
     const courses = await Course.find(searchCriteria)
       .populate({
-        path: 'levels',
-        select: 'title' // Only fetch the title of the levels
+        path: "levels",
+        select: "title", // Only fetch the title of the levels
       })
-      .select('title description language levels'); // Select only required fields
+      .select("title description language levels"); // Select only required fields
 
     // Return the filtered list of courses
     res.status(200).json(courses);
   } catch (error) {
     console.error(`Error searching courses: ${error.message}`);
-    res.status(500).json({ message: 'Failed to search courses', error });
+    res.status(500).json({ message: "Failed to search courses", error });
   }
 };
 
@@ -386,7 +407,7 @@ exports.deleteCourse = async (req, res) => {
     // Find the course to delete
     const course = await Course.findById(courseId);
     if (!course) {
-      return res.status(404).json({ message: 'Course not found' });
+      return res.status(404).json({ message: "Course not found" });
     }
 
     console.log(`Deleting course: ${courseId}`);
@@ -397,7 +418,7 @@ exports.deleteCourse = async (req, res) => {
       const level = await Level.findById(levelId);
       if (!level) {
         console.log(`Level not found: ${levelId}`);
-        continue;  // Skip if level is not found
+        continue; // Skip if level is not found
       }
 
       // Delete all associated slides
@@ -406,7 +427,7 @@ exports.deleteCourse = async (req, res) => {
         const slide = await Slide.findById(slideId);
         if (!slide) {
           console.log(`Slide not found: ${slideId}`);
-          continue;  // Skip if slide is not found
+          continue; // Skip if slide is not found
         }
 
         // Delete associated questions for the slide
@@ -439,9 +460,11 @@ exports.deleteCourse = async (req, res) => {
       console.log(`Failed to delete course: ${courseId}`);
     }
 
-    res.status(200).json({ message: 'Course and related data deleted successfully' });
+    res
+      .status(200)
+      .json({ message: "Course and related data deleted successfully" });
   } catch (error) {
-    console.error('Error deleting course:', error);
-    res.status(500).json({ message: 'Failed to delete course', error });
+    console.error("Error deleting course:", error);
+    res.status(500).json({ message: "Failed to delete course", error });
   }
 };

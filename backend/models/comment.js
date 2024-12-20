@@ -8,6 +8,7 @@ const commentSchema = new mongoose.Schema({
   createdAt: { type: Date, default: Date.now },
   edited: { type: Boolean, default: false },
   editedAt: { type: Date },
+  avatar: { type: String },
 });
 
 module.exports = mongoose.model("Comment", commentSchema);

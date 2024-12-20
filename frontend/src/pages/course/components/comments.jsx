@@ -12,7 +12,11 @@ import {
 import { ExpandMore } from "@mui/icons-material";
 import CommentInput from "./commentInput";
 import CommentItem from "./commentItem";
-import { useAddComment, useDeleteComment, useEditComment } from "../../../hooks/useComments";
+import {
+  useAddComment,
+  useDeleteComment,
+  useEditComment,
+} from "../../../hooks/useComments";
 import { checkLogin, fetchUserById } from "../../../services/users";
 
 const CommentsSection = ({
@@ -39,7 +43,9 @@ const CommentsSection = ({
 
   // Sort comments by date in descending order (newer first)
   const sortComments = (comments) => {
-    return [...comments].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+    return [...comments].sort(
+      (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
+    );
   };
 
   // Initialize comments
@@ -76,7 +82,9 @@ const CommentsSection = ({
     const fetchUser = async () => {
       try {
         const loggedInUser = await checkLogin();
-        const userHasCommented = comments.some((comment) => comment.userId === loggedInUser.id);
+        const userHasCommented = comments.some(
+          (comment) => comment.userId === loggedInUser.id
+        );
         if (userHasCommented) {
           setAlertMessage("You have commented on this course.");
           setAlertSeverity("info");
@@ -109,7 +117,9 @@ const CommentsSection = ({
 
   const { mutate: deleteComment } = useDeleteComment(
     () => {
-      const updatedComments = sortComments(comments.filter((_, index) => index !== commentToDelete));
+      const updatedComments = sortComments(
+        comments.filter((_, index) => index !== commentToDelete)
+      );
       setComments(updatedComments);
       onUpdateRating(updatedComments);
       setAlertMessage("Comment deleted successfully!");
@@ -171,6 +181,7 @@ const CommentsSection = ({
         rating: newRating,
         userId: currentUserId,
         name: user?.username || "Guest",
+        avatar: user?.avatar,
       },
     });
 
@@ -255,7 +266,11 @@ const CommentsSection = ({
       </Accordion>
 
       {/* Deletion Confirmation */}
-      <Snackbar open={alertOpen} onClose={() => setAlertOpen(false)} autoHideDuration={6000}>
+      <Snackbar
+        open={alertOpen}
+        onClose={() => setAlertOpen(false)}
+        autoHideDuration={6000}
+      >
         <Alert
           severity="warning"
           action={
@@ -274,7 +289,11 @@ const CommentsSection = ({
       </Snackbar>
 
       {/* Snackbar for Success or Error */}
-      <Snackbar open={snackBarOpen} autoHideDuration={2000} onClose={() => setSnackBarOpen(false)}>
+      <Snackbar
+        open={snackBarOpen}
+        autoHideDuration={2000}
+        onClose={() => setSnackBarOpen(false)}
+      >
         <Alert severity={alertSeverity}>{alertMessage}</Alert>
       </Snackbar>
     </Box>
