@@ -2,7 +2,6 @@ import React, { useState } from 'react'; // Import useState
 import {
   Container,
   Typography,
-  Grid,
   Box,
   Button,
   TextField,
@@ -10,7 +9,7 @@ import {
   useMediaQuery,
   Snackbar, 
   Alert,
-  Grid2, 
+  Grid, 
 } from '@mui/material';
 import { keyframes } from '@emotion/react';
 import RobotLoader from '../../shared/Loaders/Components/Robot';
@@ -68,7 +67,7 @@ const HomePage = () => {
           marginBottom: 4,
         }}
       >
-        <Grid2
+        <Grid
           container
           spacing={4}
           alignItems="center"
@@ -77,7 +76,7 @@ const HomePage = () => {
             textAlign: { xs: 'center', md: 'left' },
           }}
         >
-          <Grid2 item xs={12} md={6}>
+          <Grid item xs={12} md={6}>
             <Box
               sx={{
                 animation: `${fadeIn} 1.5s ease-out`,
@@ -119,12 +118,12 @@ const HomePage = () => {
                 </Button>
               </Link>
             </Box>
-          </Grid2>
+          </Grid>
 
-          <Grid2 item xs={12} md={6} display="flex" justifyContent="center">
+          <Grid item xs={12} md={6} display="flex" justifyContent="center">
             <RobotLoader />
-          </Grid2>
-        </Grid2>
+          </Grid>
+        </Grid>
       </Box>
 
       <Box

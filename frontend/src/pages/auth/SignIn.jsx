@@ -105,6 +105,7 @@ const SignIn = () => {
         flexDirection='column'
         sx={{
           background:
+
             'linear-gradient(135deg, rgba(25, 118, 210, 0.5), rgba(66, 165, 245, 0.5))',
           borderBottomLeftRadius: '100px',
           justifyContent: 'center',
@@ -120,6 +121,7 @@ const SignIn = () => {
             marginRight: '10px',
             marginLeft: '10px',
             height: '75vh',
+
           },
         }}
         padding={2}

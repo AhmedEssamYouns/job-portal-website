@@ -46,17 +46,20 @@ const Navbar = () => {
     useEffect(() => {
         const getCourses = async () => {
             const data = await fetchCourses();
-            setCourses(data); // Assuming fetchCourses returns an array of course objects
+            setCourses(data); 
         };
 
         getCourses();
     }, []);
 
     useEffect(() => {
-        // Filter courses based on search query
-        setFilteredCourses(courses.filter(course => course.title.toLowerCase().includes(searchQuery.toLowerCase())));
+        if (Array.isArray(courses)) {
+            setFilteredCourses(courses.filter(course => course.title.toLowerCase().includes(searchQuery.toLowerCase())));
+        } else {
+            console.error('courses is not an array:', courses);
+        }
     }, [searchQuery, courses]);
-
+    
     const handleMenuClick = (event) => {
         setAnchorEl(event.currentTarget);
     };

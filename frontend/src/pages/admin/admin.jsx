@@ -4,7 +4,6 @@ import AddIcon from '@mui/icons-material/Add';
 import AdminCourseCard from '../../shared/Course/admin/AdminCourseCard';
 import { fetchCourses, deleteCourse } from '../../services/courses'; 
 import { Link } from 'react-router-dom';
-
 const AdminPanal = () => {
     const [searchQuery, setSearchQuery] = useState('');
     const [courses, setCourses] = useState([]);
@@ -70,6 +69,28 @@ const AdminPanal = () => {
         }
     };
 
+    // New function to update the course locally after edit
+    const handleUpdateCourse = (courseId, updatedCourseData) => {
+        // Update the courses state with the new data
+        setCourses(prevCourses => 
+            prevCourses.map(course => 
+                course._id === courseId ? { ...course, ...updatedCourseData } : course
+            )
+        );
+
+        // Update the filteredCourses state as well (in case the search query filters the list)
+        setFilteredCourses(prevFilteredCourses => 
+            prevFilteredCourses.map(course => 
+                course._id === courseId ? { ...course, ...updatedCourseData } : course
+            )
+        );
+
+        // Show success message after updating
+        setSnackbarMessage('Course updated successfully!');
+        setSnackbarSeverity('success');
+        setSnackbarOpen(true);
+    };
+
     const handleCloseSnackbar = () => {
         setSnackbarOpen(false);
     };
@@ -107,11 +128,12 @@ const AdminPanal = () => {
             ) : (
                 <Grid container spacing={3}>
                     {filteredCourses.map(course => (
-                        <Grid item xs={12} sm={6} md={4} key={course.id}>
+                        <Grid item xs={12} sm={6} md={4} key={course._id}>
                             <AdminCourseCard
                                 course={course}
                                 onEdit={handleEditCourse}
                                 onDelete={handleDeleteCourse}
+                                onUpdateCourse={handleUpdateCourse}  // Pass onUpdateCourse as prop
                             />
                         </Grid>
                     ))}

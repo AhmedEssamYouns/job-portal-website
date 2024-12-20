@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
+import React from 'react';
 import CourseCard from './CourseCard';
-import { Grid, CircularProgress, Typography, Box, Button } from '@mui/material';
+import { Grid, Typography, Box, Button } from '@mui/material';
 import { useFetchCourses, useFetchCoursesWithCompletionStatus, useFetchIncompletedCourses } from '../../../hooks/useCourses';
 import { useNavigate } from 'react-router-dom';
 import HourglassLoader from '../../Loaders/Components/Hamster';
@@ -10,17 +10,35 @@ const CoursesList = ({ fetchType }) => {
   const navigate = useNavigate();
   const user = checkLogin();
 
-  // Always call hooks unconditionally
-  const { data: completedCourses = [], isLoading: isLoadingCompleted, isError: isErrorCompleted, error: errorCompleted } = useFetchCoursesWithCompletionStatus();
-  const { data: incompletedCourses = [], isLoading: isLoadingIncompleted, isError: isErrorIncompleted, error: errorIncompleted } = useFetchIncompletedCourses(user?.id);
-  const { data: allCourses = [], isLoading: isLoadingAll, isError: isErrorAll, error: errorAll } = useFetchCourses();
+  // Fetch data from hooks
+  const {
+    data: completedCourses = [],
+    isLoading: isLoadingCompleted,
+    isError: isErrorCompleted,
+    error: errorCompleted,
+  } = useFetchCoursesWithCompletionStatus();
 
+  const {
+    data: incompletedCourses = [],
+    isLoading: isLoadingIncompleted,
+    isError: isErrorIncompleted,
+    error: errorIncompleted,
+  } = useFetchIncompletedCourses(user?.id);
+
+  const {
+    data: allCourses = [],
+    isLoading: isLoadingAll,
+    isError: isErrorAll,
+    error: errorAll,
+  } = useFetchCourses();
+
+  // Initialize variables
   let courses = [];
   let isLoading = false;
   let isError = false;
   let error = null;
 
-  // Select the appropriate data and state based on `fetchType`
+  // Determine data based on fetchType
   switch (fetchType) {
     case 'completed':
       courses = completedCourses;
@@ -40,6 +58,8 @@ const CoursesList = ({ fetchType }) => {
       isError = isErrorAll;
       error = errorAll;
   }
+
+  // Handle loading state
   if (isLoading) {
     return (
       <Box
@@ -55,7 +75,30 @@ const CoursesList = ({ fetchType }) => {
     );
   }
 
-  if (isError) return <Typography color="error">Error: {error.message}</Typography>;
+  // Handle errors
+  if (isError) {
+    console.error('Error loading courses:', error);
+    return (
+      <Box textAlign="center" sx={{ marginTop: 4 }}>
+        <Typography color="error" gutterBottom>
+          Failed to load courses. Please try again later.
+        </Typography>
+        {error?.message && <Typography color="error">{error.message}</Typography>}
+      </Box>
+    );
+  }
+
+  // Validate courses
+  if (!Array.isArray(courses)) {
+    console.error('Unexpected data format for courses:', courses);
+    return (
+      <Box textAlign="center" sx={{ marginTop: 4 }}>
+        <Typography color="error" gutterBottom>
+          Unexpected data format received. Please contact support.
+        </Typography>
+      </Box>
+    );
+  }
 
   return (
     <Box>
@@ -73,7 +116,7 @@ const CoursesList = ({ fetchType }) => {
       {courses.length === 0 ? (
         <Box textAlign="center" sx={{ marginTop: 4 }}>
           <Typography variant="h6" gutterBottom>
-            {fetchType === 'incompleted' ? "Start a New Course Today!" : ""}
+            {fetchType === 'incompleted' ? 'Start a New Course Today!' : ''}
           </Typography>
           {fetchType === 'incompleted' && (
             <Button
@@ -81,7 +124,7 @@ const CoursesList = ({ fetchType }) => {
               color="primary"
               onClick={() => navigate('/courses')}
               sx={{
-                animation: 'bounce 1.5s infinite', // Add bounce animation
+                animation: 'bounce 1.5s infinite',
                 '@keyframes bounce': {
                   '0%, 20%, 50%, 80%, 100%': { transform: 'translateY(0)' },
                   '40%': { transform: 'translateY(-10px)' },

@@ -63,7 +63,7 @@ const CommentInput = ({ newComment, setNewComment, newRating, setNewRating, hand
           variant="contained"
           color="primary"
           onClick={handleAddComment}
-          disabled={!newComment.trim()}
+          disabled={!newComment.trim()|| !newRating}
           sx={{ height: "100%" }}
         >
           Comment

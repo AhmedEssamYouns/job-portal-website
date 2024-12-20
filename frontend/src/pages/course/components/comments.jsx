@@ -1,31 +1,28 @@
-import React, { useState } from "react";
-import { Accordion, AccordionSummary, AccordionDetails, Typography, Snackbar, Alert, Button, Box } from "@mui/material";
+import React, { useState, useEffect } from "react";
+import {
+  Accordion,
+  AccordionSummary,
+  AccordionDetails,
+  Typography,
+  Snackbar,
+  Alert,
+  Button,
+  Box,
+} from "@mui/material";
 import { ExpandMore } from "@mui/icons-material";
 import CommentInput from "./commentInput";
 import CommentItem from "./commentItem";
+import { useAddComment, useDeleteComment, useEditComment } from "../../../hooks/useComments";
+import { checkLogin, fetchUserById } from "../../../services/users";
 
-const CommentsSection = ({ currentUserId }) => {
+const CommentsSection = ({
+  currentUserId,
+  courseId,
+  comments: initialComments,
+  onUpdateRating,
+}) => {
   const [expanded, setExpanded] = useState(false);
-  const [comments, setComments] = useState([
-    {
-      id: 1,
-      userId: 1,
-      img: "user1.jpg",
-      name: "John Doe",
-      comment: "Great course! Learned a lot.",
-      rating: 4,
-      date: "2024-12-18",
-    },
-    {
-      id: 2,
-      userId: 2,
-      img: "user2.jpg",
-      name: "Jane Smith",
-      comment: "Very informative. Highly recommended!",
-      rating: 5,
-      date: "2024-12-17",
-    },
-  ]);
+  const [comments, setComments] = useState([]);
   const [newComment, setNewComment] = useState("");
   const [newRating, setNewRating] = useState(0);
   const [editingIndex, setEditingIndex] = useState(null);
@@ -34,21 +31,151 @@ const CommentsSection = ({ currentUserId }) => {
   const [alertOpen, setAlertOpen] = useState(false);
   const [commentToDelete, setCommentToDelete] = useState(null);
   const [snackBarOpen, setSnackBarOpen] = useState(false);
+  const [alertMessage, setAlertMessage] = useState("");
+  const [alertSeverity, setAlertSeverity] = useState("success");
+  const [user, setUser] = useState(null);
+
+  const CurrentUser = checkLogin();
+
+  // Sort comments by date in descending order (newer first)
+  const sortComments = (comments) => {
+    return [...comments].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+  };
+
+  // Initialize comments
+  useEffect(() => {
+    setComments(sortComments(initialComments));
+  }, [initialComments]);
+
+  // Fetch user details
+  useEffect(() => {
+    const loadUser = async () => {
+      try {
+        if (CurrentUser) {
+          const userData = await fetchUserById(CurrentUser.id);
+          setUser(userData);
+
+          // Check if there's a stored avatar and name that matches the current user
+          const storedAvatar = localStorage.getItem("userAvatar");
+          const storedUserName = localStorage.getItem("userName");
+
+          if (storedUserName === userData.username) {
+            setUser((prevUser) => ({ ...prevUser, avatar: storedAvatar }));
+          }
+        }
+      } catch (err) {
+        console.error("Error fetching user:", err.message);
+      }
+    };
+
+    loadUser();
+  }, [CurrentUser]);
+
+  // Check if user already commented
+  useEffect(() => {
+    const fetchUser = async () => {
+      try {
+        const loggedInUser = await checkLogin();
+        const userHasCommented = comments.some((comment) => comment.userId === loggedInUser.id);
+        if (userHasCommented) {
+          setAlertMessage("You have commented on this course.");
+          setAlertSeverity("info");
+          setSnackBarOpen(true);
+        }
+      } catch (error) {
+        console.error("Error fetching user:", error);
+      }
+    };
+    fetchUser();
+  }, [comments]);
+
+  // Hooks for API interactions
+  const { mutate: addComment } = useAddComment(
+    (data) => {
+      const updatedComments = sortComments([data.comment, ...comments]);
+      setComments(updatedComments);
+      onUpdateRating(updatedComments);
+      setAlertMessage("Comment added successfully!");
+      setAlertSeverity("success");
+      setSnackBarOpen(true);
+    },
+    (error) => {
+      console.error("Add comment error:", error.message);
+      setAlertMessage(`Error adding comment: ${error.message}`);
+      setAlertSeverity("error");
+      setSnackBarOpen(true);
+    }
+  );
+
+  const { mutate: deleteComment } = useDeleteComment(
+    () => {
+      const updatedComments = sortComments(comments.filter((_, index) => index !== commentToDelete));
+      setComments(updatedComments);
+      onUpdateRating(updatedComments);
+      setAlertMessage("Comment deleted successfully!");
+      setAlertSeverity("success");
+      setSnackBarOpen(true);
+      setAlertOpen(false);
+    },
+    (error) => {
+      console.error("Delete comment error:", error.message);
+      setAlertMessage(`Error deleting comment: ${error.message}`);
+      setAlertSeverity("error");
+      setSnackBarOpen(true);
+    }
+  );
+
+  const { mutate: editComment } = useEditComment(
+    (data) => {
+      const updatedComments = sortComments(
+        comments.map((comment, index) =>
+          index === editingIndex ? data.comment : comment
+        )
+      );
+      setComments(updatedComments);
+      onUpdateRating(updatedComments);
+      setEditingIndex(null);
+      setEditedComment("");
+      setEditedRating(0);
+      setAlertMessage("Comment edited successfully!");
+      setAlertSeverity("success");
+      setSnackBarOpen(true);
+    },
+    (error) => {
+      console.error("Edit comment error:", error.message);
+      setAlertMessage(`Error editing comment: ${error.message}`);
+      setAlertSeverity("error");
+      setSnackBarOpen(true);
+    }
+  );
 
   const handleAddComment = () => {
-    if (newComment.trim()) {
-      const newCommentData = {
+    if (!newComment.trim()) {
+      setAlertMessage("Comment cannot be empty.");
+      setAlertSeverity("error");
+      setSnackBarOpen(true);
+      return;
+    }
+
+    if (user && comments.some((comment) => comment.userId === CurrentUser.id)) {
+      setAlertMessage("You have commented on this course.");
+      setAlertSeverity("info");
+      setSnackBarOpen(true);
+      return;
+    }
+
+    addComment({
+      courseId,
+      commentData: {
         comment: newComment,
         rating: newRating,
         userId: currentUserId,
-        name: "User Name", // Replace with actual user name
-        img: "",
-        date: new Date().toLocaleDateString(),
-      };
-      setComments([newCommentData, ...comments]);
-      setNewComment("");
-      setNewRating(0);
-    }
+        name: user?.username || "Guest",
+      },
+    });
+
+    setNewComment("");
+    setNewRating(0);
   };
 
   const handleEditComment = (index) => {
@@ -57,14 +184,15 @@ const CommentsSection = ({ currentUserId }) => {
     setEditedRating(comments[index].rating);
   };
 
-  const handleSaveEdit = (index) => {
-    const updatedComments = [...comments];
-    updatedComments[index].comment = editedComment;
-    updatedComments[index].rating = editedRating;
-    setComments(updatedComments);
-    setEditingIndex(null);
-    setEditedComment("");
-    setEditedRating(0);
+  const handleSaveEdit = () => {
+    editComment({
+      courseId,
+      commentId: comments[editingIndex]._id,
+      updatedCommentData: {
+        comment: editedComment,
+        rating: editedRating,
+      },
+    });
   };
 
   const handleDeleteComment = (index) => {
@@ -73,10 +201,10 @@ const CommentsSection = ({ currentUserId }) => {
   };
 
   const confirmDelete = () => {
-    const updatedComments = comments.filter((_, index) => index !== commentToDelete);
-    setComments(updatedComments);
-    setAlertOpen(false);
-    setSnackBarOpen(true);
+    deleteComment({
+      courseId,
+      commentId: comments[commentToDelete]._id,
+    });
   };
 
   const cancelDelete = () => {
@@ -87,7 +215,11 @@ const CommentsSection = ({ currentUserId }) => {
     <Box sx={{ maxWidth: { xs: "100%", sm: 800 }, margin: "0 auto" }}>
       <Accordion expanded={expanded} onChange={() => setExpanded(!expanded)}>
         <AccordionSummary expandIcon={<ExpandMore />}>
-          <Typography variant="h6">{expanded ? "Hide Comments" : `Show ${comments.length} Comments`}</Typography>
+          <Typography variant="h6">
+            {expanded
+              ? "Hide Comments"
+              : `Show ${comments.length > 0 ? comments.length : ""} Comments`}
+          </Typography>
         </AccordionSummary>
         <AccordionDetails>
           <CommentInput
@@ -141,9 +273,9 @@ const CommentsSection = ({ currentUserId }) => {
         </Alert>
       </Snackbar>
 
-      {/* Snackbar for Successful Deletion */}
+      {/* Snackbar for Success or Error */}
       <Snackbar open={snackBarOpen} autoHideDuration={2000} onClose={() => setSnackBarOpen(false)}>
-        <Alert severity="success">Comment deleted successfully!</Alert>
+        <Alert severity={alertSeverity}>{alertMessage}</Alert>
       </Snackbar>
     </Box>
   );
