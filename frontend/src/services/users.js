@@ -1,9 +1,40 @@
 import axios from 'axios';
 
-const BASE_API_URL = 'https://job-portal-website-production.up.railway.app/api/';
+const BASE_API_URL = 'http://localhost:5000/api/';
 
 
-
+export const uploadProfileImage = async (userId, file) => {
+    try {
+      const formData = new FormData();
+      formData.append('profileImage', file);
+      console.error('Payload:', formData);
+      const response = await axios.post(
+        `${BASE_API_URL}auth/${userId}/profile-image/`,
+        formData,
+        {
+          headers: {
+            'Content-Type': 'multipart/form-data',
+          },
+        }
+      );
+      return response.data; // Handle success
+    } catch (error) {
+      console.error('Error uploading profile image:', error);
+      throw new Error(error);
+    }
+  };
+  // Retrieve profile image by ID
+export const getProfileImage = async (imageId) => {
+    try {
+      const response = await axios.get(`${BASE_API_URL}auth/profile-image/${imageId}`, {
+        responseType: 'blob', // To handle image files
+      });
+      return URL.createObjectURL(response.data); // Convert Blob to a usable image URL
+    } catch (error) {
+      console.error('Error fetching profile image:', error.response?.data?.message);
+      throw new Error(error.response?.data?.message || 'Failed to fetch profile image');
+    }
+  };
 
 
 export const signup = async (userData) => {
