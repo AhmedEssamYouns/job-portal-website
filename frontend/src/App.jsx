@@ -29,6 +29,7 @@ import { useCheckLogin } from "./hooks/useAuth";
 import { fetchUserById } from "./services/users";
 import HourglassLoader from "./shared/Loaders/Components/Hamster";
 import ForgetPassword from "./pages/auth/ForgetPassword";
+import ChangePassword from "./pages/auth/ChangePassword";
 
 
 const queryClient = new QueryClient();
@@ -107,6 +108,10 @@ const App = () => {
                   <Route
                     path="/course/:courseId/level/:levelId"
                     element={isLoggedIn ? <LevelDetail /> : <SignIn />}
+                  />
+                   <Route
+                    path="/changePassword"
+                    element={isLoggedIn ? <ChangePassword /> : <SignIn />}
                   />
                     <Route
                     path="/forgetPassword"

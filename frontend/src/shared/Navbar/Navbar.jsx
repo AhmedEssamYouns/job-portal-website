@@ -363,6 +363,7 @@ const Navbar = () => {
                 }}
             >
                 <MenuItem onClick={toggleTheme}>Change Theme</MenuItem>
+                {user && <MenuItem onClick={()=> navigate('/changePassword')}>change password</MenuItem>}
                 {user && <MenuItem onClick={handleLogout}>Logout</MenuItem>}
             </Popover>
         </AppBar>

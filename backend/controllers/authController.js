@@ -81,6 +81,85 @@ const signIn = async (req, res) => {
     }
 };
 
+const changePassword = asyncWrapper(async (req, res, next) => {
+  try {
+    const { currentPassword, newPassword } = req.body;
+
+    // Ensure currentPassword and newPassword are provided
+    if (!currentPassword || !newPassword) {
+      const error = appError.create(
+        "Current password and new password are required.",
+        400,
+        httpStatusText.FAIL
+      );
+      return next(error);
+    }
+
+    // Get token from Authorization header
+    const token = req.headers.authorization?.split(" ")[1];
+    if (!token) {
+      const error = appError.create(
+        "Authorization token is required.",
+        401,
+        httpStatusText.UNAUTHORIZED
+      );
+      return next(error);
+    }
+
+    // Verify the token
+    let userId;
+    try {
+      const decoded = jwt.verify(token, process.env.JWT_SECRET);
+      userId = decoded.id;
+    } catch (err) {
+      const error = appError.create(
+        "Invalid or expired token.",
+        401,
+        httpStatusText.UNAUTHORIZED
+      );
+      return next(error);
+    }
+
+    // Find the user by ID
+    const user = await User.findById(userId);
+    if (!user) {
+      const error = appError.create("User not found.", 404, httpStatusText.FAIL);
+      return next(error);
+    }
+
+    // Check if the current password matches
+    const isMatch = await bcrypt.compare(currentPassword, user.password);
+    if (!isMatch) {
+      const error = appError.create(
+        "Current password is incorrect.",
+        400,
+        httpStatusText.FAIL
+      );
+      return next(error);
+    }
+
+    // Hash the new password
+    const hashedPassword = await bcrypt.hash(newPassword, 12);
+
+    // Update user's password
+    user.password = hashedPassword;
+    await user.save();
+
+    res.status(200).json({
+      status: "success",
+      message: "Password has been changed successfully.",
+    });
+  } catch (err) {
+    console.error("Error in changePassword:", err);
+    next(
+      appError.create(
+        "An error occurred while changing the password.",
+        500,
+        httpStatusText.FAIL
+      )
+    );
+  }
+});
 
 // Configure Nodemailer
 const transporter = nodemailer.createTransport({
@@ -341,4 +420,4 @@ const setAdminStatus = async (req, res) => {
   }
 };
 
-module.exports = { signUp, signIn, addCompletedCourse, getUserById , forgotPassword , verifyResetCode , resetPassword ,setAdminStatus};
+module.exports = { signUp, signIn,changePassword, addCompletedCourse, getUserById , forgotPassword , verifyResetCode , resetPassword ,setAdminStatus};

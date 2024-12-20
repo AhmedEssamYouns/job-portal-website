@@ -10,18 +10,26 @@ import {
   useMediaQuery,
   Alert,
   Snackbar,
+  InputAdornment,
+  IconButton,
 } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import { useNavigate } from 'react-router-dom';
+import { changePassword } from '../../services/users';
+import Visibility from '@mui/icons-material/Visibility';
+import VisibilityOff from '@mui/icons-material/VisibilityOff';
 
 const ChangePassword = () => {
   const [formData, setFormData] = useState({
     currentPassword: '',
     newPassword: '',
+    confirmPassword: '',
   });
   const [error, setError] = useState('');
   const [openSnackbar, setOpenSnackbar] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
   const navigate = useNavigate();
@@ -30,29 +38,46 @@ const ChangePassword = () => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
+  const handleClickShowPassword = () => {
+    setShowPassword((prev) => !prev);
+  };
+
+  const handleClickShowConfirmPassword = () => {
+    setShowConfirmPassword((prev) => !prev);
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
     setSnackbarMessage('');
 
-    // Simulate password change API call
-    try {
-      // Replace this with actual API integration
-      if (!formData.currentPassword || !formData.newPassword) {
-        throw new Error('All fields are required.');
-      }
-      if (formData.currentPassword === formData.newPassword) {
-        throw new Error(
-          'New password must be different from the current password.'
-        );
-      }
-
-      setSnackbarMessage('Password changed successfully!');
+    // Validate fields
+    if (!formData.currentPassword || !formData.newPassword || !formData.confirmPassword) {
+      setError('All fields are required.');
       setOpenSnackbar(true);
-      // Navigate or reload as necessary after success
-      navigate('/dashboard');
+      return;
+    }
+
+    if (formData.newPassword !== formData.confirmPassword) {
+      setError('New password and confirm password must match.');
+      setOpenSnackbar(true);
+      return;
+    }
+
+    if (formData.currentPassword === formData.newPassword) {
+      setError('New password must be different from the current password.');
+      setOpenSnackbar(true);
+      return;
+    }
+
+    // Call API to change password
+    try {
+      const response = await changePassword(formData.currentPassword, formData.newPassword);
+      setSnackbarMessage(response.message || 'Password changed successfully!');
+      setOpenSnackbar(true);
+      navigate('/'); 
     } catch (error) {
-      setError(error.message);
+      setError(error.message || 'An error occurred while changing the password.');
       setSnackbarMessage(error.message);
       setOpenSnackbar(true);
     }
@@ -63,10 +88,7 @@ const ChangePassword = () => {
   };
 
   return (
-    <Grid
-      container
-      sx={{ height: isMobile ? 'auto' : '80vh' }}
-    >
+    <Grid container sx={{ height: isMobile ? 'auto' : '80vh' }}>
       {/* Left Side: Only for larger screens */}
       {!isMobile && (
         <Grid
@@ -129,54 +151,77 @@ const ChangePassword = () => {
           </Typography>
         </Box>
 
-        <Card
-          sx={{ width: '90%', maxWidth: 400, borderRadius: 10, boxShadow: 5 }}
-        >
+        <Card sx={{ width: '90%', maxWidth: 400, borderRadius: 10, boxShadow: 5 }}>
           <CardContent>
-            <Typography
-              variant='h4'
-              align='center'
-              gutterBottom
-            >
+            <Typography variant='h4' align='center' gutterBottom>
               Change Password
             </Typography>
 
             <form onSubmit={handleSubmit}>
               <TextField
                 label='Current Password'
-                type='password'
+                type={showPassword ? 'text' : 'password'}
                 name='currentPassword'
                 required
                 value={formData.currentPassword}
                 onChange={handleChange}
                 fullWidth
                 sx={{ marginBottom: 2 }}
+                InputProps={{
+                  endAdornment: (
+                    <InputAdornment position='end'>
+                      <IconButton onClick={handleClickShowPassword} edge='end'>
+                        {showPassword ? <VisibilityOff /> : <Visibility />}
+                      </IconButton>
+                    </InputAdornment>
+                  ),
+                }}
               />
               <TextField
                 label='New Password'
-                type='password'
+                type={showPassword ? 'text' : 'password'}
                 name='newPassword'
                 required
                 value={formData.newPassword}
                 onChange={handleChange}
                 fullWidth
                 sx={{ marginBottom: 2 }}
+                InputProps={{
+                  endAdornment: (
+                    <InputAdornment position='end'>
+                      <IconButton onClick={handleClickShowPassword} edge='end'>
+                        {showPassword ? <VisibilityOff /> : <Visibility />}
+                      </IconButton>
+                    </InputAdornment>
+                  ),
+                }}
               />
-              <Button
-                type='submit'
-                variant='contained'
-                color='primary'
+              <TextField
+                label='Confirm Password'
+                type={showConfirmPassword ? 'text' : 'password'}
+                name='confirmPassword'
+                required
+                value={formData.confirmPassword}
+                onChange={handleChange}
                 fullWidth
-              >
+                sx={{ marginBottom: 2 }}
+                InputProps={{
+                  endAdornment: (
+                    <InputAdornment position='end'>
+                      <IconButton onClick={handleClickShowConfirmPassword} edge='end'>
+                        {showConfirmPassword ? <VisibilityOff /> : <Visibility />}
+                      </IconButton>
+                    </InputAdornment>
+                  ),
+                }}
+              />
+              <Button type='submit' variant='contained' color='primary' fullWidth>
                 Change Password
               </Button>
             </form>
 
             {error && (
-              <Alert
-                severity='error'
-                sx={{ marginTop: 2 }}
-              >
+              <Alert severity='error' sx={{ marginTop: 2 }}>
                 {error}
               </Alert>
             )}
@@ -191,11 +236,7 @@ const ChangePassword = () => {
         onClose={handleCloseSnackbar}
         anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
       >
-        <Alert
-          onClose={handleCloseSnackbar}
-          severity={error ? 'error' : 'success'}
-          sx={{ width: '100%' }}
-        >
+        <Alert onClose={handleCloseSnackbar} severity={error ? 'error' : 'success'} sx={{ width: '100%' }}>
           {snackbarMessage}
         </Alert>
       </Snackbar>

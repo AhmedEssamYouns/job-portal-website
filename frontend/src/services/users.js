@@ -30,7 +30,22 @@ export const login = async (userData) => {
         throw new Error(error.response?.data?.message || 'Sign in failed');
     }
 };
+export const changePassword = async (currentPassword, newPassword) => {
+    try {
+      const response = await axios.put(
+        `${BASE_API_URL}auth/changePassword`, 
+        { currentPassword, newPassword },
+        { headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } }
+      );
+      return response.data; // Handle success (e.g., show a success message)
+    } catch (error) {
+        console.error('Error changing password:', error);
+      const errorMessage = "current password is incorrect. Please try again.";
+      throw new Error(errorMessage);
+    }
+  };
 
+  
 export const forgotPassword = async (email) => {
     try {
         const response = await axios.post(`${BASE_API_URL}auth/forgotPassword`, { email }, {
