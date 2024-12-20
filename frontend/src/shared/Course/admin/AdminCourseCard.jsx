@@ -33,7 +33,8 @@ import {
 } from "react-icons/si";
 import { editCourse } from "../../../services/courses";
 import { useNavigate } from "react-router-dom";
-
+import ImageIcon from "../../../assets/imgs/image.png";
+import { Image } from "@mui/icons-material";
 const languageIcons = {
   javascript: { icon: <SiJavascript />, color: "#F7DF1E" },
   python: { icon: <SiPython />, color: "#306998" },
@@ -97,8 +98,8 @@ const AdminCourseCard = ({ course, onEdit, onDelete, onUpdateCourse }) => {
   const handleSaveChanges = async () => {
     try {
       // Update the course via API call
-      await editCourse(course._id, courseData); 
-      onUpdateCourse(course._id, courseData); 
+      await editCourse(course._id, courseData);
+      onUpdateCourse(course._id, courseData);
       setSnackbarMessage("Course updated successfully!");
       setSnackbarOpen(true);
       setOpen(false); // Close the dialog after saving
@@ -108,7 +109,7 @@ const AdminCourseCard = ({ course, onEdit, onDelete, onUpdateCourse }) => {
       setSnackbarOpen(true);
     }
   };
-const navigate = useNavigate();
+  const navigate = useNavigate();
   return (
     <>
       <Card
@@ -200,8 +201,12 @@ const navigate = useNavigate();
           <Typography variant="body2" color="text.secondary">
             <strong>price:</strong> {course.price}
           </Typography>
-          <Button sx={{ position: "absolute", bottom: 5, right: 5 }} variant="contained" onClick={() => navigate(`/course/${course._id}`)}>
-              View Course
+          <Button
+            sx={{ position: "absolute", bottom: 5, right: 5 }}
+            variant="contained"
+            onClick={() => navigate(`/course/${course._id}`)}
+          >
+            View Course
           </Button>
         </CardContent>
       </Card>
@@ -210,6 +215,16 @@ const navigate = useNavigate();
       <Dialog open={open} onClose={handleCloseDialog}>
         <DialogTitle>Edit Course</DialogTitle>
         <DialogContent>
+          <img
+            src={ImageIcon}
+            alt="Course Image"
+            style={{
+              width: "150px",
+              margin: "0 auto", 
+              display: "block", 
+            }}
+          />
+
           <TextField
             fullWidth
             label="Title"

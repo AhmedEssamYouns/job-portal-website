@@ -4,7 +4,6 @@ import AddIcon from '@mui/icons-material/Add';
 import AdminCourseCard from '../../shared/Course/admin/AdminCourseCard';
 import { fetchCourses, deleteCourse } from '../../services/courses'; 
 import { Link } from 'react-router-dom';
-
 const AdminPanal = () => {
     const [searchQuery, setSearchQuery] = useState('');
     const [courses, setCourses] = useState([]);
