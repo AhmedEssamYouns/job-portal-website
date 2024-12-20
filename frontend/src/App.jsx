@@ -7,6 +7,8 @@ import {
   Routes,
   Navigate,
 } from "react-router-dom";
+import CartPage from "../src/pages/home/purchase-flow/cartpage";
+import PaymentPage from "../src/pages/home/purchase-flow/paymentpage";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Provider } from "react-redux";
 import store from "./redux/store";
@@ -28,8 +30,6 @@ import AddCoursePage from "./pages/admin/addCourse";
 import { useCheckLogin } from "./hooks/useAuth";
 import { fetchUserById } from "./services/users";
 import HourglassLoader from "./shared/Loaders/Components/Hamster";
-import ForgetPassword from "./pages/auth/ForgetPassword";
-import ChangePassword from "./pages/auth/ChangePassword";
 
 
 const queryClient = new QueryClient();
@@ -46,12 +46,12 @@ const App = () => {
         const userId = isLoggedIn.id;
         if (userId) {
           const userData = await fetchUserById(userId);
-          setIsAdmin(userData?.isAdmin || false); 
+          setIsAdmin(userData?.isAdmin || false); // Set admin status
         }
       } catch (error) {
         console.error("Error verifying admin status:", error.message);
       } finally {
-        setLoading(false);
+        setLoading(false); // End loading
       }
     };
 
@@ -97,6 +97,8 @@ const App = () => {
                   <Route path="/signup" element={<SignUp />} />
                   <Route path="/search" element={<SearchResultsPage />} />
                   <Route path="/courses" element={<CoursesPage />} />
+                  <Route path= "/cart" element={<CartPage />} />
+                  <Route path= "/paymentpage" element={<PaymentPage />} />
                   <Route
                     path="/profile"
                     element={isLoggedIn ? <UserProfile /> : <SignIn />}
@@ -108,14 +110,6 @@ const App = () => {
                   <Route
                     path="/course/:courseId/level/:levelId"
                     element={isLoggedIn ? <LevelDetail /> : <SignIn />}
-                  />
-                   <Route
-                    path="/changePassword"
-                    element={isLoggedIn ? <ChangePassword /> : <SignIn />}
-                  />
-                    <Route
-                    path="/forgetPassword"
-                    element={<ForgetPassword />}
                   />
                   {/* Admin Routes */}
                   <Route
