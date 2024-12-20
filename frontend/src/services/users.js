@@ -39,12 +39,15 @@ export const changePassword = async (currentPassword, newPassword) => {
       );
       return response.data; // Handle success (e.g., show a success message)
     } catch (error) {
-        console.error('Error changing password:', error);
-      const errorMessage = "current password is incorrect. Please try again.";
-      throw new Error(errorMessage);
+      console.error('Error before password:', error.response || error);  // Log the error response from Axios
+      if (error.response) {
+        // If there's a response from the server, throw the error message from the response
+        throw new Error(error.response.data.message || 'An error occurred.');
+      }
+      throw new Error('An unknown error occurred.');
     }
   };
-
+  
   
 export const forgotPassword = async (email) => {
     try {
@@ -54,7 +57,7 @@ export const forgotPassword = async (email) => {
         return response.data; // You can return the success message or other data
     } catch (error) {
         console.error(`Forgot password error: ${error.response?.data?.message}`);
-        throw new Error(error.response?.message || 'user not found');
+        throw new Error(error);
     }
 };
 

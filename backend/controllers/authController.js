@@ -87,23 +87,19 @@ const changePassword = asyncWrapper(async (req, res, next) => {
 
     // Ensure currentPassword and newPassword are provided
     if (!currentPassword || !newPassword) {
-      const error = appError.create(
-        "Current password and new password are required.",
-        400,
-        httpStatusText.FAIL
-      );
-      return next(error);
+      return res.status(400).json({
+        status: "fail",
+        message: "Current password and new password are required."
+      });
     }
 
     // Get token from Authorization header
     const token = req.headers.authorization?.split(" ")[1];
     if (!token) {
-      const error = appError.create(
-        "Authorization token is required.",
-        401,
-        httpStatusText.UNAUTHORIZED
-      );
-      return next(error);
+      return res.status(401).json({
+        status: "fail",
+        message: "Authorization token is required."
+      });
     }
 
     // Verify the token
@@ -112,30 +108,28 @@ const changePassword = asyncWrapper(async (req, res, next) => {
       const decoded = jwt.verify(token, process.env.JWT_SECRET);
       userId = decoded.id;
     } catch (err) {
-      const error = appError.create(
-        "Invalid or expired token.",
-        401,
-        httpStatusText.UNAUTHORIZED
-      );
-      return next(error);
+      return res.status(401).json({
+        status: "fail",
+        message: "Invalid or expired token."
+      });
     }
 
     // Find the user by ID
     const user = await User.findById(userId);
     if (!user) {
-      const error = appError.create("User not found.", 404, httpStatusText.FAIL);
-      return next(error);
+      return res.status(404).json({
+        status: "fail",
+        message: "User not found."
+      });
     }
 
     // Check if the current password matches
     const isMatch = await bcrypt.compare(currentPassword, user.password);
     if (!isMatch) {
-      const error = appError.create(
-        "Current password is incorrect.",
-        400,
-        httpStatusText.FAIL
-      );
-      return next(error);
+      return res.status(400).json({
+        status: "fail",
+        message: "Current password is incorrect."
+      });
     }
 
     // Hash the new password
@@ -145,21 +139,19 @@ const changePassword = asyncWrapper(async (req, res, next) => {
     user.password = hashedPassword;
     await user.save();
 
-    res.status(200).json({
+    return res.status(200).json({
       status: "success",
-      message: "Password has been changed successfully.",
+      message: "Password has been changed successfully."
     });
   } catch (err) {
     console.error("Error in changePassword:", err);
-    next(
-      appError.create(
-        "An error occurred while changing the password.",
-        500,
-        httpStatusText.FAIL
-      )
-    );
+    return res.status(500).json({
+      status: "fail",
+      message: "An error occurred while changing the password."
+    });
   }
 });
+
 
 // Configure Nodemailer
 const transporter = nodemailer.createTransport({
