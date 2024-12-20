@@ -1,5 +1,5 @@
 const express = require('express');
-const { addCourse, fetchIncompletedCourses, searchCourses, deleteCourse, editCourse } = require('../controllers/courseController');
+const { addCourse, fetchIncompletedCourses, searchCourses, deleteCourse, editCourse, enrollCourses } = require('../controllers/courseController');
 const { getCourse } = require('../controllers/courseController');
 const { getAllCourses } = require('../controllers/courseController');
 const { addCommentToCourse, editComment, deleteComment } = require('../controllers/courseController');
@@ -13,6 +13,9 @@ router.get('/incompleted-courses/:userId', fetchIncompletedCourses);
 
 // Route to search for courses based on title and language
 router.get('/courses/search', searchCourses);
+
+
+router.post('/enroll', enrollCourses);
 
 // Route to get a specific course by ID
 router.get('/:id', getCourse);

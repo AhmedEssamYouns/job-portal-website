@@ -7,8 +7,8 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const nodemailer = require("nodemailer");
 const GridFS = require('../config/gridfsConfig');
-const { getGFS } = require('../config/gridfsConfig');  // Adjust the path if needed
 const mongoose = require('mongoose');
+const { getGridFSBucket } = require('../config/gridfsConfig'); 
 
 
 const signUp = async (req, res) => {
@@ -156,7 +156,6 @@ const changePassword = asyncWrapper(async (req, res, next) => {
     });
   }
 });
-const { getGridFSBucket } = require('../config/gridfsConfig'); // Adjust the path as needed
 const uploadImage = async (req, res) => {
   try {
     const bucket = getGridFSBucket();
@@ -221,33 +220,7 @@ const uploadImage = async (req, res) => {
 
 
 
-const getProfileImage = async (req, res) => {
-  try {
-    const bucket = getGridFSBucket();
-    const { filename } = req.params; // Filename from URL parameter
 
-    if (!filename) {
-      return res.status(400).send({ message: 'No filename provided' });
-    }
-
-    // Open download stream by filename
-    const downloadStream = bucket.openDownloadStreamByName(filename);
-
-    downloadStream.on('error', (err) => {
-      console.error('Error retrieving image:', err);
-      res.status(404).send({ message: 'Image not found', error: err.message });
-    });
-
-    // Pipe the stream to the response
-    downloadStream.pipe(res);
-  } catch (err) {
-    console.error('Error retrieving profile image:', err);
-    res.status(500).send({
-      message: 'Error retrieving profile image',
-      error: err.message,
-    });
-  }
-};
 
 const getProfileImageById = async (req, res) => {
   try {

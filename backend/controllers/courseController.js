@@ -7,6 +7,46 @@ const Joi = require("joi");
 const Comment = require("../models/comment");
 const mongoose = require("mongoose");
 
+
+
+exports.enrollCourses = async (req, res) => {
+  const { userId, courseIds } = req.body;
+
+  // Validate input
+  if (!userId || !Array.isArray(courseIds) || courseIds.length === 0) {
+    return res.status(400).json({ message: "Invalid input: userId and courseIds are required" });
+  }
+
+  try {
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    // Find courses to enroll
+    const courses = await Course.find({ _id: { $in: courseIds } });
+    if (courses.length !== courseIds.length) {
+      return res.status(404).json({ message: "One or more courses not found" });
+    }
+
+    // Add courses to the user's enrolledCourses list
+    const newEnrollments = courses
+      .filter(course => !user.enrolledCourses.includes(course._id))
+      .map(course => course._id);
+
+    user.enrolledCourses.push(...newEnrollments);
+    await user.save();
+
+    res.status(200).json({
+      message: "Courses enrolled successfully",
+      enrolledCourses: user.enrolledCourses,
+    });
+  } catch (error) {
+    console.error("Error enrolling courses:", error);
+    res.status(500).json({ message: "Failed to enroll in courses", error: error.message });
+  }
+};
+
 exports.addCommentToCourse = async (req, res) => {
   const { courseId } = req.params;
   const { userId, name, comment, rating, } = req.body;

@@ -23,10 +23,10 @@ const UserProfile = () => {
         if (CurrentUser) {
           const userData = await fetchUserById(CurrentUser.id);
 
-          if (userData.profileImage) {
-            const imageSrc = await getProfileImage(userData.profileImage);
-            userData.avatar = imageSrc;
-          }
+        //   if (userData.profileImage) {
+        //     const imageSrc = await getProfileImage(userData.profileImage);
+        //     userData.avatar = imageSrc;
+        //   }
 
           setUser(userData);
         } else {
@@ -122,7 +122,7 @@ const UserProfile = () => {
           />
         )}
         <Typography variant="h5" fontWeight="bold" gutterBottom>
-          {user.name}
+          {user.avatar}
         </Typography>
         <Typography variant="body1" sx={{ mb: 1 }}>
           {user.email}
