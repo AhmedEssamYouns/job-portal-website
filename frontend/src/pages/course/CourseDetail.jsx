@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { useParams, Link } from "react-router-dom";
+import { useParams, Link, useNavigate } from "react-router-dom";
 import { useFetchCourseById } from "../../hooks/useCourses";
 import { useFetchUserById } from "../../hooks/useAuth";
 import {
@@ -22,6 +22,7 @@ import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
 import PaymentIcon from "@mui/icons-material/Payment";
 import { blue, green, pink } from "@mui/material/colors";
 import RobotHi from "../../assets/svgs/RobotHi.svg";
+import { getCartItems, saveCartItems } from "../../utils/storage";
 
 const CourseDetail = () => {
   const { id } = useParams();
@@ -53,19 +54,31 @@ const CourseDetail = () => {
 
   const [updatedRating, setUpdatedRating] = useState(course?.rating || 0);
 
-  const [isEnrolled, setIsEnrolled] = useState(false); // Static state for enrollment
-  const [isInWishlist, setIsInWishlist] = useState(false); // Static state for wishlist
+  const [isEnrolled, setIsEnrolled] = useState(false);
+  const [isInWishlist, setIsInWishlist] = useState(false);
+  const navigate = useNavigate();
+
+  
+  useEffect(() => {
+    const cartItems = getCartItems();
+    const isCourseInCart = cartItems.some((item) => item?._id === course?._id);
+    setIsEnrolled(isCourseInCart);
+  }, [course]);
+
   const handleEnrollClick = () => {
+    const cartItems = getCartItems();
     setIsEnrolled(true);
+    saveCartItems([...cartItems, course]);
+  };
+
+  const handleBuyNowClick = () => {
+    navigate("/paymentpage", { state: [course] });
   };
 
   const handleAddToWishlist = () => {
     setIsInWishlist(true);
   };
 
-  const handleBuyNowClick = () => {
-    alert("Redirecting to payment gateway...");
-  };
   const calculateAverageRating = (comments) => {
     if (!comments || comments.length === 0) return 0;
     const totalRating = comments.reduce(
@@ -119,7 +132,6 @@ const CourseDetail = () => {
         Description:
       </Typography>
       <Box
-      
         sx={{
           position: "absolute",
           right: "0px",
@@ -200,8 +212,8 @@ const CourseDetail = () => {
               sx={{
                 height: 55,
 
-                backgroundColor: '#e91e63',
-                color: 'white',
+                backgroundColor: "#e91e63",
+                color: "white",
                 "&:hover": {
                   backgroundColor: theme.palette.secondary.dark,
                 },
@@ -221,7 +233,6 @@ const CourseDetail = () => {
             >
               {!isEnrolled ? (
                 <Button
-                
                   variant="contained"
                   startIcon={<AddShoppingCartIcon />}
                   sx={{
@@ -240,6 +251,8 @@ const CourseDetail = () => {
               ) : (
                 <Button
                   variant="contained"
+                  LinkComponent={Link}
+                  to="/cart"
                   startIcon={<ShoppingCartIcon />}
                   sx={{
                     backgroundColor: green[500],

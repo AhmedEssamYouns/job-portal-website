@@ -121,9 +121,6 @@ const UserProfile = () => {
             }}
           />
         )}
-        <Typography variant="h5" fontWeight="bold" gutterBottom>
-          {user.avatar}
-        </Typography>
         <Typography variant="body1" sx={{ mb: 1 }}>
           {user.email}
         </Typography>
