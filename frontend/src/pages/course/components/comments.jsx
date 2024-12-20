@@ -58,7 +58,7 @@ const CommentsSection = ({ currentUserId, courseId, comments: initialComments, o
         // Check if the user has already commented on this course
         const userHasCommented = comments.some((comment) => comment.userId === loggedInUser.id);
         if (userHasCommented) {
-          setAlertMessage("You have already commented on this course.");
+          setAlertMessage("You have commented on this course.");
           setAlertSeverity("info");
           setSnackBarOpen(true);
         }
@@ -139,8 +139,8 @@ const CommentsSection = ({ currentUserId, courseId, comments: initialComments, o
     }
   
     if (user && comments.some((comment) => comment.userId === CurrentUser.id)) {
-      console.warn("You have already commented on this course.");
-      setAlertMessage("You have already commented on this course.");
+      console.warn("You have commented on this course.");
+      setAlertMessage("You have commented on this course.");
       setAlertSeverity("info");
       setSnackBarOpen(true);
       return 0;

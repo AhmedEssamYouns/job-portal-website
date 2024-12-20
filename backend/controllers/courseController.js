@@ -3,6 +3,7 @@ const Level = require('../models/Level');
 const Slide = require('../models/Slide');
 const Question = require('../models/Question');
 const User =require('../models/User')
+const Joi = require("joi");
 const Comment = require('../models/comment');
 const mongoose = require('mongoose');
 
@@ -11,100 +12,103 @@ exports.addCommentToCourse = async (req, res) => {
   const { courseId } = req.params;
   const { userId, name, comment, rating } = req.body;
 
+  // Validate input
+  const schema = Joi.object({
+    userId: Joi.string().required(),
+    name: Joi.string().required(),
+    comment: Joi.string().required(),
+    rating: Joi.number().min(1).max(5).required(),
+  });
+
+  const { error } = schema.validate({ userId, name, comment, rating });
+  if (error) {
+    return res.status(400).json({ message: error.details[0].message });
+  }
+
   try {
-    // Validate input data
-    if (!userId || !name || !comment || !rating) {
-      return res.status(400).json({ message: 'All fields are required.' });
-    }
-
-    // Ensure rating is between 1 and 5
-    const validRating = Math.min(Math.max(rating, 1), 5);
-
-    // Find the course by ID
     const course = await Course.findById(courseId);
     if (!course) {
-      return res.status(404).json({ message: 'Course not found' });
+      return res.status(404).json({ message: "Course not found" });
     }
 
-    // Create the Comment document
     const newComment = new Comment({
-      userId,  // Directly store the userId as a string
+      userId,
       name,
       comment,
-      rating: validRating,
+      rating,
       createdAt: Date.now(),
-      edited: false
     });
 
-    // Save the new comment to the database
     await newComment.save();
 
-    // Add the new comment's ObjectId to the course's comments array
     course.comments.push(newComment._id);
-
-    // Update the totalRating and commentCount of the course
-    course.totalRating += validRating; // Add the new comment's rating
-    course.commentCount += 1; // Increment the comment count
-
-    // Recalculate the course's rating, capped at 5
+    course.totalRating += rating;
+    course.commentCount += 1;
     course.rating = Math.min(course.totalRating / course.commentCount, 5);
 
-    // Save the updated course
     await course.save();
 
-    res.status(201).json({ message: 'Comment added successfully', comment: newComment });
+    res.status(201).json({
+      message: "Comment added successfully",
+      comment: newComment,
+    });
   } catch (error) {
-    console.error('Error adding comment:', error);
-    res.status(500).json({ message: 'Failed to add comment', error: error.message });
+    console.error("Error adding comment:", error);
+    res.status(500).json({ message: "Failed to add comment", error: error.message });
   }
 };
 
 
-
-
-// Edit a comment on a course
 
 exports.editComment = async (req, res) => {
   const { courseId, commentId } = req.params;
   const { comment, rating } = req.body;
 
-  try {
-    // Ensure rating is between 1 and 5
-    const validRating = Math.min(Math.max(rating, 1), 5);
+  const schema = Joi.object({
+    comment: Joi.string().optional(),
+    rating: Joi.number().min(1).max(5).optional(),
+  });
 
-    // Find the course and the comment
+  const { error } = schema.validate({ comment, rating });
+  if (error) {
+    return res.status(400).json({ message: error.details[0].message });
+  }
+
+  try {
     const course = await Course.findById(courseId);
     if (!course) {
-      return res.status(404).json({ message: 'Course not found' });
+      return res.status(404).json({ message: "Course not found" });
     }
 
     const commentToEdit = await Comment.findById(commentId);
     if (!commentToEdit) {
-      return res.status(404).json({ message: 'Comment not found' });
+      return res.status(404).json({ message: "Comment not found" });
     }
 
-    // Update the totalRating by removing the old rating and adding the new one
-    course.totalRating -= commentToEdit.rating;  // Subtract old rating
-    course.totalRating += validRating;  // Add new rating
+    if (rating !== undefined) {
+      course.totalRating -= commentToEdit.rating;
+      course.totalRating += rating;
+      commentToEdit.rating = rating;
+      course.rating = Math.min(course.totalRating / course.commentCount, 5);
+    }
 
-    // Update the course's rating based on the updated totalRating, capped at 5
-    course.rating = Math.min(course.totalRating / course.commentCount, 5);
+    if (comment !== undefined) {
+      commentToEdit.comment = comment;
+    }
 
-    // Update the comment itself
-    commentToEdit.comment = comment;
-    commentToEdit.rating = validRating;
     commentToEdit.edited = true;
-    await commentToEdit.save();
+    commentToEdit.editedAt = Date.now(); // Set the edited time
 
-    // Save the updated course
+    await commentToEdit.save();
     await course.save();
 
-    res.status(200).json({ message: 'Comment edited successfully', comment: commentToEdit });
+    res.status(200).json({ message: "Comment edited successfully", comment: commentToEdit });
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ message: 'Failed to edit comment', error });
+    console.error("Error editing comment:", error);
+    res.status(500).json({ message: "Failed to edit comment", error: error.message });
   }
 };
+
 
 // Delete a comment from a course
 exports.deleteComment = async (req, res) => {
