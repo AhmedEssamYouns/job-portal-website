@@ -1,20 +1,25 @@
 import React, { useEffect, useState } from 'react';
 import {
-  Box, Typography, Avatar, Paper, useTheme, Button, Grid, CircularProgress,
+  Box, Typography, Avatar, Paper, useTheme, Button, Grid, CircularProgress, TextField, Dialog, DialogActions, DialogContent, DialogTitle, IconButton
 } from '@mui/material';
 import { fetchUserById, checkLogin, useProfileImage } from '../../services/users';
-import { uploadProfileImage, getProfileImage } from '../../services/users';
+import { uploadProfileImage, getProfileImage, editProfile } from '../../services/users';
 import CoursesList from '../../shared/Course/client/CoursesList';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import HourglassLoader from '../../shared/Loaders/Components/Hamster';
 import SignIn from '../auth/SignIn';
 import { useFetchUserById } from '../../hooks/useAuth';
+import EditIcon from '@mui/icons-material/Edit';
 
 const UserProfile = () => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [avatarLoading, setAvatarLoading] = useState(false);
+  const [openEditDialog, setOpenEditDialog] = useState(false);
+  const [newUsername, setNewUsername] = useState('');
+  const [newEmail, setNewEmail] = useState('');
+  
   const CurrentUser = checkLogin();
   const theme = useTheme();
   const { data: userData, isLoading: userLoading, isError: userError, error: userFetchError } = useFetchUserById(CurrentUser?.id);
@@ -53,6 +58,28 @@ const UserProfile = () => {
     }
   };
 
+  // Handle opening and closing of edit dialog
+  const handleEditDialogOpen = () => {
+    setNewUsername(user.username);
+    setNewEmail(user.email);
+    setOpenEditDialog(true);
+  };
+
+  const handleEditDialogClose = () => {
+    setOpenEditDialog(false);
+  };
+
+  const handleEditSubmit = async () => {
+    try {
+      const updatedUser = await editProfile(CurrentUser.id, { username: newUsername, email: newEmail });
+      setUser(updatedUser);
+      setOpenEditDialog(false);  // Close the dialog
+      window.location.reload(); // Reload the page to reflect updated user data
+    } catch (error) {
+      setError('Failed to update profile.');
+    }
+  };
+  
   if (loading || imageLoading || userLoading) {
     return (
       <Box
@@ -129,6 +156,12 @@ const UserProfile = () => {
         <Typography variant="body2" sx={{ mb: 1 }}>
           @{user.username}
         </Typography>
+        
+        {/* Edit Icon Button */}
+        <IconButton onClick={handleEditDialogOpen} color="inherit" >
+          <Typography>Edit Account info</Typography><EditIcon />
+        </IconButton>
+
         <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', marginTop: 1 }}>
           {user.completedCourses.length > 0 && (
             <>
@@ -139,6 +172,8 @@ const UserProfile = () => {
             </>
           )}
         </Box>
+
+        {/* Upload Image */}
         <input
           accept="image/*"
           style={{ display: 'none' }}
@@ -170,19 +205,47 @@ const UserProfile = () => {
 
         <Grid container spacing={2}>
           <Grid item xs={12}>
-            <CoursesList  fetchType="incompleted" />
+            <CoursesList fetchType="incompleted" />
           </Grid>
           {user.enrolledCourses.length > 0 && (
-              <Grid item xs={16}>
-                <CoursesList  fetchType="enrolled" />
-              </Grid>
-        )}
+            <Grid item xs={16}>
+              <CoursesList fetchType="enrolled" />
+            </Grid>
+          )}
           <Grid item xs={16}>
-            <CoursesList  fetchType="completed" />
+            <CoursesList fetchType="completed" />
           </Grid>
         </Grid>
-
       </Box>
+
+      {/* Edit Profile Dialog */}
+      <Dialog open={openEditDialog} onClose={handleEditDialogClose}>
+        <DialogTitle>Edit Profile</DialogTitle>
+        <DialogContent>
+          <TextField
+            label="Username"
+            value={newUsername}
+            onChange={(e) => setNewUsername(e.target.value)}
+            fullWidth
+            margin="normal"
+          />
+          <TextField
+            label="Email"
+            value={newEmail}
+            onChange={(e) => setNewEmail(e.target.value)}
+            fullWidth
+            margin="normal"
+          />
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleEditDialogClose} color="primary">
+            Cancel
+          </Button>
+          <Button onClick={handleEditSubmit} color="primary">
+            Save
+          </Button>
+        </DialogActions>
+      </Dialog>
     </Box>
   );
 };
