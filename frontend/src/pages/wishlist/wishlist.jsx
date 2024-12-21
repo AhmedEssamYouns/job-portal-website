@@ -1,62 +1,111 @@
-import React, { useState, useEffect } from 'react';
-import { Box, Typography, List, ListItem, ListItemText, IconButton } from '@mui/material';
-import DeleteIcon from '@mui/icons-material/Delete';
-import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
-import { useNavigate } from 'react-router-dom';
+import React, { useState, useEffect } from "react";
+import {
+  Box,
+  Typography,
+  List,
+  ListItem,
+  ListItemText,
+  IconButton,
+} from "@mui/material";
+import DeleteIcon from "@mui/icons-material/Delete";
+import { useNavigate } from "react-router-dom";
+import { useFetchUserById } from "../../hooks/useAuth"; // Assuming this is your hook
+import { useFetchCourses } from "../../hooks/useCourses"; // Assuming this is your hook
+import { removeCourseFromWishlist } from "../../services/courses"; // Assuming this is your API call
+import { checkLogin } from "../../services/users";
+import HourglassLoader from "../../shared/Loaders/Components/Hamster";
+import CourseCard from "../../shared/Course/client/CourseCard";
 
 const WishList = () => {
-    const navigate = useNavigate(); 
-    const [wishlist, setWishlist] = useState([]);
-    const [cart, setCart] = useState([]); 
+  const userId = checkLogin().id;
 
-    useEffect(() => {
-        const fakeWishlist = [
-            { id: 1, name: 'Product 1', price: '$100' },
-            { id: 2, name: 'Product 2', price: '$150' },
-            { id: 3, name: 'Product 3', price: '$200' },
-        ];
-        setWishlist(fakeWishlist);
-    }, []);
+  // Fetch user and course data
+  const { data: user, isLoading: userLoading } = useFetchUserById(userId);
+  const { data: courses, isLoading: coursesLoading } = useFetchCourses();
 
-    const handleRemoveItem = (itemId) => {
-        const updatedWishlist = wishlist.filter((item) => item.id !== itemId);
-        setWishlist(updatedWishlist);
-    };
+  // Add state for managing the wishlist
+  const [wishlist, setWishlist] = useState([]);
 
-    const handleAddToCart = (item) => {
-        setCart([...cart, item]); 
-        navigate('/cart', { state: [...cart, item] }); 
-    };
- 
+  // Filter courses to match user enrolled courses (course._id should match user.enrolledCourses)
+
+  const handleRemoveItem = async (courseId) => {
+    try {
+      // Remove course from wishlist via API
+      await removeCourseFromWishlist(userId, courseId);
+
+      // Update local wishlist state by removing the course with the matching ID
+      const updatedWishlist = wishlist.filter(
+        (course) => course._id !== courseId
+      );
+
+      // Set the updated wishlist state
+      setWishlist(updatedWishlist);
+    } catch (error) {
+      console.error("Error removing course from wishlist:", error);
+    }
+  };
+
+  // Wait for the user and courses data to be loaded before rendering
+  useEffect(() => {
+    if (user && courses) {
+      // Initialize wishlist with courses that the user has in their wishlist
+      const initialWishlist = courses.filter((course) =>
+        user.wishlistCourses.includes(course._id)
+      );
+      setWishlist(initialWishlist);
+    }
+  }, [user, courses]);
+
+  // If user data or courses are still loading
+  if (userLoading || coursesLoading) {
     return (
-        <Box sx={{ padding: 4 }}>
-            <Typography variant="h4" gutterBottom>
-                My Wishlist
-            </Typography>
-            {wishlist.length === 0 ? (
-                <Typography>No items in wishlist.</Typography>
-            ) : (
-                <List>
-                    {wishlist.map((item) => (
-                        <ListItem key={item.id} sx={{ borderBottom: '1px solid #ccc' }}>
-                            <ListItemText primary={item.name} secondary={`Price: ${item.price}`} />
-                            <IconButton onClick={() => handleRemoveItem(item.id)} edge="end" aria-label="delete">
-                                <DeleteIcon />
-                            </IconButton>
-                            <IconButton 
-                                onClick={() => handleAddToCart(item)} 
-                                edge="end" 
-                                aria-label="add to cart"
-                                sx={{ marginLeft: 1 }}
-                            >
-                                <ShoppingCartIcon />
-                            </IconButton>
-                        </ListItem>
-                    ))}
-                </List>
-            )}
-        </Box>
+      <Box
+        sx={{
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          height: "100vh",
+        }}
+      >
+        <HourglassLoader />
+      </Box>
     );
+  }
+
+  // If user is not logged in or no wishlist courses, show appropriate message
+  if (!wishlist || wishlist.length === 0) {
+    return (
+      <Box sx={{ padding: 4 }}>
+        <Typography variant="h4" gutterBottom>
+          My Wishlist
+        </Typography>
+        <Typography>No items in wishlist.</Typography>
+      </Box>
+    );
+  }
+
+  return (
+    <Box sx={{ padding: 4 }}>
+      <Typography variant="h4" gutterBottom>
+        My Wishlist
+      </Typography>
+      <List>
+        {wishlist.length === 0 ? (
+          <Typography>No enrolled courses in wishlist.</Typography>
+        ) : (
+          wishlist.map((course) => (
+            <Box>
+              <CourseCard
+                course={course}
+                onRemove={handleRemoveItem}
+                showRemoveButton={true}
+              />
+            </Box>
+          ))
+        )}
+      </List>
+    </Box>
+  );
 };
 
 export default WishList;

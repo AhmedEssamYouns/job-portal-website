@@ -458,12 +458,18 @@ const Navbar = () => {
             view cart {Total > 0 ? `(${Total})` : ""}
           </MenuItem>
         )}
+           {user && (
+          <MenuItem onClick={() => navigate("/WishList")}>
+            my wishlist
+          </MenuItem>
+        )}
         <MenuItem onClick={toggleTheme}>Change Theme</MenuItem>
         {user && (
           <MenuItem onClick={() => navigate("/changePassword")}>
             change password
           </MenuItem>
         )}
+      
         {user && <MenuItem onClick={handleLogout}>Logout</MenuItem>}
       </Popover>
     </AppBar>

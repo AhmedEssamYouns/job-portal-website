@@ -32,6 +32,7 @@ import { fetchUserById } from "./services/users";
 import HourglassLoader from "./shared/Loaders/Components/Hamster";
 import ForgetPassword from "./pages/auth/ForgetPassword";
 import ChangePassword from "./pages/auth/ChangePassword";
+import WishList from "./pages/wishlist/wishlist";
 const queryClient = new QueryClient();
 
 const App = () => {
@@ -115,6 +116,10 @@ const App = () => {
                   <Route
                     path="/course/:courseId/level/:levelId"
                     element={isLoggedIn ? <LevelDetail /> : <SignIn />}
+                  />
+                   <Route
+                    path="/WishList"
+                    element={isLoggedIn ? <WishList /> : <SignIn />}
                   />
                   {/* Admin Routes */}
                   <Route
