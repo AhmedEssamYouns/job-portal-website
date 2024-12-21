@@ -23,6 +23,7 @@ import PaymentIcon from "@mui/icons-material/Payment";
 import { blue, green, pink } from "@mui/material/colors";
 import RobotHi from "../../assets/svgs/RobotHi.svg";
 import { getCartItems, saveCartItems } from "../../utils/storage";
+import { addCourseToWishlist, removeCourseFromWishlist } from "../../services/courses";
 const CourseDetail = () => {
   const { id } = useParams();
   const theme = useTheme();
@@ -52,10 +53,16 @@ const CourseDetail = () => {
       .every((level) => isLevelCompletedByUser(level));
   };
 
+  useEffect(() => {
+    if (user && course) {
+      setIsInWishlist(user.wishlistCourses?.includes(course._id) || false);
+    }
+  }, [user, course]);
+
   const [updatedRating, setUpdatedRating] = useState(course?.rating || 0);
 
   const [isEnrolled, setIsEnrolled] = useState(false);
-  const [isInWishlist, setIsInWishlist] = useState(false);
+  const [isInWishlist, setIsInWishlist] = useState(user?.wishlistCourses?.includes(course?._id) || false);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -74,8 +81,24 @@ const CourseDetail = () => {
     navigate("/paymentpage", { state: [course] });
   };
 
-  const handleAddToWishlist = () => {
-    setIsInWishlist(true);
+  const handleAddToWishlist = async () => {
+    if (isInWishlist) {
+      // If course is already in wishlist, remove it
+      try {
+        await removeCourseFromWishlist(CurrentUser.id, course._id);
+        setIsInWishlist(false);
+      } catch (error) {
+        console.error("Error removing course from wishlist", error);
+      }
+    } else {
+      // If course is not in wishlist, add it
+      try {
+        await addCourseToWishlist(CurrentUser.id, course._id);
+        setIsInWishlist(true);
+      } catch (error) {
+        console.error("Error adding course to wishlist", error);
+      }
+    }
   };
 
   const calculateAverageRating = (comments) => {

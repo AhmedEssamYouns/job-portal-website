@@ -47,6 +47,79 @@ exports.enrollCourses = async (req, res) => {
   }
 };
 
+
+exports.addCourseToWishlist = async (req, res) => {
+  const { userId, courseId } = req.body;
+
+  // Validate input
+  if (!userId || !courseId) {
+    return res.status(400).json({ message: "Invalid input: userId and courseId are required" });
+  }
+
+  try {
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    // Find the course to add to the wishlist
+    const course = await Course.findById(courseId);
+    if (!course) {
+      return res.status(404).json({ message: "Course not found" });
+    }
+
+    // Add the course to the wishlist if not already in it
+    if (!user.wishlistCourses.includes(course._id)) {
+      user.wishlistCourses.push(course._id);
+      await user.save();
+
+      res.status(200).json({
+        message: "Course added to wishlist successfully",
+        wishlistCourses: user.wishlistCourses,
+      });
+    } else {
+      res.status(400).json({ message: "Course already in wishlist" });
+    }
+  } catch (error) {
+    console.error("Error adding course to wishlist:", error);
+    res.status(500).json({ message: "Failed to add course to wishlist", error: error.message });
+  }
+};
+
+exports.removeCourseFromWishlist = async (req, res) => {
+  const { userId, courseId } = req.body;
+
+  // Validate input
+  if (!userId || !courseId) {
+    return res.status(400).json({ message: "Invalid input: userId and courseId are required" });
+  }
+
+  try {
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    // Check if the course is in the wishlist
+    const courseIndex = user.wishlistCourses.indexOf(courseId);
+    if (courseIndex === -1) {
+      return res.status(404).json({ message: "Course not found in wishlist" });
+    }
+
+    // Remove the course from the wishlist
+    user.wishlistCourses.splice(courseIndex, 1);
+    await user.save();
+
+    res.status(200).json({
+      message: "Course removed from wishlist successfully",
+      wishlistCourses: user.wishlistCourses,
+    });
+  } catch (error) {
+    console.error("Error removing course from wishlist:", error);
+    res.status(500).json({ message: "Failed to remove course from wishlist", error: error.message });
+  }
+};
+
 exports.addCommentToCourse = async (req, res) => {
   const { courseId } = req.params;
   const { userId, name, comment, rating, } = req.body;

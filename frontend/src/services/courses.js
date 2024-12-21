@@ -1,7 +1,7 @@
 import axios from 'axios';
 import { checkLogin, fetchUserById } from "./users";
 
-const BASE_API_URL = 'https://job-portal-website-production.up.railway.app/api/';
+const BASE_API_URL = 'http://localhost:5000/api/';
 
 
 
@@ -15,6 +15,28 @@ export const enrollCourses = async (userId, courseIds) => {
     }
 };
 
+
+// Add course to wishlist
+export const addCourseToWishlist = async (userId, courseId) => {
+    try {
+        const response = await axios.post(`${BASE_API_URL}courses/wishlist/add`, { userId, courseId });
+        return response.data;
+    } catch (error) {
+        console.error('Error adding course to wishlist:', error.response?.data?.message || error.message);
+        throw error;
+    }
+};
+
+// Remove course from wishlist
+export const removeCourseFromWishlist = async (userId, courseId) => {
+    try {
+        const response = await axios.post(`${BASE_API_URL}courses/wishlist/remove`, { userId, courseId });
+        return response.data;
+    } catch (error) {
+        console.error('Error removing course from wishlist:', error.response?.data?.message || error.message);
+        throw error;
+    }
+};
 
 export const addCourse = async (courseData) => {
     try {

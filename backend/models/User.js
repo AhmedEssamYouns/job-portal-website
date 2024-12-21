@@ -15,6 +15,12 @@ const userSchema = new mongoose.Schema({
       ref: "Course",
     },
   ],
+  wishlistCourses: [
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Course",
+    },
+  ],
 });
 
 module.exports = mongoose.model('User', userSchema);
