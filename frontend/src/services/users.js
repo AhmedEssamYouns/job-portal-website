@@ -4,6 +4,25 @@ import axios from 'axios';
 const BASE_API_URL = 'https://job-portal-website-production.up.railway.app/api/';
 
 
+export const editProfile = async (userId, userData) => {
+  try {
+    const response = await axios.put(
+      `${BASE_API_URL}auth/${userId}`,
+      userData,
+      {
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${localStorage.getItem('token')}`,
+        },
+      }
+    );
+    return response.data; // Handle success
+  } catch (error) {
+    console.error('Error updating profile:', error);
+    throw new Error(error.response?.data?.message || 'Failed to update profile');
+  }
+};
+
 
 export const uploadProfileImage = async (userId, file) => {
     try {
