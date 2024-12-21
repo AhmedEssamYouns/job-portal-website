@@ -131,7 +131,7 @@ const CoursesList = ({ fetchType }) => {
       {courses.length === 0 ? (
         <Box textAlign="center" sx={{ marginTop: 4 }}>
           <Typography variant="h6" gutterBottom>
-            {fetchType === 'enrolled' ? 'No Enrolled Courses Yet!' : 'Start a New Course Today!'}
+            {fetchType === 'enrolled' ? 'No Enrolled Courses Yet!' : ''}
           </Typography>
           {fetchType === 'incompleted' && (
             <Button
