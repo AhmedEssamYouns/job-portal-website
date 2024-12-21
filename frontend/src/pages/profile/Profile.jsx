@@ -72,9 +72,8 @@ const UserProfile = () => {
   const handleEditSubmit = async () => {
     try {
       const updatedUser = await editProfile(CurrentUser.id, { username: newUsername, email: newEmail });
-      setUser(updatedUser);
-      setOpenEditDialog(false);  // Close the dialog
-      window.location.reload(); // Reload the page to reflect updated user data
+      setOpenEditDialog(false);  
+      window.location.reload(); 
     } catch (error) {
       setError('Failed to update profile.');
     }
