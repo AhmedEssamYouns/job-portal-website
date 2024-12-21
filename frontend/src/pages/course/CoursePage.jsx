@@ -8,7 +8,7 @@ const CoursesPage = () => {
             <Typography variant="h4" gutterBottom align="center">
                 Explore Our Courses
             </Typography>
-            <CoursesList fetchType="all" /> 
+            <CoursesList showprice={true} withFilter  withSort fetchType="all" /> 
         </Container>
     );
 };

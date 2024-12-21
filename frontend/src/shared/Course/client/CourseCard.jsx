@@ -48,7 +48,12 @@ const languageIcons = {
 const placeholderIconUrl =
   "https://assets.xcelpros.com/wp-content/uploads/2023/04/28141538/icm-icon-code.png";
 
-const CourseCard = ({ course, showRemoveButton = false, onRemove }) => {
+const CourseCard = ({
+  course,
+  showRemoveButton = false,
+  onRemove,
+  showprice = false,
+}) => {
   const [user, setUser] = useState(null);
   const [levelsCompleted, setLevelsCompleted] = useState(0);
   const [totalLevels, setTotalLevels] = useState(0);
@@ -116,7 +121,7 @@ const CourseCard = ({ course, showRemoveButton = false, onRemove }) => {
   const PlaceholderCard = () => (
     <Card
       sx={{
-        height: "220px",
+        height: "265px",
         display: "flex",
         flexDirection: "column",
         position: "relative",
@@ -154,7 +159,7 @@ const CourseCard = ({ course, showRemoveButton = false, onRemove }) => {
           sx={{
             width: "100%",
             maxWidth: "400px",
-            height: "220px",
+            height: "265px",
             display: "flex",
             marginTop: "10px",
             flexDirection: "column",
@@ -237,16 +242,39 @@ const CourseCard = ({ course, showRemoveButton = false, onRemove }) => {
             <Typography variant="body2" color="text.secondary">
               <strong>Language:</strong> {course.language}
             </Typography>
+            {course.price > 0 && (
+              <Box
+                sx={{
+                  width: "fit-content",
+                  mt: "5px",
+                  background: "gold",
+                  color: "black",
+                  padding: "2px 8px",
+                  borderRadius: "12px",
+                  fontSize: "0.75rem",
+                  fontWeight: "bold",
+                  boxShadow: "0 2px 5px rgba(0, 0, 0, 0.2)",
+                  textTransform: "uppercase",
+                }}
+              >
+                Premium
+              </Box>
+            )}
+            {showprice && course.price > 0 && (
+              <Typography pt="5px" variant="body2" color="text.secondary">
+                <strong>Price:</strong> ${course.price}
+              </Typography>
+            )}
           </CardContent>
           <CardActions
             sx={{
+              pb: "5px",
               justifyContent: "space-between",
-              mt: "2px",
               flexDirection: { xs: "column", md: "row" },
             }}
           >
             {levelsCompleted > 0 && (
-              <Box sx={{ mt: 1, width: "100%" }}>
+              <Box sx={{ width: "100%" }}>
                 <Typography
                   variant="body2"
                   color="text.secondary"

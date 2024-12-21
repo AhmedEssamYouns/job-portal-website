@@ -168,17 +168,17 @@ const UserProfile = () => {
           Your Courses
         </Typography>
 
-        <Grid container spacing={4}>
+        <Grid container spacing={2}>
           <Grid item xs={12}>
-            <CoursesList fetchType="incompleted" />
+            <CoursesList  fetchType="incompleted" />
           </Grid>
           {user.enrolledCourses.length > 0 && (
-              <Grid item xs={12}>
-                <CoursesList fetchType="enrolled" />
+              <Grid item xs={16}>
+                <CoursesList  fetchType="enrolled" />
               </Grid>
         )}
-          <Grid item xs={12}>
-            <CoursesList fetchType="completed" />
+          <Grid item xs={16}>
+            <CoursesList  fetchType="completed" />
           </Grid>
         </Grid>
 
