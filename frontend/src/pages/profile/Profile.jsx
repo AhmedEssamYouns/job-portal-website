@@ -172,24 +172,16 @@ const UserProfile = () => {
           <Grid item xs={12}>
             <CoursesList fetchType="incompleted" />
           </Grid>
+          {user.enrolledCourses.length > 0 && (
+              <Grid item xs={12}>
+                <CoursesList fetchType="enrolled" />
+              </Grid>
+        )}
           <Grid item xs={12}>
             <CoursesList fetchType="completed" />
           </Grid>
         </Grid>
 
-        {/* Show Enrollment Courses if the user has any */}
-        {user.enrolledCourses.length > 0 && (
-          <Box sx={{ marginTop: 4 }}>
-            <Typography variant="h4" gutterBottom align="center">
-              Your Enrollment Courses
-            </Typography>
-            <Grid container spacing={4}>
-              <Grid item xs={12}>
-                <CoursesList fetchType="enrolled" />
-              </Grid>
-            </Grid>
-          </Box>
-        )}
       </Box>
     </Box>
   );
