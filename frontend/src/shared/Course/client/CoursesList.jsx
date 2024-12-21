@@ -5,10 +5,12 @@ import { useFetchCourses, useFetchCoursesWithCompletionStatus, useFetchIncomplet
 import { useNavigate } from 'react-router-dom';
 import HourglassLoader from '../../Loaders/Components/Hamster';
 import { checkLogin } from '../../../services/users';
+import { useFetchUserById } from '../../../hooks/useAuth';
 
 const CoursesList = ({ fetchType }) => {
   const navigate = useNavigate();
   const user = checkLogin();
+  const { data: userData, isLoading: userLoading, isError: userError, error: userFetchError } = useFetchUserById(user?.id);
 
   // Fetch data from hooks
   const {
@@ -51,6 +53,14 @@ const CoursesList = ({ fetchType }) => {
       isLoading = isLoadingIncompleted;
       isError = isErrorIncompleted;
       error = errorIncompleted;
+      break;
+    case 'enrolled':
+      courses = allCourses.filter((course) =>
+        userData?.enrolledCourses?.includes(course._id)
+      );
+      isLoading = isLoadingAll || userLoading;
+      isError = isErrorAll || userError;
+      error = errorAll || userFetchError;
       break;
     default:
       courses = allCourses;
@@ -112,11 +122,16 @@ const CoursesList = ({ fetchType }) => {
           Completed Courses
         </Typography>
       )}
+      {fetchType === 'enrolled' && courses.length > 0 && (
+        <Typography variant="h5" gutterBottom align="center" sx={{ marginTop: 2 }}>
+          Enrolled Courses
+        </Typography>
+      )}
 
       {courses.length === 0 ? (
         <Box textAlign="center" sx={{ marginTop: 4 }}>
           <Typography variant="h6" gutterBottom>
-            {fetchType === 'incompleted' ? 'Start a New Course Today!' : ''}
+            {fetchType === 'enrolled' ? 'No Enrolled Courses Yet!' : 'Start a New Course Today!'}
           </Typography>
           {fetchType === 'incompleted' && (
             <Button

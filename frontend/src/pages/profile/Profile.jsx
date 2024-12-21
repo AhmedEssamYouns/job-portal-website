@@ -185,7 +185,7 @@ const UserProfile = () => {
             </Typography>
             <Grid container spacing={4}>
               <Grid item xs={12}>
-                <CoursesList fetchType="enrolled" courses={user.enrolledCourses} />
+                <CoursesList fetchType="enrolled" />
               </Grid>
             </Grid>
           </Box>
