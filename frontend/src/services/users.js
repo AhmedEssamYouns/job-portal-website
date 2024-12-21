@@ -1,6 +1,8 @@
+import { useQuery } from '@tanstack/react-query';
 import axios from 'axios';
 
-const BASE_API_URL = 'http://localhost:5000/api/';
+const BASE_API_URL = 'https://job-portal-website-production.up.railway.app/api/';
+
 
 
 
@@ -37,6 +39,15 @@ export const uploadProfileImage = async (userId, file) => {
     }
   };
 
+  export const useProfileImage = (imageId) => {
+    return useQuery({
+      queryKey: ['profileImage', imageId], 
+      queryFn: () => getProfileImage(imageId),
+      enabled: !!imageId,
+      refetchOnWindowFocus: false,
+    });
+  };
+  
 
   export const signup = async (userData) => {
     try {
