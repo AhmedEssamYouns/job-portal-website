@@ -103,14 +103,14 @@ const UserProfile = () => {
         }}
       >
         {avatarLoading ? (
-         <Box 
-         height="350px" 
-         display="flex" 
-         justifyContent="center" 
-         alignItems="center"
-       >
-         <CircularProgress color="secondary" />
-       </Box>
+          <Box 
+            height="350px" 
+            display="flex" 
+            justifyContent="center" 
+            alignItems="center"
+          >
+            <CircularProgress color="secondary" />
+          </Box>
         ) : (
           <Avatar
             src={user.avatar || 'https://th.bing.com/th/id/OIP.XmhhHP-RnTJSSDJsNshpUQHaHa?w=186&h=186&c=7&r=0&o=5&dpr=1.3&pid=1.7'}
@@ -176,6 +176,20 @@ const UserProfile = () => {
             <CoursesList fetchType="completed" />
           </Grid>
         </Grid>
+
+        {/* Show Enrollment Courses if the user has any */}
+        {user.enrolledCourses.length > 0 && (
+          <Box sx={{ marginTop: 4 }}>
+            <Typography variant="h4" gutterBottom align="center">
+              Your Enrollment Courses
+            </Typography>
+            <Grid container spacing={4}>
+              <Grid item xs={12}>
+                <CoursesList fetchType="enrolled" courses={user.enrolledCourses} />
+              </Grid>
+            </Grid>
+          </Box>
+        )}
       </Box>
     </Box>
   );
