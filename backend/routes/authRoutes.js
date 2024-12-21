@@ -1,5 +1,5 @@
 const express = require('express');
-const { signUp, signIn, getUserById, forgotPassword, verifyResetCode, resetPassword, setAdminStatus, changePassword ,uploadImage, getProfileImageById} = require('../controllers/authController');
+const { signUp, signIn, getUserById, forgotPassword, verifyResetCode, resetPassword, setAdminStatus, changePassword ,uploadImage, getProfileImageById, editUser} = require('../controllers/authController');
 const adminAuth = require('../middleware/adminAuth'); 
 const router = express.Router();
 const multer = require('multer');
@@ -17,6 +17,8 @@ router.put('/resetPassword', resetPassword);
 // POST route to upload image
 router.post('/:userId/profile-image', upload.single('profileImage'), uploadImage);
 router.get('/:id', getUserById);
+router.get('/:id', getUserById);
+router.put('/:userId', editUser);
 router.put('/changePassword', changePassword);
 router.get('/profile-image/:id', getProfileImageById);
 // Route to set user as admin (only accessible by admins)

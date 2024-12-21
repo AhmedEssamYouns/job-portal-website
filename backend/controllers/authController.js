@@ -49,6 +49,50 @@ const signUp = async (req, res) => {
     }
 };
 
+const editUser = async (req, res) => {
+  const { userId } = req.params; // User ID passed in the request URL
+  const { username, email } = req.body; // New username and email from the request body
+
+  // Email validation regex
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+  if (email && !emailRegex.test(email)) {
+      return res.status(400).json({ message: 'Invalid email format.' });
+  }
+
+  try {
+      // Check for username or email conflicts
+      if (username) {
+          const existingUserByUsername = await User.findOne({ username, _id: { $ne: userId } });
+          if (existingUserByUsername) {
+              return res.status(400).json({ message: 'Username already taken.' });
+          }
+      }
+
+      if (email) {
+          const existingUserByEmail = await User.findOne({ email, _id: { $ne: userId } });
+          if (existingUserByEmail) {
+              return res.status(400).json({ message: 'Email already signed up.' });
+          }
+      }
+
+      // Update the user
+      const updatedUser = await User.findByIdAndUpdate(
+          userId,
+          { username, email },
+          { new: true, runValidators: true } // Return updated document and run validation
+      );
+
+      if (!updatedUser) {
+          return res.status(404).json({ message: 'User not found.' });
+      }
+
+      res.status(200).json({ message: 'User updated successfully.', user: updatedUser });
+  } catch (error) {
+      res.status(500).json({ message: 'Server error.' });
+  }
+};
+
 
 
 // Sign In
@@ -512,4 +556,4 @@ const setAdminStatus = async (req, res) => {
   }
 };
 
-module.exports = { signUp, signIn,changePassword,uploadImage, addCompletedCourse, getUserById , forgotPassword ,getProfileImageById, verifyResetCode , resetPassword ,setAdminStatus};
+module.exports = { signUp, signIn,changePassword,uploadImage,editUser, addCompletedCourse, getUserById , forgotPassword ,getProfileImageById, verifyResetCode , resetPassword ,setAdminStatus};
