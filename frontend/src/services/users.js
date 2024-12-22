@@ -7,7 +7,7 @@ const BASE_API_URL = 'https://job-portal-website-production.up.railway.app/api/'
 export const editProfile = async (userId, userData) => {
   try {
     const response = await axios.put(
-      `${BASE_API_URL}editUser/auth/${userId}`,
+      `${BASE_API_URL}auth/editUser/${userId}`,
       userData,
       {
         headers: {
@@ -19,7 +19,7 @@ export const editProfile = async (userId, userData) => {
     return response.data; // Handle success
   } catch (error) {
     console.error('Error updating profile:', error);
-    throw new Error(error.response?.data?.message || 'Failed to update profile');
+    throw error;
   }
 };
 

@@ -75,7 +75,7 @@ const UserProfile = () => {
       setOpenEditDialog(false);  
       window.location.reload(); 
     } catch (error) {
-      setError('Failed to update profile.');
+      setError(error);
     }
   };
   
@@ -94,9 +94,9 @@ const UserProfile = () => {
     );
   }
 
-  if (error) {
-    return <SignIn />;
-  }
+  // if (error) {
+  //   return <SignIn />;
+  // }
 
   return (
     <Box
@@ -228,6 +228,7 @@ const UserProfile = () => {
             fullWidth
             margin="normal"
           />
+          {error && <Typography color="error">{error.response.data.message}</Typography>}
           <TextField
             label="Email"
             value={newEmail}
