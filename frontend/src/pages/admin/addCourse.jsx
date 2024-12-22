@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
     TextField, Button, Container, Typography, Box, Accordion, AccordionSummary, AccordionDetails,
     IconButton, Divider, CircularProgress, Snackbar, Alert
@@ -10,12 +10,18 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import { addCourse } from '../../services/courses';
 
 const AddCoursePage = () => {
-    const [courseData, setCourseData] = useState({
-        title: '',
-        description: '',
-        language: '',
-        levels: [],
+    const [courseData, setCourseData] = useState(() => {
+        // Load initial state from localStorage if available
+        const savedData = localStorage.getItem('courseData');
+        return savedData ? JSON.parse(savedData) : { title: '', description: '', language: '', levels: [] };
     });
+
+    // Save courseData to localStorage whenever it changes
+    useEffect(() => {
+        localStorage.setItem('courseData', JSON.stringify(courseData));
+    }, [courseData]);
+
+    
     const [newLevelTitle, setNewLevelTitle] = useState('');
     const [editing, setEditing] = useState({ type: null, levelIndex: null, slideIndex: null, sectionIndex: null });
     const [slideInputs, setSlideInputs] = useState({});
@@ -148,6 +154,10 @@ const AddCoursePage = () => {
         }));
     };
 
+    const handleClearStorage = () => {
+        localStorage.removeItem('courseData');
+    };
+
     const handleSubmit = async () => {
         setLoading(true);
         try {
@@ -155,12 +165,12 @@ const AddCoursePage = () => {
             setLoading(false);
             setAlert({ open: true, message: 'Course added successfully!', severity: 'success' });
             setCourseData({ title: '', description: '', language: '', levels: [] });
+            handleClearStorage(); 
         } catch (error) {
             setLoading(false);
             setAlert({ open: true, message: `Failed to add course: ${error.message}`, severity: 'error' });
         }
     };
-
     const handleCloseAlert = () => {
         setAlert({ ...alert, open: false });
     };
