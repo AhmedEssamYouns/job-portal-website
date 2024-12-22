@@ -167,7 +167,7 @@ const Navbar = () => {
               sx={{
                 color: theme.palette.common.white,
                 fontFamily: "Tiny5",
-                fontSize: isMobile ? "1.605rem" : "2.625rem",
+                fontSize: isMobile ? "1.305rem" : "2.625rem",
               }}
             >
               CodeQuest
@@ -416,7 +416,6 @@ const Navbar = () => {
               <IconButton color="inherit" component={Link} to="/courses">
                 <SchoolIcon />
               </IconButton>
-              {!isMobile && (
                 <IconButton color="inherit" component={Link} to="/cart">
                   <Badge
                     badgeContent={Total}
@@ -427,7 +426,6 @@ const Navbar = () => {
                     <ShoppingCartCheckoutOutlined color="inherit" />
                   </Badge>
                 </IconButton>
-              )}
               <IconButton color="inherit" component={Link} to="/profile">
                 <AccountCircleIcon />
               </IconButton>
