@@ -1,13 +1,13 @@
 import { useQuery } from '@tanstack/react-query';
 import axios from 'axios';
 
-const BASE_API_URL = 'https://job-portal-website-production.up.railway.app/api/';
+const BASE_API_URL = 'http://localhost:5000/api/';
 
 
 export const editProfile = async (userId, userData) => {
   try {
     const response = await axios.put(
-      `${BASE_API_URL}auth/${userId}`,
+      `${BASE_API_URL}editUser/auth/${userId}`,
       userData,
       {
         headers: {
@@ -97,21 +97,48 @@ export const login = async (userData) => {
     }
 };
 export const changePassword = async (currentPassword, newPassword) => {
-    try {
-      const response = await axios.put(
-        `${BASE_API_URL}auth/changePassword`, 
-        { currentPassword, newPassword },
-        { headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } }
-      );
-      return response.data;
-    } catch (error) {
-      console.error('Error before password:', error.response || error);  
-      if (error.response) {
-        throw new Error(error.response.data.message || 'An error occurred.');
-      }
-      throw new Error('An unknown error occurred.');
+  try {
+    console.log("Attempting to change password...");
+    console.log("Request Payload:", { currentPassword, newPassword });
+    const token = localStorage.getItem('token');
+    console.log("Token Retrieved:", token);
+
+    // Check if token is missing
+    if (!token) {
+      throw new Error("Authentication token is missing. Please log in again.");
     }
-  };
+
+    // Make the API request
+    const response = await axios.put(
+      `${BASE_API_URL}auth/changePassword`,
+      { currentPassword, newPassword },
+      { headers: { Authorization: `Bearer ${token}` } }
+    );
+
+    console.log("API Response:", response.data); // Log the successful response
+    return response.data;
+  } catch (error) {
+    console.error("Error in changePassword function:");
+    if (error.response) {
+      // Server responded with a status code outside the range of 2xx
+      console.error("Response Data:", error.response.data);
+      console.error("Response Status:", error.response.status);
+      console.error("Response Headers:", error.response.headers);
+
+      // Return a more user-friendly error message
+      throw new Error(error.response.data.message || "An error occurred.");
+    } else if (error.request) {
+      // Request was made, but no response received
+      console.error("Request Details:", error.request);
+      throw new Error("No response from the server. Please try again later.");
+    } else {
+      // Something else happened while setting up the request
+      console.error("Unexpected Error:", error.message);
+      throw new Error("An unexpected error occurred.");
+    }
+  }
+};
+
   
   
 export const forgotPassword = async (email) => {

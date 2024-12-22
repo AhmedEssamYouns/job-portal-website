@@ -45,7 +45,7 @@ const signUp = async (req, res) => {
                 : 'Email already signed up';
             return res.status(400).json({ message });
         }
-        res.status(500).json({ message: 'Server error' });
+        res.status(500).json({ message: 'Server error for edit' });
     }
 };
 
@@ -89,7 +89,7 @@ const editUser = async (req, res) => {
 
       res.status(200).json({ message: 'User updated successfully.', user: updatedUser });
   } catch (error) {
-      res.status(500).json({ message: 'Server error.' });
+      res.status(500).json({ message: 'Server error editprofile. ' });
   }
 };
 
@@ -128,14 +128,18 @@ const signIn = async (req, res) => {
     } catch (error) {
         res.status(500).json({ message: error.message });
     }
-};
-
-const changePassword = asyncWrapper(async (req, res, next) => {
+};const changePassword = asyncWrapper(async (req, res, next) => {
   try {
+    // Destructure current and new passwords from the request body
     const { currentPassword, newPassword } = req.body;
+
+    // Log incoming request data for debugging
+    console.log("Change Password Request Received");
+    console.log("Request Body:", { currentPassword, newPassword });
 
     // Ensure currentPassword and newPassword are provided
     if (!currentPassword || !newPassword) {
+      console.log("Validation Failed: Missing Password Fields");
       return res.status(400).json({
         status: "fail",
         message: "Current password and new password are required."
@@ -145,6 +149,7 @@ const changePassword = asyncWrapper(async (req, res, next) => {
     // Get token from Authorization header
     const token = req.headers.authorization?.split(" ")[1];
     if (!token) {
+      console.log("Validation Failed: Missing Authorization Token");
       return res.status(401).json({
         status: "fail",
         message: "Authorization token is required."
@@ -156,24 +161,48 @@ const changePassword = asyncWrapper(async (req, res, next) => {
     try {
       const decoded = jwt.verify(token, process.env.JWT_SECRET);
       userId = decoded.id;
+      console.log("Token Verified, User ID:", userId);
     } catch (err) {
+      console.error("Token Verification Failed:", err);
       return res.status(401).json({
         status: "fail",
         message: "Invalid or expired token."
       });
     }
 
-    // Find the user by ID
-    const user = await User.findById(userId);
+    // Find the user by ID in the database
+    let user;
+    try {
+      user = await User.findById(userId);
+    } catch (err) {
+      console.error("Database Error: Unable to find user by ID:", err);
+      return res.status(500).json({
+        status: "fail",
+        message: "Database error while retrieving user."
+      });
+    }
+
     if (!user) {
+      console.log("User Not Found for ID:", userId);
       return res.status(404).json({
         status: "fail",
         message: "User not found."
       });
     }
 
-    // Check if the current password matches
-    const isMatch = await bcrypt.compare(currentPassword, user.password);
+    // Check if the current password matches the user's stored password
+    let isMatch;
+    try {
+      isMatch = await bcrypt.compare(currentPassword, user.password);
+    } catch (err) {
+      console.error("Error comparing passwords:", err);
+      return res.status(500).json({
+        status: "fail",
+        message: "Error checking current password."
+      });
+    }
+
+    console.log("Password Match Check:", isMatch);
     if (!isMatch) {
       return res.status(400).json({
         status: "fail",
@@ -182,24 +211,46 @@ const changePassword = asyncWrapper(async (req, res, next) => {
     }
 
     // Hash the new password
-    const hashedPassword = await bcrypt.hash(newPassword, 12);
+    let hashedPassword;
+    try {
+      hashedPassword = await bcrypt.hash(newPassword, 12);
+    } catch (err) {
+      console.error("Error hashing new password:", err);
+      return res.status(500).json({
+        status: "fail",
+        message: "Error hashing new password."
+      });
+    }
 
     // Update user's password
-    user.password = hashedPassword;
-    await user.save();
+    try {
+      user.password = hashedPassword;
+      await user.save();
+      console.log("User Password Updated");
+    } catch (err) {
+      console.error("Error updating user password:", err);
+      return res.status(500).json({
+        status: "fail",
+        message: "Error saving new password to database."
+      });
+    }
 
+    // Send success response
     return res.status(200).json({
       status: "success",
       message: "Password has been changed successfully."
     });
   } catch (err) {
-    console.error("Error in changePassword:", err);
+    // General error handling
+    console.error("General Error in changePassword:", err);
     return res.status(500).json({
       status: "fail",
-      message: "An error occurred while changing the password."
+      message: "An error occurred while changing the password.",
+      error: err.message || "Unknown error"
     });
   }
 });
+
 const uploadImage = async (req, res) => {
   try {
     const bucket = getGridFSBucket();

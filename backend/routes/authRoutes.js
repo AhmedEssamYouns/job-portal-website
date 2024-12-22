@@ -18,7 +18,9 @@ router.put('/resetPassword', resetPassword);
 router.post('/:userId/profile-image', upload.single('profileImage'), uploadImage);
 router.get('/:id', getUserById);
 router.get('/:id', getUserById);
-router.put('/:userId', editUser);
+router.put('/editUser/:userId', editUser);
+
+
 router.put('/changePassword', changePassword);
 router.get('/profile-image/:id', getProfileImageById);
 // Route to set user as admin (only accessible by admins)

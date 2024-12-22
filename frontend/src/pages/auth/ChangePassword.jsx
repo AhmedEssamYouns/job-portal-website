@@ -5,10 +5,10 @@ import {
   Typography,
   Box,
   Card,
+  Alert,
   CardContent,
   Grid,
   useMediaQuery,
-  Alert,
   Snackbar,
   InputAdornment,
   IconButton,
@@ -18,7 +18,6 @@ import { useNavigate } from "react-router-dom";
 import { changePassword } from "../../services/users";
 import Visibility from "@mui/icons-material/Visibility";
 import VisibilityOff from "@mui/icons-material/VisibilityOff";
-
 const ChangePassword = () => {
   const [formData, setFormData] = useState({
     currentPassword: "",
@@ -80,6 +79,7 @@ const ChangePassword = () => {
         formData.currentPassword,
         formData.newPassword
       );
+      alert("Password changed successfully!");
       setSnackbarMessage(response.message || "Password changed successfully!");
       setOpenSnackbar(true);
       navigate("/");
