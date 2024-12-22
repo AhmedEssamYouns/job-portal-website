@@ -28,7 +28,7 @@ const CartPage = () => {
     }, []);
 
     const handleRemoveItem = (itemId) => {
-        const updatedCart = cartItems.filter((item) => item.id !== itemId);
+        const updatedCart = cartItems.filter((item) => item._id !== itemId);
         setCartItems(updatedCart);
         saveCartItems(updatedCart);
     };
@@ -116,7 +116,7 @@ const CartPage = () => {
                                             color="secondary"
                                             variant="outlined"
                                             startIcon={<DeleteIcon />}
-                                            onClick={() => handleRemoveItem(item.id)}
+                                            onClick={() => handleRemoveItem(item._id)}
                                         >
                                             Remove
                                         </Button>
