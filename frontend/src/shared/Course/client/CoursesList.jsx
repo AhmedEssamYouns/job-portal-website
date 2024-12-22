@@ -10,6 +10,7 @@ import {
   FormControl,
   InputLabel,
   TextField,
+  useMediaQuery,
 } from "@mui/material";
 import {
   useFetchCourses,
@@ -23,19 +24,28 @@ import { useFetchUserById } from "../../../hooks/useAuth";
 
 const CoursesList = ({
   fetchType,
+  onRemove,
   withFilter = false,
   withSort = false,
   showprice = false,
 }) => {
   const navigate = useNavigate();
   const user = checkLogin();
+  const [refetch, setRefetch] = useState(false);
+
   const {
     data: userData,
     isLoading: userLoading,
     isError: userError,
     error: userFetchError,
-  } = useFetchUserById(user?.id);
+  } = useFetchUserById(user?.id, { refetchInterval: refetch ? 0 : null });
 
+  const handleRemove = (courseId) => {
+    if (onRemove) {
+      onRemove(courseId);
+      setRefetch((prev) => !prev); // Toggle refetch state
+    }
+  };
   // Fetch data from hooks
   const {
     data: completedCourses = [],
@@ -86,6 +96,15 @@ const CoursesList = ({
       isError = isErrorAll || userError;
       error = errorAll || userFetchError;
       break;
+    case "wishlist":
+      courses = allCourses.filter((course) =>
+        userData?.wishlistCourses?.includes(course._id)
+      );
+      isLoading = isLoadingAll || userLoading;
+      isError = isErrorAll || userError;
+      error = errorAll || userFetchError;
+
+      break;
     default:
       courses = allCourses;
       isLoading = isLoadingAll;
@@ -98,7 +117,7 @@ const CoursesList = ({
   const [sort, setSort] = useState("none");
   const [minPrice, setMinPrice] = useState("");
   const [maxPrice, setMaxPrice] = useState("");
-
+  const isMobile = useMediaQuery("(max-width: 600px)");
   // Apply filter
   if (withFilter) {
     courses = courses.filter((course) => {
@@ -165,58 +184,66 @@ const CoursesList = ({
         <Box
           sx={{
             display: "flex",
-            justifyContent: "space-between",
+            justifyContent: isMobile ? "center" : "space-between",
             alignItems: "center",
             mb: 2,
             flexWrap: "wrap",
             gap: 2,
           }}
         >
+          <Box sx={{ display: "flex", gap: 1 }}>
+            {withFilter && (
+              <FormControl variant="outlined" sx={{ width: "130px" }}>
+                <InputLabel>Filter</InputLabel>
+                <Select
+                  value={filter}
+                  onChange={(e) => setFilter(e.target.value)}
+                  label="Filter"
+                >
+                  <MenuItem value="all">All</MenuItem>
+                  <MenuItem value="free">Free</MenuItem>
+                  <MenuItem value="premium">Premium</MenuItem>
+                </Select>
+              </FormControl>
+            )}
+            {withSort && (
+              <FormControl variant="outlined" sx={{ width: "130px" }}>
+                <InputLabel>Sort by</InputLabel>
+                <Select
+                  value={sort}
+                  onChange={(e) => setSort(e.target.value)}
+                  label="Sort by"
+                >
+                  <MenuItem value="none">None</MenuItem>
+                  <MenuItem value="low-to-high">Price: Low to High</MenuItem>
+                  <MenuItem value="high-to-low">Price: High to Low</MenuItem>
+                </Select>
+              </FormControl>
+            )}
+          </Box>
           {withFilter && (
-            <FormControl variant="outlined" size="small" sx={{ minWidth: 150 }}>
-              <InputLabel>Filter</InputLabel>
-              <Select
-                value={filter}
-                onChange={(e) => setFilter(e.target.value)}
-                label="Filter"
-              >
-                <MenuItem value="all">All</MenuItem>
-                <MenuItem value="free">Free</MenuItem>
-                <MenuItem value="premium">Premium</MenuItem>
-              </Select>
-            </FormControl>
-          )}
-          {withFilter && (
-            <Box sx={{ display: "flex", gap: 1 }}>
+            <Box
+              sx={{
+                display: "flex",
+                gap: 1,
+                justifyContent: { xs: "center", sm: "flex-start" },
+              }}
+            >
               <TextField
-                size="small"
+                sx={{ width: "130px" }}
                 label="Min Price"
                 type="number"
                 value={minPrice}
                 onChange={(e) => setMinPrice(e.target.value)}
               />
               <TextField
-                size="small"
+                sx={{ width: "130px" }}
                 label="Max Price"
                 type="number"
                 value={maxPrice}
                 onChange={(e) => setMaxPrice(e.target.value)}
               />
             </Box>
-          )}
-          {withSort && (
-            <FormControl variant="outlined" size="small" sx={{ minWidth: 150 }}>
-              <InputLabel>Sort by</InputLabel>
-              <Select
-                value={sort}
-                onChange={(e) => setSort(e.target.value)}
-                label="Sort by"
-              >
-                <MenuItem value="none">None</MenuItem>
-                <MenuItem value="low-to-high">Price: Low to High</MenuItem>
-                <MenuItem value="high-to-low">Price: High to Low</MenuItem>
-              </Select>
-            </FormControl>
           )}
         </Box>
       )}
@@ -230,13 +257,15 @@ const CoursesList = ({
           {fetchType === "completed" && "Completed Courses"}
           {fetchType === "incompleted" && "Current Learning Courses"}
           {fetchType === "enrolled" && "Enrolled Courses"}
+          {fetchType === "wishlist" && "My Wishlist"}
         </Typography>
       )}
 
       {courses.length === 0 ? (
         <Box textAlign="center" sx={{ marginTop: 4 }}>
           <Typography variant="h6" gutterBottom>
-            {fetchType === "enrolled" ? "No Enrolled Courses Yet!" : ""}
+            {fetchType === "enrolled" && "No Enrolled Courses Yet!"}
+            {fetchType === "wishlist" && "Your Wishlist is Empty!"}
           </Typography>
           {fetchType === "incompleted" && (
             <Button
@@ -270,7 +299,12 @@ const CoursesList = ({
         >
           {courses.map((course) => (
             <Grid item xs={12} sm={6} md={4} key={course._id}>
-              <CourseCard showprice={showprice}  course={course} />
+              <CourseCard
+                showprice={showprice}
+                showRemoveButton={onRemove}
+                onRemove={handleRemove}
+                course={course}
+              />
             </Grid>
           ))}
         </Grid>
