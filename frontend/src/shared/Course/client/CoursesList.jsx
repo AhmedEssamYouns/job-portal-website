@@ -247,19 +247,20 @@ const CoursesList = ({
           )}
         </Box>
       )}
-      {fetchType && filter === "all" && (
-        <Typography
-          variant="h5"
-          gutterBottom
-          align="center"
-          sx={{ marginTop: 2 }}
-        >
-          {fetchType === "completed" && "Completed Courses"}
-          {fetchType === "incompleted" && "Current Learning Courses"}
-          {fetchType === "enrolled" && "Enrolled Courses"}
-          {fetchType === "wishlist" && "My Wishlist"}
-        </Typography>
-      )}
+   {fetchType && filter === "all" && courses.length > 0 && (
+  <Typography
+    variant="h5"
+    gutterBottom
+    align="center"
+    sx={{ marginTop: 2 }}
+  >
+    {fetchType === "completed" && "Completed Courses"}
+    {fetchType === "incompleted" && "Current Learning Courses"}
+    {fetchType === "enrolled" && "Enrolled Courses"}
+    {fetchType === "wishlist" && "My Wishlist"}
+  </Typography>
+)}
+
 
       {courses.length === 0 ? (
         <Box textAlign="center" sx={{ marginTop: 4 }}>
