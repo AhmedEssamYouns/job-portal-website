@@ -77,7 +77,7 @@ const PaymentPage = () => {
           `Payment successful for total: $${totalPrice}!\n${enrollmentResponse.message}`
         );
 
-        cartItems.forEach((item) => removeCartItem(item.id));
+        cartItems.forEach((item) => removeCartItem(item._id));
         console.log("Cart items removed:", cartItems);
         navigate("/courses");
       } catch (error) {
@@ -107,7 +107,7 @@ const PaymentPage = () => {
                 borderBottom="1px solid #ddd"
                 paddingY={1}
               >
-                <Typography variant="body1">{item.title}</Typography>
+                <Typography variant="body1">{item._id}</Typography>
                 <Typography variant="body1">
                   ${item.price.toFixed(2)}
                 </Typography>

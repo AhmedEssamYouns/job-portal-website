@@ -487,7 +487,7 @@ const Navbar = () => {
           {user && (
             <MenuItem onClick={() => navigate("/cart")}>
               <ShoppingCart sx={{ marginRight: "10px" }} />
-              View cart {Total > 0 ? `(${Total})` : ""}
+              My cart {Total > 0 ? `(${Total})` : ""}
             </MenuItem>
           )}
           {user && (

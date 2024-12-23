@@ -4,7 +4,7 @@ export const getCartItemsLength = () => getCartItems().length;
 export const clearCartItems = () => localStorage.removeItem('cartItems');
 export const removeCartItem = (itemId) => {
     const cartItems = getCartItems();
-    const updatedCartItems = cartItems.filter(item => item.id !== itemId);
+    const updatedCartItems = cartItems.filter(item => item._id !== itemId);
     saveCartItems(updatedCartItems);
     return updatedCartItems; 
 };
