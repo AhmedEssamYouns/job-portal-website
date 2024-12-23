@@ -31,9 +31,11 @@ import { useTheme } from "@mui/material/styles";
 import { logout, checkLogin } from "../../services/users";
 import { fetchCourses } from "../../services/courses";
 import {
+  AssignmentTurnedIn,
   CardGiftcard,
   CardGiftcardRounded,
   CardGiftcardTwoTone,
+  MenuBook,
   ShoppingCartCheckoutOutlined,
 } from "@mui/icons-material";
 import { getCartItems, getCartItemsLength } from "../../utils/storage";
@@ -461,10 +463,10 @@ const Navbar = () => {
           onClick={handleDrawerClose}
           onKeyDown={handleDrawerClose}
           sx={{
-            padding: "20px", // Add padding inside the drawer
+            padding: "20px", 
             display: "flex",
             flexDirection: "column",
-            gap: "15px", // Add space between items
+            gap: isMobile ? "10px" : "15px",
           }}
         >
           <img
@@ -490,10 +492,24 @@ const Navbar = () => {
               My cart {Total > 0 ? `(${Total})` : ""}
             </MenuItem>
           )}
+
           {user && (
             <MenuItem onClick={() => navigate("/WishList")}>
               <Favorite sx={{ marginRight: "10px" }} />
               My Wishlist
+            </MenuItem>
+          )}
+
+          {user && (
+            <MenuItem onClick={() => navigate("/myCourses/incompleted")}>
+              <MenuBook sx={{ marginRight: "10px" }} />
+              In-Progress Courses
+            </MenuItem>
+          )}
+          {user && (
+            <MenuItem onClick={() => navigate("/myCourses/enrolled")}>
+              <AssignmentTurnedIn sx={{ marginRight: "10px" }} />
+              Enrolled Courses
             </MenuItem>
           )}
           <MenuItem onClick={toggleTheme}>

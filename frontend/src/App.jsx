@@ -33,6 +33,7 @@ import HourglassLoader from "./shared/Loaders/Components/Hamster";
 import ForgetPassword from "./pages/auth/ForgetPassword";
 import ChangePassword from "./pages/auth/ChangePassword";
 import WishList from "./pages/wishlist/wishlist";
+import MyCourse from "./pages/course/myCourses";
 const queryClient = new QueryClient();
 
 const App = () => {
@@ -103,6 +104,10 @@ const App = () => {
                   <Route
                     path="/profile"
                     element={isLoggedIn ? <UserProfile /> : <SignIn />}
+                  />
+                      <Route
+                    path="/myCourses/:fetchType"
+                    element={isLoggedIn ? <MyCourse /> : <SignIn />}
                   />
                   <Route
                     path="/changePassword"

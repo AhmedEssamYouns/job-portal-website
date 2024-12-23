@@ -9,12 +9,14 @@ import {
     Typography,
     Button,
     Box,
+    useMediaQuery,
 } from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
 import ClearAllIcon from '@mui/icons-material/ClearAll';
 import { getCartItems, saveCartItems, clearCartItems as clearCartUtil } from '../../../utils/storage';
 import { useTheme } from '@emotion/react';
+import { use } from 'react';
 
 
 const CartPage = () => {
@@ -38,6 +40,7 @@ const CartPage = () => {
         clearCartUtil();
     };
 
+    const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
     const handleCheckout = () => {
         navigate('/paymentpage', { state: cartItems });
     };
@@ -135,13 +138,17 @@ const CartPage = () => {
                             '&:hover': { boxShadow: 5 },
                             borderRadius: 2,
                             boxShadow: 2,
+                            gap: { xs: 3, sm: 2 },
                         }}
                     >
                         <Button
                             variant="contained"
                             color="error"
-                            startIcon={<ClearAllIcon />}
+                            startIcon={<ClearAllIcon fontSize={isMobile? '0.6rem' : '1rem'} />}
                             onClick={handleClearCart}
+                            sx={{
+                                fontSize: isMobile ? '0.6rem' : '1rem',
+                            }}
                         >
                             Clear Cart
                         </Button>
@@ -149,7 +156,9 @@ const CartPage = () => {
                             variant="contained"
                             color="primary"
                             onClick={handleCheckout}
-                            sx={{ fontWeight: 'bold' }}
+                            sx={{
+                                fontSize: isMobile ? '0.6rem' : '1rem',
+                            }}
                         >
                             Checkout
                         </Button>

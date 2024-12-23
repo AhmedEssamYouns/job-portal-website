@@ -107,7 +107,7 @@ const PaymentPage = () => {
                 borderBottom="1px solid #ddd"
                 paddingY={1}
               >
-                <Typography variant="body1">{item._id}</Typography>
+                <Typography variant="body1">{item.title}</Typography>
                 <Typography variant="body1">
                   ${item.price.toFixed(2)}
                 </Typography>

@@ -252,9 +252,6 @@ const UserProfile = () => {
           minHeight: "350px",
         }}
       >
-        <Typography variant="h4" gutterBottom align="center">
-          Your Courses
-        </Typography>
 
         <Grid container spacing={2}>
           <Grid item xs={12}>

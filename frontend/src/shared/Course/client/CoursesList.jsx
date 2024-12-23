@@ -31,6 +31,7 @@ const CoursesList = ({
   withFilter = false,
   withSort = false,
   showprice = false,
+  showPlaceholder = false,
 }) => {
   const navigate = useNavigate();
   const user = checkLogin();
@@ -338,38 +339,40 @@ const CoursesList = ({
         </Box>
       )}
       {(filter !== "all" || minPrice || maxPrice) && (
-  <Box
-    sx={{
-      display: "flex",
-      justifyContent: "space-between",
-      alignItems: "center",
-      mb: 2,
-      p: 2,
-      bgcolor: "background.paper",
-      borderRadius: "8px",
-      boxShadow: (theme) => theme.shadows[1],
-    }}
-  >
-    <Typography variant="body1" color="primary">
-      Filter Applied:{" "}
-      {filter !== "all" && filter !== "none" ? filter.charAt(0).toUpperCase() + filter.slice(1) : ""}
-      {minPrice && ` | Min Price: ${minPrice}`}
-      {maxPrice && ` | Max Price: ${maxPrice}`}
-    </Typography>
-    <Button
-      variant="outlined"
-      color="secondary"
-      size="small"
-      onClick={() => {
-        setFilter("all");
-        setMinPrice("");
-        setMaxPrice("");
-      }}
-    >
-      Tab to Remove
-    </Button>
-  </Box>
-)}
+        <Box
+          sx={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+            mb: 2,
+            p: 2,
+            bgcolor: "background.paper",
+            borderRadius: "8px",
+            boxShadow: (theme) => theme.shadows[1],
+          }}
+        >
+          <Typography variant="body1" color="primary">
+            Filter Applied:{" "}
+            {filter !== "all" && filter !== "none"
+              ? filter.charAt(0).toUpperCase() + filter.slice(1)
+              : ""}
+            {minPrice && ` | Min Price: ${minPrice}`}
+            {maxPrice && ` | Max Price: ${maxPrice}`}
+          </Typography>
+          <Button
+            variant="outlined"
+            color="secondary"
+            size="small"
+            onClick={() => {
+              setFilter("all");
+              setMinPrice("");
+              setMaxPrice("");
+            }}
+          >
+            Tab to Remove
+          </Button>
+        </Box>
+      )}
 
       {fetchType && filter === "all" && courses.length > 0 && (
         <Typography
@@ -388,31 +391,111 @@ const CoursesList = ({
       {courses.length === 0 ? (
         <Box textAlign="center" sx={{ marginTop: 4 }}>
           <Typography variant="h6" gutterBottom>
-            {fetchType === "enrolled" && "No Enrolled Courses Yet!"}
+            {fetchType === "enrolled" && (
+              <>
+                <Typography
+                  variant="h4"
+                  sx={{
+                    textAlign: "center",
+                    color: "text.secondary",
+                    fontWeight: "bold",
+                    mt: 2,
+                    mb: 4,
+                  }}
+                >
+                  No Enrolled Courses Yet!
+                </Typography>
+                <Button
+                  variant="contained"
+                  color="primary"
+                  onClick={() => navigate("/courses")}
+                  sx={{
+                    animation: "bounce 1.5s infinite",
+                    "@keyframes bounce": {
+                      "0%, 20%, 50%, 80%, 100%": { transform: "translateY(0)" },
+                      "40%": { transform: "translateY(-10px)" },
+                      "60%": { transform: "translateY(-5px)" },
+                    },
+                    mt: 2,
+                    px: 3,
+                    py: 1,
+                    borderRadius: "20px",
+                    fontWeight: "bold",
+                    boxShadow: (theme) => theme.shadows[4],
+                  }}
+                >
+                  Browse Courses
+                </Button>
+                {showPlaceholder && (
+                  <div
+                    style={{
+                      display: "flex",
+                      justifyContent: "center",
+                      marginTop: "20px",
+                    }}
+                  >
+                    <img
+                      src={require("../../../assets/imgs/image.png")}
+                      alt="Placeholder"
+                      style={{ width: "300px" }}
+                    />
+                  </div>
+                )}
+              </>
+            )}
             {fetchType === "wishlist" && "Your Wishlist is Empty!"}
           </Typography>
           {fetchType === "incompleted" && (
-            <Button
-              variant="contained"
-              color="primary"
-              onClick={() => navigate("/courses")}
-              sx={{
-                animation: "bounce 1.5s infinite",
-                "@keyframes bounce": {
-                  "0%, 20%, 50%, 80%, 100%": { transform: "translateY(0)" },
-                  "40%": { transform: "translateY(-10px)" },
-                  "60%": { transform: "translateY(-5px)" },
-                },
-                mt: 2,
-                px: 3,
-                py: 1,
-                borderRadius: "20px",
-                fontWeight: "bold",
-                boxShadow: (theme) => theme.shadows[4],
-              }}
-            >
-              Browse Courses
-            </Button>
+            <>
+              <Typography
+                variant="h4"
+                sx={{
+                  textAlign: "center",
+                  color: "text.secondary",
+                  fontWeight: "bold",
+                  mt: 2,
+                  mb: 4,
+                }}
+              >
+                You have no active courses.
+              </Typography>
+              <Button
+                variant="contained"
+                color="primary"
+                onClick={() => navigate("/courses")}
+                sx={{
+                  animation: "bounce 1.5s infinite",
+                  "@keyframes bounce": {
+                    "0%, 20%, 50%, 80%, 100%": { transform: "translateY(0)" },
+                    "40%": { transform: "translateY(-10px)" },
+                    "60%": { transform: "translateY(-5px)" },
+                  },
+                  mt: 2,
+                  px: 3,
+                  py: 1,
+                  borderRadius: "20px",
+                  fontWeight: "bold",
+                  boxShadow: (theme) => theme.shadows[4],
+                }}
+              >
+                Browse Courses
+              </Button>
+              {showPlaceholder && (
+                <div
+                  style={{
+                    display: "flex",
+                    justifyContent: "center",
+                    marginTop: "20px",
+                  }}
+                >
+                  <img
+                    src={require("../../../assets/imgs/image.png")}
+                    alt="Placeholder"
+                    style={{ width: "300px" }}
+                  />
+                </div>
+              )}
+            </>
           )}
         </Box>
       ) : (
