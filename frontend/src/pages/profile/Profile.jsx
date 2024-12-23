@@ -1,15 +1,36 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState } from "react";
 import {
-  Box, Typography, Avatar, Paper, useTheme, Button, Grid, CircularProgress, TextField, Dialog, DialogActions, DialogContent, DialogTitle, IconButton
-} from '@mui/material';
-import { fetchUserById, checkLogin, useProfileImage } from '../../services/users';
-import { uploadProfileImage, getProfileImage, editProfile } from '../../services/users';
-import CoursesList from '../../shared/Course/client/CoursesList';
-import CheckCircleIcon from '@mui/icons-material/CheckCircle';
-import HourglassLoader from '../../shared/Loaders/Components/Hamster';
-import SignIn from '../auth/SignIn';
-import { useFetchUserById } from '../../hooks/useAuth';
-import EditIcon from '@mui/icons-material/Edit';
+  Box,
+  Typography,
+  Avatar,
+  Paper,
+  useTheme,
+  Button,
+  Grid,
+  CircularProgress,
+  TextField,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
+  IconButton,
+} from "@mui/material";
+import {
+  fetchUserById,
+  checkLogin,
+  useProfileImage,
+} from "../../services/users";
+import {
+  uploadProfileImage,
+  getProfileImage,
+  editProfile,
+} from "../../services/users";
+import CoursesList from "../../shared/Course/client/CoursesList";
+import CheckCircleIcon from "@mui/icons-material/CheckCircle";
+import HourglassLoader from "../../shared/Loaders/Components/Hamster";
+import SignIn from "../auth/SignIn";
+import { useFetchUserById } from "../../hooks/useAuth";
+import EditIcon from "@mui/icons-material/Edit";
 
 const UserProfile = () => {
   const [user, setUser] = useState(null);
@@ -17,15 +38,25 @@ const UserProfile = () => {
   const [error, setError] = useState(null);
   const [avatarLoading, setAvatarLoading] = useState(false);
   const [openEditDialog, setOpenEditDialog] = useState(false);
-  const [newUsername, setNewUsername] = useState('');
-  const [newEmail, setNewEmail] = useState('');
-  
+  const [newUsername, setNewUsername] = useState("");
+  const [newEmail, setNewEmail] = useState("");
+
   const CurrentUser = checkLogin();
   const theme = useTheme();
-  const { data: userData, isLoading: userLoading, isError: userError, error: userFetchError } = useFetchUserById(CurrentUser?.id);
+  const {
+    data: userData,
+    isLoading: userLoading,
+    isError: userError,
+    error: userFetchError,
+  } = useFetchUserById(CurrentUser?.id);
 
   // Fetch profile image if user has one
-  const { data: imageUrl, isLoading: imageLoading, isError: imageError, error: imageFetchError } = useProfileImage(userData?.profileImage);
+  const {
+    data: imageUrl,
+    isLoading: imageLoading,
+    isError: imageError,
+    error: imageFetchError,
+  } = useProfileImage(userData?.profileImage);
 
   // Combine user data and image once both are fetched
   React.useEffect(() => {
@@ -51,7 +82,7 @@ const UserProfile = () => {
         const imageSrc = await getProfileImage(response.user.profileImage);
         setUser((prevUser) => ({ ...prevUser, avatar: imageSrc }));
       } catch (err) {
-        console.error('Error uploading image:', err);
+        console.error("Error uploading image:", err);
       } finally {
         setAvatarLoading(false);
       }
@@ -71,22 +102,32 @@ const UserProfile = () => {
 
   const handleEditSubmit = async () => {
     try {
-      const updatedUser = await editProfile(CurrentUser.id, { username: newUsername, email: newEmail });
-      setOpenEditDialog(false);  
-      window.location.reload(); 
+      const updatedUser = await editProfile(CurrentUser.id, {
+        username: newUsername,
+        email: newEmail,
+      });
+
+      setUser((prevUser) => ({
+        ...prevUser,
+        username: newUsername,
+        email: newEmail,
+      }));
+
+      setOpenEditDialog(false);
+      setError(null);
     } catch (error) {
       setError(error);
     }
   };
-  
+
   if (loading || imageLoading || userLoading) {
     return (
       <Box
         sx={{
-          display: 'flex',
-          justifyContent: 'center',
-          alignItems: 'center',
-          height: '100vh',
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          height: "100vh",
         }}
       >
         <HourglassLoader />
@@ -101,8 +142,8 @@ const UserProfile = () => {
   return (
     <Box
       sx={{
-        display: 'flex',
-        flexDirection: { xs: 'column', sm: 'row' },
+        display: "flex",
+        flexDirection: { xs: "column", sm: "row" },
         gap: 4,
         padding: { xs: 2, sm: 10 },
         paddingRight: { xs: 2, sm: 20 },
@@ -115,37 +156,41 @@ const UserProfile = () => {
         sx={{
           padding: 3,
           borderRadius: 2,
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
           flex: 1,
-          background: theme.palette.mode === 'light'
-            ? 'linear-gradient(135deg, #1976d2, #42a5f5)'
-            : 'linear-gradient(135deg, #0d47a1, #1565c0)',
+          background:
+            theme.palette.mode === "light"
+              ? "linear-gradient(135deg, #1976d2, #42a5f5)"
+              : "linear-gradient(135deg, #0d47a1, #1565c0)",
           color: theme.palette.common.white,
-          textAlign: 'center',
-          maxWidth: '400px',
-          maxHeight: '350px',
+          textAlign: "center",
+          maxWidth: "400px",
+          maxHeight: "350px",
         }}
       >
         {avatarLoading ? (
-          <Box 
-            height="350px" 
-            display="flex" 
-            justifyContent="center" 
+          <Box
+            height="350px"
+            display="flex"
+            justifyContent="center"
             alignItems="center"
           >
             <CircularProgress color="secondary" />
           </Box>
         ) : (
           <Avatar
-            src={user.avatar || 'https://th.bing.com/th/id/OIP.XmhhHP-RnTJSSDJsNshpUQHaHa?w=186&h=186&c=7&r=0&o=5&dpr=1.3&pid=1.7'}
+            src={
+              user.avatar ||
+              "https://th.bing.com/th/id/OIP.XmhhHP-RnTJSSDJsNshpUQHaHa?w=186&h=186&c=7&r=0&o=5&dpr=1.3&pid=1.7"
+            }
             alt={user.name}
             sx={{
               width: 120,
               height: 120,
               marginBottom: 2,
-              border: '2px solid #ffffff',
+              border: "2px solid #ffffff",
             }}
           />
         )}
@@ -155,19 +200,27 @@ const UserProfile = () => {
         <Typography variant="body2" sx={{ mb: 1 }}>
           @{user.username}
         </Typography>
-        
+
         {/* Edit Icon Button */}
-        <IconButton onClick={handleEditDialogOpen} color="inherit" >
-          <Typography>Edit Account info</Typography><EditIcon />
+        <IconButton onClick={handleEditDialogOpen} color="inherit">
+          <Typography>Edit Account info</Typography>
+          <EditIcon />
         </IconButton>
 
-        <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', marginTop: 1 }}>
+        <Box
+          sx={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            marginTop: 1,
+          }}
+        >
           {user.completedCourses.length > 0 && (
             <>
               <Typography variant="body2" sx={{ marginRight: 1 }}>
                 {user.completedCourses.length} Completed Courses
               </Typography>
-              <CheckCircleIcon sx={{ color: 'limegreen' }} />
+              <CheckCircleIcon sx={{ color: "limegreen" }} />
             </>
           )}
         </Box>
@@ -175,7 +228,7 @@ const UserProfile = () => {
         {/* Upload Image */}
         <input
           accept="image/*"
-          style={{ display: 'none' }}
+          style={{ display: "none" }}
           id="icon-button-file"
           type="file"
           onChange={handleImageUpload}
@@ -192,10 +245,11 @@ const UserProfile = () => {
           flex: 1,
           padding: { xs: 2, sm: 2 },
           marginLeft: { sm: 2 },
-          backgroundColor: theme.palette.mode === 'light' ? '#f0f0f0' : '#0a0a0a',
+          backgroundColor:
+            theme.palette.mode === "light" ? "#f0f0f0" : "#0a0a0a",
           borderRadius: 2,
           boxShadow: 3,
-          minHeight: '350px',
+          minHeight: "350px",
         }}
       >
         <Typography variant="h4" gutterBottom align="center">
@@ -218,7 +272,11 @@ const UserProfile = () => {
       </Box>
 
       {/* Edit Profile Dialog */}
-      <Dialog open={openEditDialog} onClose={handleEditDialogClose}>
+      <Dialog
+        open={openEditDialog}
+        onClose={handleEditDialogClose}
+        sx={{ "& .MuiDialog-paper": { width: "600px", maxWidth: "80%" } }} // Customize width
+      >
         <DialogTitle>Edit Profile</DialogTitle>
         <DialogContent>
           <TextField
@@ -228,7 +286,12 @@ const UserProfile = () => {
             fullWidth
             margin="normal"
           />
-          {error && <Typography color="error">{error.response.data.message}</Typography>}
+          <Typography
+            color="error"
+            sx={{ minHeight: "24px", visibility: error ? "visible" : "hidden" }}
+          >
+            {error?.response?.data?.message || ""}
+          </Typography>
           <TextField
             label="Email"
             value={newEmail}
