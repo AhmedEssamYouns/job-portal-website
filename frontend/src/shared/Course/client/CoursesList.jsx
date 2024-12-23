@@ -11,7 +11,10 @@ import {
   InputLabel,
   TextField,
   useMediaQuery,
+  Drawer,
+  IconButton,
 } from "@mui/material";
+import FilterListIcon from "@mui/icons-material/FilterList";
 import {
   useFetchCourses,
   useFetchCoursesWithCompletionStatus,
@@ -113,6 +116,7 @@ const CoursesList = ({
   }
 
   // State for filter, sort, and custom price range
+  const [drawerOpen, setDrawerOpen] = useState(false);
   const [filter, setFilter] = useState("all");
   const [sort, setSort] = useState("none");
   const [minPrice, setMinPrice] = useState("");
@@ -180,7 +184,87 @@ const CoursesList = ({
 
   return (
     <Box>
-      {(withFilter || withSort) && (
+      {withFilter && isMobile && (
+        <Box sx={{ display: "flex", justifyContent: "flex-end", mb: 2 }}>
+          <IconButton
+            color="primary"
+            onClick={() => setDrawerOpen(true)}
+            size={isMobile ? "large" : "medium"}
+          >
+            <Typography variant="body1">Filter Courses </Typography>
+            <FilterListIcon />
+          </IconButton>
+        </Box>
+      )}
+ <Drawer
+  anchor={isMobile ? "bottom" : "left"}
+  variant="temporary"
+  open={drawerOpen}
+  onClose={() => setDrawerOpen(false)}
+>
+  <Box
+    sx={{
+      width: isMobile ? "100%" : 250,
+      p: 2,
+      display: "flex",
+      flexDirection: "column",
+      justifyContent: "center",
+      alignItems: "center",
+      height: "100%",
+    }}
+  >
+    {withFilter && isMobile && (
+      <FormControl fullWidth margin="normal">
+        <InputLabel>Filter</InputLabel>
+        <Select
+          value={filter}
+          onChange={(e) => setFilter(e.target.value)}
+          label="Filter"
+        >
+          <MenuItem value="all">All</MenuItem>
+          <MenuItem value="free">Free</MenuItem>
+          <MenuItem value="premium">Premium</MenuItem>
+        </Select>
+      </FormControl>
+    )}
+    {withSort && (
+      <FormControl fullWidth margin="normal">
+        <InputLabel>Sort by</InputLabel>
+        <Select
+          value={sort}
+          onChange={(e) => setSort(e.target.value)}
+          label="Sort by"
+        >
+          <MenuItem value="none">None</MenuItem>
+          <MenuItem value="low-to-high">Price: Low to High</MenuItem>
+          <MenuItem value="high-to-low">Price: High to Low</MenuItem>
+        </Select>
+      </FormControl>
+    )}
+    {withFilter && (
+      <>
+        <TextField
+          fullWidth
+          label="Min Price"
+          type="number"
+          value={minPrice}
+          onChange={(e) => setMinPrice(e.target.value)}
+          margin="normal"
+        />
+        <TextField
+          fullWidth
+          label="Max Price"
+          type="number"
+          value={maxPrice}
+          onChange={(e) => setMaxPrice(e.target.value)}
+          margin="normal"
+        />
+      </>
+    )}
+  </Box>
+</Drawer>
+
+      {(withFilter || withSort) && !isMobile && (
         <Box
           sx={{
             display: "flex",
@@ -247,20 +331,19 @@ const CoursesList = ({
           )}
         </Box>
       )}
-   {fetchType && filter === "all" && courses.length > 0 && (
-  <Typography
-    variant="h5"
-    gutterBottom
-    align="center"
-    sx={{ marginTop: 2 }}
-  >
-    {fetchType === "completed" && "Completed Courses"}
-    {fetchType === "incompleted" && "Current Learning Courses"}
-    {fetchType === "enrolled" && "Enrolled Courses"}
-    {fetchType === "wishlist" && "My Wishlist"}
-  </Typography>
-)}
-
+      {fetchType && filter === "all" && courses.length > 0 && (
+        <Typography
+          variant="h5"
+          gutterBottom
+          align="center"
+          sx={{ marginTop: 2 }}
+        >
+          {fetchType === "completed" && "Completed Courses"}
+          {fetchType === "incompleted" && "Current Learning Courses"}
+          {fetchType === "enrolled" && "Enrolled Courses"}
+          {fetchType === "wishlist" && "My Wishlist"}
+        </Typography>
+      )}
 
       {courses.length === 0 ? (
         <Box textAlign="center" sx={{ marginTop: 4 }}>
