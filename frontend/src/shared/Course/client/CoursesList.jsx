@@ -185,7 +185,7 @@ const CoursesList = ({
   return (
     <Box>
       {withFilter && isMobile && (
-        <Box sx={{ display: "flex", justifyContent: "flex-end", mb: 2 }}>
+        <Box sx={{ display: "flex", justifyContent: "flex-end" }}>
           <IconButton
             color="primary"
             onClick={() => setDrawerOpen(true)}
@@ -337,6 +337,40 @@ const CoursesList = ({
           )}
         </Box>
       )}
+      {(filter !== "all" || minPrice || maxPrice) && (
+  <Box
+    sx={{
+      display: "flex",
+      justifyContent: "space-between",
+      alignItems: "center",
+      mb: 2,
+      p: 2,
+      bgcolor: "background.paper",
+      borderRadius: "8px",
+      boxShadow: (theme) => theme.shadows[1],
+    }}
+  >
+    <Typography variant="body1" color="primary">
+      Filter Applied:{" "}
+      {filter !== "all" && filter !== "none" ? filter.charAt(0).toUpperCase() + filter.slice(1) : ""}
+      {minPrice && ` | Min Price: ${minPrice}`}
+      {maxPrice && ` | Max Price: ${maxPrice}`}
+    </Typography>
+    <Button
+      variant="outlined"
+      color="secondary"
+      size="small"
+      onClick={() => {
+        setFilter("all");
+        setMinPrice("");
+        setMaxPrice("");
+      }}
+    >
+      Tab to Remove
+    </Button>
+  </Box>
+)}
+
       {fetchType && filter === "all" && courses.length > 0 && (
         <Typography
           variant="h5"
