@@ -15,6 +15,8 @@ import {
   ListItem,
   ListItemText,
   Badge,
+  Drawer,
+  Divider,
 } from "@mui/material";
 import { Link, useNavigate } from "react-router-dom";
 import WbSunnyIcon from "@mui/icons-material/WbSunny";
@@ -35,7 +37,14 @@ import {
   ShoppingCartCheckoutOutlined,
 } from "@mui/icons-material";
 import { getCartItems, getCartItemsLength } from "../../utils/storage";
-
+import {
+  AccountCircle,
+  ShoppingCart,
+  Favorite,
+  Brightness6,
+  Lock,
+  ExitToApp,
+} from "@mui/icons-material";
 const Navbar = () => {
   const { toggleTheme } = useThemeContext();
   const user = checkLogin();
@@ -55,14 +64,14 @@ const Navbar = () => {
     // Set interval to update the cart length every 500ms
     const intervalId = setInterval(() => {
       const currentCartLength = getCartItemsLength();
-      setCartLength(currentCartLength);  // Update the state with the current cart length
+      setCartLength(currentCartLength); // Update the state with the current cart length
     }, 500);
 
     // Cleanup the interval when the component unmounts
     return () => {
       clearInterval(intervalId);
     };
-  }, []); 
+  }, []);
 
   const navigate = useNavigate();
 
@@ -87,13 +96,10 @@ const Navbar = () => {
     }
   }, [searchQuery, courses]);
 
-  const handleMenuClick = (event) => {
-    setAnchorEl(event.currentTarget);
-  };
+  const [openDrawer, setOpenDrawer] = useState(false);
 
-  const handleClose = () => {
-    setAnchorEl(null);
-  };
+  const handleDrawerClose = () => setOpenDrawer(false);
+  const handleDrawerOpen = () => setOpenDrawer(true);
 
   const handleSearchSubmit = (event) => {
     if (event.key === "Enter") {
@@ -416,60 +422,101 @@ const Navbar = () => {
               <IconButton color="inherit" component={Link} to="/courses">
                 <SchoolIcon />
               </IconButton>
-                <IconButton color="inherit" component={Link} to="/cart">
-                  <Badge
-                    badgeContent={Total}
-                    color="error"
-                    invisible={Total === 0}
-                    sx={{ "& .MuiBadge-dot": { top: 10, right: 10 } }}
-                  >
-                    <ShoppingCartCheckoutOutlined color="inherit" />
-                  </Badge>
-                </IconButton>
+              <IconButton color="inherit" component={Link} to="/cart">
+                <Badge
+                  badgeContent={Total}
+                  color="error"
+                  invisible={Total === 0}
+                  sx={{ "& .MuiBadge-dot": { top: 10, right: 10 } }}
+                >
+                  <ShoppingCartCheckoutOutlined color="inherit" />
+                </Badge>
+              </IconButton>
               <IconButton color="inherit" component={Link} to="/profile">
                 <AccountCircleIcon />
               </IconButton>
-              <IconButton color="inherit" onClick={handleMenuClick}>
+              <IconButton color="inherit" onClick={handleDrawerOpen}>
                 <MenuIcon />
               </IconButton>
             </>
           )}
         </Box>
       </Toolbar>
-
-      <Popover
-        id={id}
-        open={open}
-        anchorEl={anchorEl}
-        onClose={handleClose}
-        anchorOrigin={{
-          vertical: "bottom",
-          horizontal: "left",
-        }}
-        transformOrigin={{
-          vertical: "top",
-          horizontal: "left",
+      <Drawer
+        anchor="right"
+        open={openDrawer}
+        onClose={handleDrawerClose}
+        sx={{
+          width: 250, // Set drawer width
+          flexShrink: 0,
+          "& .MuiDrawer-paper": {
+            width: 250, // Width for the paper inside the drawer
+            backgroundColor: "background.paper", // Background color of the drawer
+            borderRadius: "10px 0 0 10px", // Add border radius for rounded corners on the left
+          },
         }}
       >
-        {user && isMobile && (
-          <MenuItem onClick={() => navigate("/cart")}>
-            view cart {Total > 0 ? `(${Total})` : ""}
+        <Box
+          role="presentation"
+          onClick={handleDrawerClose}
+          onKeyDown={handleDrawerClose}
+          sx={{
+            padding: "20px", // Add padding inside the drawer
+            display: "flex",
+            flexDirection: "column",
+            gap: "15px", // Add space between items
+          }}
+        >
+          <img
+            src={require("./image.png")}
+            alt="logo"
+            style={{
+              width: "150px",
+              height: "auto",
+              display: "block",
+              margin: "0 auto",
+            }}
+          />
+
+          {user && (
+            <MenuItem onClick={() => navigate("/profile")}>
+              <AccountCircle sx={{ marginRight: "10px" }} />
+              My Profile
+            </MenuItem>
+          )}
+          {user && (
+            <MenuItem onClick={() => navigate("/cart")}>
+              <ShoppingCart sx={{ marginRight: "10px" }} />
+              View cart {Total > 0 ? `(${Total})` : ""}
+            </MenuItem>
+          )}
+          {user && (
+            <MenuItem onClick={() => navigate("/WishList")}>
+              <Favorite sx={{ marginRight: "10px" }} />
+              My Wishlist
+            </MenuItem>
+          )}
+          <MenuItem onClick={toggleTheme}>
+            <Brightness6 sx={{ marginRight: "10px" }} />
+            Change Theme
           </MenuItem>
-        )}
-           {user && (
-          <MenuItem onClick={() => navigate("/WishList")}>
-            my wishlist
-          </MenuItem>
-        )}
-        <MenuItem onClick={toggleTheme}>Change Theme</MenuItem>
-        {user && (
-          <MenuItem onClick={() => navigate("/changePassword")}>
-            change password
-          </MenuItem>
-        )}
-      
-        {user && <MenuItem onClick={handleLogout}>Logout</MenuItem>}
-      </Popover>
+          {user && (
+            <MenuItem onClick={() => navigate("/changePassword")}>
+              <Lock sx={{ marginRight: "10px" }} />
+              Change Password
+            </MenuItem>
+          )}
+
+          <Divider sx={{ marginTop: "20px" }} />
+
+          {user && (
+            <MenuItem onClick={handleLogout}>
+              <ExitToApp sx={{ marginRight: "10px" }} />
+              Logout
+            </MenuItem>
+          )}
+        </Box>
+      </Drawer>
     </AppBar>
   );
 };
