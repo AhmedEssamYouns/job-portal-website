@@ -2,7 +2,7 @@ import axios from 'axios';
 import { refreshAccessToken } from './users';
 
 const axiosInstance = axios.create({
-  baseURL: 'https://job-portal-website-production.up.railway.app/api/',
+  baseURL: 'http://localhost:5000/api/',
   headers: {
     'Content-Type': 'application/json',
   },
