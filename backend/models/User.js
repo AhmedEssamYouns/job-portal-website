@@ -9,6 +9,7 @@ const userSchema = new mongoose.Schema({
   passwordResetVerified: { type: Boolean, default: false },
   isAdmin: { type: Boolean, default: false },
   profileImage: { type: String, default: null }, 
+  refreshToken: { type: String } ,
   enrolledCourses: [
     {
       type: mongoose.Schema.Types.ObjectId,

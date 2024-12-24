@@ -289,6 +289,8 @@ const ForgetPassword = () => {
                               style: { textAlign: "center", fontSize: "18px",padding:"5px" },
                             }}
                             required
+                            type="number"
+                            inputMode="numeric"
                             variant="outlined"
                             fullWidth
                           />

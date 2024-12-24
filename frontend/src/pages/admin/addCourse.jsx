@@ -206,6 +206,18 @@ const AddCoursePage = () => {
                     onChange={handleInputChange}
                     margin="normal"
                 />
+                  <TextField
+                    required
+                    fullWidth
+                    label="price"
+                    name="price"
+                    value={courseData.price}
+                    onChange={handleInputChange}
+                    margin="normal"
+                    type='number'
+                    inputMode="numeric"
+
+                />
 
                 <Box mt={3}>
                     <Typography variant="h6">Levels</Typography>

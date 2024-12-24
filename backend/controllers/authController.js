@@ -96,6 +96,7 @@ const editUser = async (req, res) => {
 
 
 // Sign In
+
 const signIn = async (req, res) => {
     const { email, password } = req.body;
 
@@ -110,25 +111,70 @@ const signIn = async (req, res) => {
             return res.status(400).json({ message: 'Invalid email or password' });
         }
 
-        // Generate token
-        const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: '1h' });
+        // Generate access token
+        const accessToken = jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: '15m' });
+
+        // Generate refresh token
+        const refreshToken = jwt.sign({ id: user._id }, process.env.JWT_REFRESH_SECRET, { expiresIn: '7d' });
+
+        // Store the refresh token in the database
+        user.refreshToken = refreshToken;
+        await user.save();
 
         // Exclude password from user data
         const { password: _, ...userData } = user.toObject();
 
         res.json({
             message: "Login successful",
-            token,
+            accessToken,
+            refreshToken,
             username: userData.username,
             email: userData.email,
             userId: userData._id,
             avatar: userData.avatar
-
         });
     } catch (error) {
         res.status(500).json({ message: error.message });
     }
-};const changePassword = asyncWrapper(async (req, res, next) => {
+};
+
+
+const refreshAccessToken = async (req, res) => {
+  const { refreshToken } = req.body;
+
+  if (!refreshToken) {
+      return res.status(400).json({ message: 'Refresh token is required' });
+  }
+
+  try {
+      // Verify the refresh token
+      const decoded = jwt.verify(refreshToken, process.env.JWT_REFRESH_SECRET);
+
+      // Find the user and validate the refresh token
+      const user = await User.findById(decoded.id);
+      if (!user || user.refreshToken !== refreshToken) {
+          return res.status(403).json({ message: 'Invalid refresh token' });
+      }
+
+      // Generate a new access token
+      const newAccessToken = jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: '15m' });
+
+      // Optionally, generate a new refresh token
+      const newRefreshToken = jwt.sign({ id: user._id }, process.env.JWT_REFRESH_SECRET, { expiresIn: '7d' });
+      user.refreshToken = newRefreshToken;
+      await user.save();
+
+      res.json({
+          accessToken: newAccessToken,
+          refreshToken: newRefreshToken
+      });
+  } catch (error) {
+      res.status(403).json({ message: 'Invalid or expired refresh token' });
+  }
+};
+
+
+const changePassword = asyncWrapper(async (req, res, next) => {
   try {
     // Destructure current and new passwords from the request body
     const { currentPassword, newPassword } = req.body;
@@ -607,4 +653,4 @@ const setAdminStatus = async (req, res) => {
   }
 };
 
-module.exports = { signUp, signIn,changePassword,uploadImage,editUser, addCompletedCourse, getUserById , forgotPassword ,getProfileImageById, verifyResetCode , resetPassword ,setAdminStatus};
+module.exports = { signUp, signIn,changePassword,uploadImage,editUser, refreshAccessToken,addCompletedCourse, getUserById , forgotPassword ,getProfileImageById, verifyResetCode , resetPassword ,setAdminStatus};
